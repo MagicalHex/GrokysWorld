@@ -1,0 +1,80 @@
+.edit-grid { 
+  display: grid; 
+  gap: 0; 
+  margin: 0 auto; 
+  justify-content: center;
+}
+
+.play-grid {
+  display: grid;
+  gap: 0;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.tile { 
+  border: 1px solid transparent;
+  position: relative; /* Positioning context for .object and .player */
+}
+
+.tile.selected { 
+  box-shadow: 0 0 8px #fff, 0 0 16px #fff !important; 
+  transform: scale(1.05);
+}
+
+.modal { 
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 15px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.modal input {
+  width: 200px;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.object {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 35px;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  animation: float 3s ease-in-out infinite;
+}
+
+.player {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  animation: float 3s ease-in-out infinite;
+}
+
+.examples {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.play-mode {
+  padding: 40px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-3px); }
+}
