@@ -3,6 +3,7 @@ import { OBJECTS } from './Objects';
 import { TERRAINS } from './Terrains';
 import './EditWorld.css';
 import './Terrains.css';
+import './Objects.css';
 
 const EditWorld = ({
   grid,

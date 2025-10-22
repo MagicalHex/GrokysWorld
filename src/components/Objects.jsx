@@ -18,8 +18,12 @@ export const OBJECTS = {
   worm: '🐛',
   rat: '🐀',
   skeleton: '☠️',
+  skeletonboss: '💀',
   goblin: '👹',
   orc: '🧌',
+  spider: '🕷',
+  spider1: '🕷️',
+  bat: '🦇',
   // ITEMS
   ball: '⚽',
   item: '⭐',
@@ -28,7 +32,23 @@ export const OBJECTS = {
   // NPCs
   agent: '🟣',
   npc: '🔵',
+  prince: '🤴',
   merchant: '🧙‍♂️',
+  // JEWELRY
+  diamond: '💎',
+  // OBSTACLES
+  spiderweb: '🕸️',
+  fireobject: '🔥',
+  woodobject: '🪵',
+  treeobject: '🌳',
+  mountainobject: '⛰️',
   // GOALS
   goal: '🎯',
+  'portal-to-1': '🌀',  // To Level 1
+  'portal-to-2': '🌀',  // To Level 2
+  'portal-to-3': '🌀',  // To Level 3
+  'portal-to-4': '🌀',  // To Level 4
+  'portal-to-5': '🌀',  // To Level 5
+  ladder: '🪜',
+  castle: '🏰',
 };

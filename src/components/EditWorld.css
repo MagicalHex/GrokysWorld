@@ -18,8 +18,10 @@
 }
 
 .tile.selected { 
-  box-shadow: 0 0 8px #fff, 0 0 16px #fff !important; 
+  box-shadow: 0 0 8px #fff, 0 0 16px #c6ff00 !important; /* important makes it place above tile, otherwise backround becomes black */
   transform: scale(1.05);
+  border: 1px solid #c6ff00;
+  border-radius: 20px;
 }
 
 .modal { 

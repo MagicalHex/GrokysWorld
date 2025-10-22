@@ -1,0 +1,174 @@
+/* Objects.css - Individual styling for EVERY object */
+.object {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+}
+
+/* === HEROES === */
+.object.player { 
+  font-size: 35px; 
+  animation: hero-glow 2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 4px #4CAF50);
+}
+.object.knight { 
+  font-size: 32px; 
+  animation: metallic-shine 1.5s ease-in-out infinite;
+}
+.object.warrior { 
+  font-size: 30px; 
+  animation: pulse 2s ease-in-out infinite;
+}
+.object.archer { 
+  font-size: 28px; 
+  animation: sway 3s ease-in-out infinite;
+}
+
+/* === WEAPONS === */
+.object.sword, .object.axe, .object.dagger, .object.bow, .object.staff {
+  font-size: 24px;
+  animation: weapon-glint 2s ease-in-out infinite;
+}
+.object.sword { filter: drop-shadow(0 0 3px #C0C0C0); }
+.object.axe { filter: drop-shadow(0 0 3px #8B4513); }
+.object.dagger { filter: drop-shadow(0 0 2px #FFD700); }
+.object.bow { animation: bow-bounce 1.5s ease-in-out infinite; }
+.object.staff { filter: drop-shadow(0 0 4px #00BFFF); }
+
+/* === ARMOR === */
+.object.armor, .object.helmet, .object.shield {
+  font-size: 26px;
+  animation: armor-shine 3s ease-in-out infinite;
+}
+.object.armor { filter: drop-shadow(0 0 3px #4682B4); }
+.object.helmet { animation: helmet-bob 2s ease-in-out infinite; }
+.object.shield { filter: drop-shadow(0 0 4px #4169E1); }
+
+/* === ENEMIES === */
+.object.worm { 
+  font-size: 20px; 
+  animation: worm-wiggle 1s ease-in-out infinite;
+}
+.object.rat { 
+  font-size: 22px; 
+  animation: rat-scurry 0.8s ease-in-out infinite;
+}
+.object.skeleton { 
+  font-size: 50px; 
+  animation: skeleton-rattle 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px #FF9800);
+}
+.object.skeletonboss { 
+  font-size: 36px; 
+  animation: boss-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #FF0000);
+}
+.object.goblin { 
+  font-size: 28px; 
+  animation: goblin-hop 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px #32CD32);
+}
+.object.orc { 
+  font-size: 34px; 
+  animation: orc-stomp 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px #8B0000);
+}
+.object.spider { 
+  font-size: 26px; 
+  animation: spider-crawl 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px #8B008B);
+}
+/* === ITEMS === */
+.object.ball { 
+  font-size: 25px; 
+  animation: bounce 1s ease-in-out infinite;
+}
+.object.item { 
+  font-size: 20px; 
+  animation: sparkle 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px #FFD700);
+}
+.object.potion { 
+  font-size: 22px; 
+  animation: potion-bubble 2s ease-in-out infinite;
+}
+.object.gold { 
+  font-size: 18px; 
+  animation: coin-spin 2s linear infinite;
+}
+
+/* === NPCs === */
+.object.agent { 
+  font-size: 24px; 
+  animation: agent-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px #9932CC);
+}
+.object.npc { 
+  font-size: 26px; 
+  animation: npc-bob 2.5s ease-in-out infinite;
+}
+.object.merchant { 
+  font-size: 30px; 
+  animation: merchant-wave 4s ease-in-out infinite;
+}
+
+/* === GOALS === */
+.object.goal { 
+  font-size: 28px; 
+  animation: goal-glow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px #FF4500);
+}
+/* .object['portal-to-1'],
+.object['portal-to-2'],
+.object['portal-to-3'],
+.object['portal-to-4'],
+.object['portal-to-5'] { 
+  font-size: 32px; 
+  animation: portal-swirl 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #00FFFF);
+} */
+.object.ladder { 
+  font-size: 26px; 
+  animation: ladder-climb 2s ease-in-out infinite;
+}
+
+/* === ANIMATIONS === */
+@keyframes hero-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px #4CAF50); }
+  50% { filter: drop-shadow(0 0 8px #4CAF50); }
+}
+@keyframes metallic-shine {
+  0%, 100% { filter: drop-shadow(0 0 2px #C0C0C0); }
+  50% { filter: drop-shadow(0 0 6px #C0C0C0); }
+}
+@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.05); } }
+@keyframes sway { 0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); } 50% { transform: translate(-50%, -50%) rotate(5deg); } }
+@keyframes weapon-glint { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes bow-bounce { 0%, 100% { transform: translate(-50%, -50%) scaleY(1); } 50% { transform: translate(-50%, -50%) scaleY(0.9); } }
+@keyframes armor-shine { 0%, 100% { filter: drop-shadow(0 0 2px #4682B4); } 50% { filter: drop-shadow(0 0 5px #4682B4); } }
+@keyframes helmet-bob { 0%, 100% { transform: translate(-50%, -50%) translateY(0px); } 50% { transform: translate(-50%, -50%) translateY(-2px); } }
+@keyframes worm-wiggle { 0%, 100% { transform: translate(-50%, -50%) rotate(0deg); } 25% { transform: translate(-50%, -50%) rotate(10deg); } 75% { transform: translate(-50%, -50%) rotate(-10deg); } }
+@keyframes rat-scurry { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(0.9); } }
+@keyframes skeleton-rattle { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 25% { transform: translate(-50%, -50%) scale(1.02); } 75% { transform: translate(-50%, -50%) scale(0.98); } }
+@keyframes boss-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } }
+@keyframes goblin-hop { 0%, 100% { transform: translate(-50%, -50%) translateY(0px); } 50% { transform: translate(-50%, -50%) translateY(-3px); } }
+@keyframes orc-stomp { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.03); } }
+@keyframes spider-crawl {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  25% { transform: translate(-50%, -50%) rotate(5deg); }
+  75% { transform: translate(-50%, -50%) rotate(-5deg); }
+}
+@keyframes bounce { 0%, 100% { transform: translate(-50%, -50%) translateY(0px); } 50% { transform: translate(-50%, -50%) translateY(-4px); } }
+@keyframes sparkle { 0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.2); } }
+@keyframes potion-bubble { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.05); } }
+@keyframes coin-spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes agent-pulse { 0%, 100% { filter: drop-shadow(0 0 4px #9932CC); } 50% { filter: drop-shadow(0 0 8px #9932CC); } }
+@keyframes npc-bob { 0%, 100% { transform: translate(-50%, -50%) translateY(0px); } 50% { transform: translate(-50%, -50%) translateY(-2px); } }
+@keyframes merchant-wave { 0%, 100% { transform: translate(-50%, -50%) rotate(0deg); } 25% { transform: translate(-50%, -50%) rotate(5deg); } }
+@keyframes goal-glow { 0%, 100% { filter: drop-shadow(0 0 5px #FF4500); } 50% { filter: drop-shadow(0 0 10px #FF4500); } }
+@keyframes portal-swirl { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); } 100% { transform: translate(-50%, -50%) rotate(360deg) scale(1.1); } }
+@keyframes ladder-climb { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
