@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { useMonsterHealths } from './hooks/useMonsterHealths';
+// REMOVE: import { useMonsterHealths } from './hooks/useMonsterHealths';
 
 const MonsterMovement = ({
   objects,
@@ -7,10 +7,10 @@ const MonsterMovement = ({
   onObjectsChange,
   restrictedTiles,
   rows,
-  columns
+  columns,
+  monsterHealths,  // ✅ RECEIVE FROM PROPS
+  setMonsterHealths  // ✅ RECEIVE FROM PROPS
 }) => {
-  const [monsterHealths] = useMonsterHealths(objects);
-
   const distance = (pos1, pos2) => {
     return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
   };
@@ -55,32 +55,34 @@ const MonsterMovement = ({
     return bestMove;
   }, [playerPos, objects, restrictedTiles, rows, columns]);
 
-  useEffect(() => {
+ useEffect(() => {
     const interval = setInterval(() => {
-      // STEP 1: SNAPSHOT ALL MONSTERS
+      // STEP 1: SNAPSHOT ALL MONSTERS (with health check)
       const monsters = [];
       Object.keys(objects).forEach(key => {
         const type = objects[key];
         if (type === 'skeleton' || type === 'spider') {
           const [x, y] = key.split(',').map(Number);
-          monsters.push({ key, type, x, y });
+          const health = monsterHealths[key] ?? 100;  // ✅ SAFE DEFAULT
+          if (health > 0) {  // ✅ ALIVE MONSTERS ONLY
+            monsters.push({ key, type, x, y, health });
+          }
         }
       });
 
       // STEP 2: CALCULATE ALL MOVES
-      let moves = monsters.map(({ key, type, x, y }) => {
+      let moves = monsters.map(({ key, type, x, y, health }) => {
         const bestMove = getBestMove(x, y, type);
-        return { from: key, type, to: bestMove };
+        return { from: key, type, to: bestMove, health };
       }).filter(move => move.to);
 
-      // ✅ STEP 3: COLLISION DETECTION & RESOLUTION!
+      // STEP 3: COLLISION DETECTION & RESOLUTION!
       const targetCounts = {};
       moves.forEach(move => {
         const toKey = `${move.to.x},${move.to.y}`;
         targetCounts[toKey] = (targetCounts[toKey] || 0) + 1;
       });
 
-      // FILTER COLLISIONS: Keep only first monster per tile
       moves = moves.filter(move => {
         const toKey = `${move.to.x},${move.to.y}`;
         return targetCounts[toKey] === 1;  // Only if NO collision
@@ -88,22 +90,33 @@ const MonsterMovement = ({
 
       if (moves.length === 0) return;
 
-      // STEP 4: ONE STATE UPDATE - NO EATING!
+      // STEP 4: CARRY HEALTH + UPDATE
+      const newHealths = { ...monsterHealths };
       const newObjects = { ...objects };
       
-      moves.forEach(({ from, type, to }) => {
-        delete newObjects[from];
+      moves.forEach(({ from, type, to, health }) => {
         const toKey = `${to.x},${to.y}`;
+        
+        // ✅ CARRY HEALTH TO NEW TILE FIRST
+        delete newHealths[from];
+        newHealths[toKey] = health;
+        
+        // Then move object
+        delete newObjects[from];
         newObjects[toKey] = type;
       });
-
+      
+      // ✅ UPDATE HEALTH STATE (shared!)
+      setMonsterHealths(newHealths);
+      
+      // ✅ UPDATE OBJECTS
       onObjectsChange(newObjects);
       
-      console.log(`🎮 ANTI-EAT: ${moves.length} monsters moved safely!`, moves);
+      console.log(`🎮 Monsters moved: ${moves.length}`);
     }, 500);
     
     return () => clearInterval(interval);
-  }, [getBestMove, objects, onObjectsChange]);
+  }, [getBestMove, objects, onObjectsChange, monsterHealths, setMonsterHealths]);
 
   return null;
 };

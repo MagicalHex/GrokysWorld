@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
+import CombatSystem from './CombatSystem';
 import { useMonsterHealths } from './hooks/useMonsterHealths';
 import HealthBar from './HealthBar';
 import './EditWorld.css';
@@ -25,7 +26,15 @@ const PlayMode = ({
 }) => {
   // ✅ FIXED: Make playerHealth mutable again
   const [playerHealth, setPlayerHealth] = useState(100);
-  const [monsterHealths] = useMonsterHealths(objects);
+// ✅ NEW: Initialize monster health from initial objects (no hook!)
+  const initialMonsterHealths = {};
+  Object.keys(objects).forEach(key => {
+    const type = objects[key];
+    if (type === 'skeleton' || type === 'spider') {
+      initialMonsterHealths[key] = 100;
+    }
+  });
+  const [monsterHealths, setMonsterHealths] = useState(initialMonsterHealths);
 
   useEffect(() => {
     console.log(`*** LEVEL CHANGED! PlayMode Level ${level} | Player at (${playerPos?.x || '?'}, ${playerPos?.y || '?'}) | Grid: ${grid[0][0]} terrain`);
@@ -52,6 +61,18 @@ const PlayMode = ({
         restrictedTiles={restrictedTiles}
         rows={rows}
         columns={columns}
+monsterHealths={monsterHealths}  // ✅ PASS SHARED STATE!
+        setMonsterHealths={setMonsterHealths}  // ✅ PASS SETTER!
+      />
+{/* ✅ NEW COMBAT SYSTEM */}
+      <CombatSystem
+        playerPos={playerPos}
+        playerHealth={playerHealth}
+        setPlayerHealth={setPlayerHealth}
+        objects={objects}
+        monsterHealths={monsterHealths}
+        setMonsterHealths={setMonsterHealths}
+        onObjectsChange={onObjectsChange}
       />
 
       {/* UI - ✅ PLAYER HEALTH BAR RESTORED */}
