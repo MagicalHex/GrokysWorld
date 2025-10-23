@@ -61,10 +61,10 @@ const PlayMode = ({
         restrictedTiles={restrictedTiles}
         rows={rows}
         columns={columns}
-monsterHealths={monsterHealths}  // ✅ PASS SHARED STATE!
+        monsterHealths={monsterHealths}  // ✅ PASS SHARED STATE!
         setMonsterHealths={setMonsterHealths}  // ✅ PASS SETTER!
       />
-{/* ✅ NEW COMBAT SYSTEM */}
+      {/* ✅ NEW COMBAT SYSTEM */}
       <CombatSystem
         playerPos={playerPos}
         playerHealth={playerHealth}
@@ -84,7 +84,7 @@ monsterHealths={monsterHealths}  // ✅ PASS SHARED STATE!
       </div>
       <button onClick={onExit}>Edit Mode</button>
       
-<div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
+      <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
         {grid.map((row, y) =>
           row.map((terrain, x) => {
             const key = `${x},${y}`;

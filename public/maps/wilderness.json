@@ -1,0 +1,24 @@
+{
+  "name": "Dark Wilderness", 
+  "grid": [
+    ["tree", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass"],
+    ["grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush"],
+    ["bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass"],
+    ["grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree"],
+    ["tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass"],
+    ["grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush"],
+    ["bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass"],
+    ["grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree"],
+    ["tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass"],
+    ["grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush"],
+    ["bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass"],
+    ["grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree"],
+    ["tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass"],
+    ["grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush"],
+    ["bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass"],
+    ["grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree", "grass", "bush", "grass", "tree"]
+  ],
+  "objects": {
+    "10,8": "campfire"
+  }
+}

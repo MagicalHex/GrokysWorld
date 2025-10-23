@@ -1,0 +1,24 @@
+{
+  "name": "Sunny Beach",
+  "grid": [
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "water"],
+    ["water", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "water"],
+    ["water", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "water"],
+    ["water", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "water"],
+    ["water", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "water"],
+    ["water", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "water"],
+    ["water", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "water"],
+    ["water", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "water"],
+    ["water", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "water"],
+    ["water", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "water"],
+    ["water", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "water"],
+    ["water", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "sand", "palm", "sand", "sand", "water"],
+    ["water", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "water"]
+  ],
+  "objects": {
+    "12,5": "beach-chair"
+  }
+}

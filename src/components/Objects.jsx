@@ -34,6 +34,7 @@ export const OBJECTS = {
   npc: '🔵',
   prince: '🤴',
   merchant: '🧙‍♂️',
+  farmer: '🧑‍🌾',
   // JEWELRY
   diamond: '💎',
   // OBSTACLES
@@ -42,6 +43,8 @@ export const OBJECTS = {
   woodobject: '🪵',
   treeobject: '🌳',
   mountainobject: '⛰️',
+  cactus: '🌵',
+  rockobject: '🪨',
   // GOALS
   goal: '🎯',
   'portal-to-1': '🌀',  // To Level 1

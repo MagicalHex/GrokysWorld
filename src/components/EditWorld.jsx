@@ -122,7 +122,7 @@ const handleCommand = (cmd) => {
                 onClick={() => handleTileClick(x, y)}
               >
                 {obj && (
-                  <div className="object">
+                  <div className={`object ${obj}`}>
                     {OBJECTS[obj]}
                   </div>
                 )}

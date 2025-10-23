@@ -1,5 +1,7 @@
 export const TERRAINS = {
+  // BASE
   grass: '#28a745',
+  grassnowalk: '#28a745',
   sand: '#ffc107',
   water: '#17a2b8',
   mountain: '#6c757d',
@@ -11,4 +13,15 @@ export const TERRAINS = {
   darkstone: 'white',
   'stone pillar': 'white',
   railway: 'brown',
+  // STRUCTURES
+  timberwall: '#28a745',
+  
+  // ✅ PATHS (camelCase)
+  grasspathup: '#28a745',
+  grasspathside: '#28a745',
+  grasspathdown: '#28a745',
+  sandPathUp: '#ffc107',
+  sandPathSide: '#ffc107',
+  sandPathDown: '#ffc107',
+  waterPath: '#17a2b8',
 };

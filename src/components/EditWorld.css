@@ -22,6 +22,7 @@
   transform: scale(1.05);
   border: 1px solid #c6ff00;
   border-radius: 20px;
+  z-index: 10;
 }
 
 .modal { 
@@ -42,7 +43,7 @@
   font-size: 16px;
 }
 
-.object {
+/* .object {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -52,8 +53,8 @@
   z-index: 10;
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
   animation: float 3s ease-in-out infinite;
-}
-
+} */
+/* THIS IS THE SORCERER PLAYER */
 .player {
   position: absolute;
   top: 50%;
@@ -64,6 +65,7 @@
   z-index: 10;
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
   animation: float 3s ease-in-out infinite;
+  z-index: 20;
 }
 
 .examples {

@@ -1,7 +1,19 @@
 /* 🌱 GRASS - Lush green fade */
 .tile.grass {
   background: linear-gradient(to right, darkgreen 0%, green 50%, #006400 100%);
-  box-shadow: inset 0 0px 10px #209d3d78;
+  box-shadow: inset 0 0px 5px #209d3d78;
+}
+.tile.grassnowalk {
+  background: linear-gradient(to right, darkgreen 0%, green 50%, #006400 100%);
+  box-shadow: inset 0 0px 5px #209d3d78;
+}
+.tile.grasspathup {
+  background: linear-gradient(to right, green 0%, #008000a6 30%, darkgreen 35%, darkgreen 65%, #008000a6 70%, green 100%);
+  box-shadow: inset 0 0px 5px #209d3d78;
+}
+.tile.grasspathside {
+  background: linear-gradient(to top, green 0%, #008000a6 30%, darkgreen 35%, darkgreen 65%, #008000a6 70%, green 100%);
+  box-shadow: inset 0 0px 5px #209d3d78;
 }
 
 /* 🏜️ SAND - Warm desert glow */
