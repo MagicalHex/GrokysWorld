@@ -106,7 +106,7 @@ useEffect(() => {
     const newRestricted = new Set();
     newGrid.forEach((row, y) => {
       row.forEach((terrain, x) => {
-        if (['stone', 'darkstone', 'stonepillar', 'grassnowalk'].includes(terrain)) {
+        if (['stone', 'darkstone', 'stonepillar', 'grassnowalk', 'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'].includes(terrain)) {
           newRestricted.add(`${x},${y}`);
         }
       });

@@ -42,6 +42,7 @@ export const OBJECTS = {
   fireobject: '🔥',
   woodobject: '🪵',
   treeobject: '🌳',
+  darktreeobject: '🌳',
   mountainobject: '⛰️',
   cactus: '🌵',
   rockobject: '🪨',

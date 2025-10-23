@@ -124,7 +124,13 @@
   font-size: 100px; 
   top: -50%;
 }
-
+.object.darktreeobject {
+  font-size: 100px;
+  top: -50%;
+  color: #00640087;
+  /* background: black; */
+  text-shadow: 0px 0px 10px black;
+}
 /* === GOALS === */
 .object.goal { 
   font-size: 28px; 

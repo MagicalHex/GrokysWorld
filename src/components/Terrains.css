@@ -3,12 +3,28 @@
   background: linear-gradient(to right, darkgreen 0%, green 50%, #006400 100%);
   box-shadow: inset 0 0px 5px #209d3d78;
 }
+.tile.darkgrass {
+background: linear-gradient(to right, #026802 0%, #006400 50%, #006800 100%);
+  box-shadow: inset 0 0px 1px #00800059;
+}
+.tile.lightgrass {
+  background: linear-gradient(to right, #00a100 0%, /* #026802 +30 */ #009400 50%, /* #006400 +30 */ #009f01 100% /* #006800 +30 */);
+  box-shadow: inset 0 0px 1px #00800059;
+}
 .tile.grassnowalk {
   background: linear-gradient(to right, darkgreen 0%, green 50%, #006400 100%);
   box-shadow: inset 0 0px 5px #209d3d78;
 }
 .tile.grasspathup {
   background: linear-gradient(to right, green 0%, #008000a6 30%, darkgreen 35%, darkgreen 65%, #008000a6 70%, green 100%);
+  box-shadow: inset 0 0px 5px #209d3d78;
+}
+.tile.grasspathcornerright {
+  background: linear-gradient(to bottom right, green 0%, #008000a6 30%, darkgreen 35%, darkgreen 65%, #008000a6 70%, green 100%);
+  box-shadow: inset 0 0px 5px #209d3d78;
+}
+.tile.grasspathcornerleft {
+  background: linear-gradient(to bottom left, green 0%, #008000a6 30%, darkgreen 35%, darkgreen 65%, #008000a6 70%, green 100%);
   box-shadow: inset 0 0px 5px #209d3d78;
 }
 .tile.grasspathside {
@@ -70,7 +86,91 @@
   );
   box-shadow: inset 0 0px 1px #708090;
 }
+/* .tile.timberwall {
+    background: linear-gradient(to right, 
+        #2C5530 0%,
+        #228B22 30%,
+        #6c360f 35%,
+        #6c360f 65%,
+        #6c360f 70%,
+        #228B22 100% 
+    );
+} */
+/* .tile.timberwall {
+      background: linear-gradient(to right, #2C5530 0%, #228B22 30%, #8B4513 35%, #8B4513 65%, #8B4513 70%, #228B22 100%);
+} */
+ .tile.timberwallup {
+    background: linear-gradient(to right, 
+        darkgreen 0%,      /* FLAT Green start */
+        #228B22 35%,     /* FLAT Green block */
+        #8B4513 35%,     /* 3D Brown start */
+        #A0522D 50%,     /* LIGHTER Brown (highlight) */
+        #654321 65%,     /* DARKER Brown (shadow) */
+        #8B4513 70%,     /* 3D Brown end */
+        #228B22 70%,     /* FLAT Green end */
+        darkgreen 100%     /* FLAT Green */
+    );
+}
+.tile.timberwallcornerleft {
+  background: linear-gradient(to bottom left, 
+    #2C5530 0%,      /* Dark green - TOP edge */
+    #228B22 15%,     /* FLAT Green - TIGHTER block */
+    #8B4513 15%,     /* 3D Brown start */
+    #A0522D 15%,     /* LIGHTER Brown (highlight) */
+    #654321 20%,     /* DARKER Brown (shadow) */
+    #8B4513 30%,     /* 3D Brown end */
+    #228b22fc 35%,     /* FLAT Green */
+    #006009  100%     /* Dark green - RIGHT edge */
+);
+    border-top: 1px solid #007900;
+    border-bottom: 1px solid darkgreen;
+    border-left: 1px solid darkgreen;
+  /* box-shadow: inset 0 1px 4px rgb(9, 131, 0); */
+}
+.tile.timberwallcornerright {
+  background: linear-gradient(to bottom right, 
+    #2C5530 0%,      /* Dark green - TOP edge */
+    #228B22 15%,     /* FLAT Green - TIGHTER block */
+    #8B4513 15%,     /* 3D Brown start */
+    #A0522D 15%,     /* LIGHTER Brown (highlight) */
+    #654321 20%,     /* DARKER Brown (shadow) */
+    #8B4513 30%,     /* 3D Brown end */
+    #228b22fc 35%,     /* FLAT Green */
+    #006009  100%     /* Dark green - RIGHT edge */
+);
+  border: 1px solid rgb(0, 100, 0);
+  /* box-shadow: inset 0 1px 4px rgb(9, 131, 0); */
+}
+ .tile.timberwallside {
+    background: linear-gradient(to top, 
+        darkgreen 0%,      /* FLAT Green start */
+        #228B22 35%,     /* FLAT Green block */
+        #8B4513 35%,     /* 3D Brown start */
+        #A0522D 50%,     /* LIGHTER Brown (highlight) */
+        #654321 65%,     /* DARKER Brown (shadow) */
+        #8B4513 70%,     /* 3D Brown end */
+        #228B22 70%,     /* FLAT Green end */
+        darkgreen 100%     /* FLAT Green */
+    );
+}
+/* Timber WALL */
+/* .tile.timberwall {
+    background: linear-gradient(to right, 
+        #2C5530 0%, #228B22 30%, #8B4513 35%, #F5DEB3 65%, #8B4513 70%, #228B22 100%);
+} */
 
+
+/* Timber CORNER (thicker beams) */
+/* .tile.timberwallcorner {
+    background: linear-gradient(to right, 
+        #2C5530 0%, #228B22 20%, #8B4513 25%, #F5DEB3 50%, #8B4513 55%, #228B22 80%, #2C5530 100%);
+} */
+
+/* Timber FLOOR (inside house) */
+.tile.timberfloor {
+    background: linear-gradient(to right, 
+        #DEB887 0%, #D2B48C 50%, #DEB887 100%);
+}
 /* 🧱 WALL - Stone texture gradient */
 .tile.wall { 
   background: linear-gradient(145deg, #343a40 0%, #212529 100%);
