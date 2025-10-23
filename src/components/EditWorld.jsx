@@ -56,13 +56,14 @@ const handleCommand = (cmd) => {
       }
     }
     // OBJECTS
-    else if (OBJECTS[cmd]) {
+// NEW (FIXED)
+else if (OBJECTS[cmd] !== undefined || ['darkstone', 'lightstone', 'stone', 'rock'].includes(cmd)) {
       // Check if tile is restricted
-      if (['stone', 'darkstone', 'stonepillar'].includes(grid[y][x])) {
-        console.log(`Cannot place '${cmd}' at (${x}, ${y}): restricted tile`);
-        setSelectedTile(null);
-        return;
-      }
+      // if (['stone', 'darkstone', 'stonepillar'].includes(grid[y][x])) {
+      //   console.log(`Cannot place '${cmd}' at (${x}, ${y}): restricted tile`);
+      //   setSelectedTile(null);
+      //   return;
+      // }
 
       // PLAYER SPECIAL CASE: ALWAYS REPLACE OLD POSITION
       if (cmd === 'player' || cmd === 'player start') {

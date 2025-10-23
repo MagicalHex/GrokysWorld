@@ -64,7 +64,7 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1 className="grokysworld">🚀 Grokys World</h1>
+        {/* <h1 className="grokysworld">🚀 Grokys World</h1> */}
         <div>
           {renderSelector()}
           <button onClick={() => setMode('rpg')}>RPG</button>

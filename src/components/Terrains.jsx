@@ -5,6 +5,8 @@ export const TERRAINS = {
   lightgrass: '#28a745',
   grassnowalk: '#28a745',
 
+  soilbrown: '#7c3502',
+
   // SAND
   sand: '#ffc107',
   water: '#17a2b8',
@@ -24,6 +26,8 @@ export const TERRAINS = {
   timberwallside: '#28a745',
   timberwallcornerleft: '#28a745',
   timberwallcornerright: '#28a745',
+  timberwallcornerleftup: '#28a745',
+  timberwallcornerrightup: '#28a745',
   timberfloor: '#28a745',
   
   // ✅ PATHS

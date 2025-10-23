@@ -5,6 +5,7 @@
 .play-grid {
   display: grid;
   gap: 0;
+  background: black;
 }
 
 .play-grid .tile {

@@ -21,8 +21,8 @@ export const OBJECTS = {
   skeletonboss: '💀',
   goblin: '👹',
   orc: '🧌',
-  spider: '🕷',
-  spider1: '🕷️',
+  spider1: '🕷',
+  spider: '🕷️',
   bat: '🦇',
   // ITEMS
   ball: '⚽',
@@ -42,10 +42,14 @@ export const OBJECTS = {
   fireobject: '🔥',
   woodobject: '🪵',
   treeobject: '🌳',
+  pinetreeobject: '🌲',
   darktreeobject: '🌳',
+  darkpinetreeobject: '🌲',
   mountainobject: '⛰️',
   cactus: '🌵',
   rockobject: '🪨',
+  gravestoneobject: '🪦',
+  phoenixbird: '🐦‍🔥',
   // GOALS
   goal: '🎯',
   'portal-to-1': '🌀',  // To Level 1
@@ -55,4 +59,9 @@ export const OBJECTS = {
   'portal-to-5': '🌀',  // To Level 5
   ladder: '🪜',
   castle: '🏰',
+  // CSS STYLED THINGS
+  darkstoneobject: '',        // Dark cobblestone
+  lightstoneobject: '',       // Light cobblestone  
+  stoneobject: '',            // Medium stone
+  rockobject: '',             // Large rock
 };

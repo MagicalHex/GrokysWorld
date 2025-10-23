@@ -19,6 +19,23 @@
     ["darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass", "darkgrass"]
   ],
   "objects": {
-    "10,8": "darktreeobject"
+    "0,0": "portal-to-1",
+    "8,3": "darktreeobject",
+    "10,14": "darktreeobject",
+    "12,8": "darktreeobject",
+    "14,1": "darkpinetreeobject",
+    "19,8": "darkpinetreeobject",
+    "14,14": "darkpinetreeobject",
+    "16,8": "darktreeobject",
+    "18,10": "darkpinetreeobject",
+    "13,6": "darktreeobject",
+    "5,12": "darktreeobject",
+    "7,11": "darkpinetreeobject",
+    "20,4": "darktreeobject",
+    "22,7": "darkpinetreeobject",
+    "3,9": "darktreeobject",
+    "19,13": "darktreeobject",
+    "21,2": "spider",
+    "21,14": "spider"
   }
 }
