@@ -47,22 +47,41 @@ export const Levels = () => {
   
   const [currentLevel, setCurrentLevel] = useState(1);
   const [selectedTile] = useState(null);
-  const [restrictedTiles, setRestrictedTiles] = useState(new Set());
+  // const [restrictedTiles, setRestrictedTiles] = useState(new Set()); Old, clashes levels
+  const [restrictedTilesByLevel, setRestrictedTilesByLevel] = useState({});
 
   // LOAD JSON & REPLACE (async, after mount)
 useEffect(() => {
-    loadMaps().then(loadedLevels => {
-      if (loadedLevels) {
-        setLevels(loadedLevels);
-        
-        // ✅ FIXED: Set restrictedTiles for JSON-loaded grids
-        const initialGrid = loadedLevels[1].grid;
-        handleGridChange(initialGrid); // Initialize restrictions!
-        
-        console.log('✅ Loaded 5 JSON maps + restrictedTiles!');
-      }
-    });
-  }, []);
+  loadMaps().then(loadedLevels => {
+    if (loadedLevels) {
+      setLevels(loadedLevels);
+
+      // Compute restrictedTiles for ALL levels
+      const restrictedByLevel = {};
+      Object.keys(loadedLevels).forEach(levelId => {
+        const grid = loadedLevels[levelId].grid;
+        const restricted = new Set();
+        grid.forEach((row, y) => {
+          row.forEach((terrain, x) => {
+            if (['stone', 'darkstone', 'stonepillar', 'grassnowalk', 
+                 'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'].includes(terrain)) {
+              restricted.add(`${x},${y}`);
+            }
+          });
+        });
+        restrictedByLevel[levelId] = restricted;
+      });
+
+      setRestrictedTilesByLevel(restrictedByLevel);
+
+      // Init current level
+      const initialGrid = loadedLevels[1].grid;
+      handleGridChange(initialGrid, 1);
+
+      console.log('Loaded maps + PER-LEVEL restrictedTiles!');
+    }
+  });
+}, []);
 
   // GET CURRENT LEVEL DATA (NEVER NULL!)
   const currentLevelData = levels[currentLevel];
@@ -101,26 +120,37 @@ useEffect(() => {
     setCurrentLevel(newLevel);
   };
 
-  // handleGridChange
-  const handleGridChange = (newGrid) => {
-    const newRestricted = new Set();
-    newGrid.forEach((row, y) => {
-      row.forEach((terrain, x) => {
-        if (['stone', 'darkstone', 'stonepillar', 'grassnowalk', 'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'].includes(terrain)) {
-          newRestricted.add(`${x},${y}`);
-        }
-      });
+  // handleGridChange FOR BLOCKING TILES AND UPDATING PER LEVEL
+const handleGridChange = (newGrid, levelId = currentLevel) => {
+  const newRestricted = new Set();
+  newGrid.forEach((row, y) => {
+    row.forEach((terrain, x) => {
+      if (['stone', 'darkstone', 'stonepillar', 'grassnowalk', 
+           'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'].includes(terrain)) {
+        newRestricted.add(`${x},${y}`);
+      }
     });
-    setRestrictedTiles(newRestricted);
-    updateLevel({ grid: newGrid });
-  };
+  });
+
+  // Save per level
+  setRestrictedTilesByLevel(prev => ({
+    ...prev,
+    [levelId]: newRestricted
+  }));
+
+  updateLevel({ grid: newGrid }, levelId);
+};
 
   // SAME EXACT RETURN STRUCTURE!
   return {
     currentLevelData,
     currentLevel,
     setCurrentLevel,
-    restrictedTiles,
+    // restrictedTiles,
+    // Pass current level's restricted tiles
+  get restrictedTiles() {
+    return restrictedTilesByLevel[currentLevel] || new Set();
+  },
     handleGridChange,
     onObjectsChange: (newObjects) => updateLevel({ objects: newObjects }),
     onPlayerPosChange: (newPos) => updateLevel({ playerPos: newPos }),

@@ -18,34 +18,69 @@ const PlayMode = ({
   tileSize,
   rows,
   columns,
-  onPlayerMove,
-  onObjectsChange,
+  onPlayerMove,        // ← Player position
+  onObjectsChange,     // ← Update objects
   restrictedTiles,
   level,
   onLevelChange
 }) => {
-  // ✅ FIXED: Make playerHealth mutable again
   const [playerHealth, setPlayerHealth] = useState(100);
-// ✅ NEW: Initialize monster health from initial objects (no hook!)
-  const initialMonsterHealths = {};
-  Object.keys(objects).forEach(key => {
-    const type = objects[key];
-    if (type === 'skeleton' || type === 'spider') {
-      initialMonsterHealths[key] = 100;
-    }
-  });
-  const [monsterHealths, setMonsterHealths] = useState(initialMonsterHealths);
+  const [monsterHealths, setMonsterHealths] = useState({});
 
-  useEffect(() => {
-    console.log(`*** LEVEL CHANGED! PlayMode Level ${level} | Player at (${playerPos?.x || '?'}, ${playerPos?.y || '?'}) | Grid: ${grid[0][0]} terrain`);
-  }, [grid, objects, playerPos, level]);
+  // === PICKUP & PERSISTENT DICTIONARIES ===
+  const PICKUP_OBJECTS = new Set(['spiderweb', 'timber', 'coin', 'potion']);
+const PERSISTENT_WALKABLE = new Set([
+  'unlockeddoorobject',
+  'portal-to-1',
+  'portal-to-2',
+  'portal-to-3',
+  'portal-to-4',
+  'bridge',
+  'ladder'
+  // Add any future walkable-but-stays objects
+]);
 
+  // === HANDLE PLAYER MOVE WITH OBJECT CONTROL ===
+const handlePlayerMove = (newPos) => {
+  const newKey = `${newPos.x},${newPos.y}`;
+  const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
+  const targetObj = objects[newKey];
+
+  const newObjects = { ...objects };
+
+  // 1. Remove player from old position
+  if (oldKey && newObjects[oldKey] === 'player') {
+    delete newObjects[oldKey];
+  }
+
+  // 2. PICKUP: Delete collectibles
+  if (targetObj && PICKUP_OBJECTS.has(targetObj)) {
+    delete newObjects[newKey];
+    console.log(`Picked up ${targetObj}!`);
+  }
+
+  // 3. PERSISTENT: DO NOT overwrite!
+  const isPersistent = targetObj && PERSISTENT_WALKABLE.has(targetObj);
+
+  // 4. PLACE PLAYER:
+  // - Only if NOT on a persistent object
+  // - OR if it's a portal (we'll handle teleport separately)
+  if (!isPersistent && !targetObj?.startsWith('portal-to-')) {
+    newObjects[newKey] = 'player';
+  }
+  // → If on door/portal → player goes UNDER it (object stays)
+
+  // 5. Update state
+  onPlayerMove(newPos);
+  onObjectsChange(newObjects);
+};
+
+  // === PASS TO PlayerMovement ===
   return (
     <div className="play-mode">
-      {/* MOVEMENT COMPONENTS - Invisible but functional */}
       <PlayerMovement
         playerPos={playerPos}
-        onPlayerMove={onPlayerMove}
+        onPlayerMove={handlePlayerMove}  // ← Use local handler
         onExit={onExit}
         objects={objects}
         restrictedTiles={restrictedTiles}

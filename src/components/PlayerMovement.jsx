@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
+// EXCEPTION DICTIONARY — Objects you CAN walk on
+const WALKABLE_OBJECTS = new Set([
+  'spiderweb',
+  'unlockeddoorobject'
+  // Add more later: 'bridge', 'ladder', etc.
+]);
+
 const PlayerMovement = ({
   playerPos,
   onPlayerMove,
@@ -35,29 +42,38 @@ const PlayerMovement = ({
 
       const targetKey = `${newPos.x},${newPos.y}`;
       const targetObj = objects[targetKey];
-      const isPortal = targetObj && targetObj.startsWith('portal-to-'); // TELEPORT WHEN WALKING ON PORTAL
-      const isSpiderweb = targetObj === 'spiderweb'; // ALLOW WALKING ON WEB
+
+      // PORTAL: always allowed
+      const isPortal = targetObj && targetObj.startsWith('portal-to-');
+
+      // WALKABLE OBJECTS: spiderweb, unlockeddoorobject, etc.
+      const isWalkableObject = targetObj && WALKABLE_OBJECTS.has(targetObj);
+
+      // EMPTY TILE
       const isEmpty = !targetObj;
-      
+
+      // FINAL CHECK: Can move if:
+      // - Not restricted
+      // - AND (empty OR portal OR walkable object)
       if (
-        !restrictedTiles.has(targetKey) && 
-        (isEmpty || isPortal || isSpiderweb) // Allow walking on these objects
+        !restrictedTiles.has(targetKey) &&
+        (isEmpty || isPortal || isWalkableObject)
       ) {
         setCanMove(false);
         onPlayerMove(newPos);
         console.log(`Player moved to (${newPos.x}, ${newPos.y})${isPortal ? ' (PORTAL!)' : ''}`);
-        
-        // AUTO-TELEPORT!
+
+        // AUTO-TELEPORT
         if (isPortal) {
           setTimeout(() => {
             const toLevel = parseInt(targetObj.split('-to-')[1], 10);
             if (toLevel && toLevel !== level) {
-              console.log(`🌀 AUTO-PORTAL! Entering Level ${toLevel}!`);
+              console.log(`AUTO-PORTAL! Entering Level ${toLevel}!`);
               onLevelChange(toLevel);
             }
           }, 100);
         }
-        
+
         setTimeout(() => setCanMove(true), moveDelay);
       }
     };
@@ -66,7 +82,7 @@ const PlayerMovement = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [playerPos, onPlayerMove, onExit, objects, restrictedTiles, rows, columns, canMove, level, onLevelChange]);
 
-  return null; // No UI, just handles movement
+  return null;
 };
 
 export default PlayerMovement;

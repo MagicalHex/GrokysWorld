@@ -33,26 +33,27 @@ function App() {
         tileSize={40}
         rows={rows}
         columns={columns}
-        onPlayerMove={(newPos) => {
-          if (restrictedTiles.has(`${newPos.x},${newPos.y}`)) {
-            console.log(`Player cannot move to (${newPos.x}, ${newPos.y}): restricted tile`);
-            return;
-          }
+        // onPlayerMove={(newPos) => {
+        //   if (restrictedTiles.has(`${newPos.x},${newPos.y}`)) {
+        //     console.log(`Player cannot move to (${newPos.x}, ${newPos.y}): restricted tile`);
+        //     return;
+        //   }
           
-          const oldKey = currentLevelData.playerPos ? `${currentLevelData.playerPos.x},${currentLevelData.playerPos.y}` : null;
-          const newKey = `${newPos.x},${newPos.y}`;
+        //   const oldKey = currentLevelData.playerPos ? `${currentLevelData.playerPos.x},${currentLevelData.playerPos.y}` : null;
+        //   const newKey = `${newPos.x},${newPos.y}`;
           
-          const newObjects = { ...currentLevelData.objects };
-          if (oldKey && newObjects[oldKey] === 'player') {
-            delete newObjects[oldKey];
-          }
-          if (!newObjects[newKey]?.startsWith('portal-to-')) {
-            newObjects[newKey] = 'player';
-          }
+        //   const newObjects = { ...currentLevelData.objects };
+        //   if (oldKey && newObjects[oldKey] === 'player') {
+        //     delete newObjects[oldKey];
+        //   }
+        //   if (!newObjects[newKey]?.startsWith('portal-to-')) {
+        //     newObjects[newKey] = 'player';
+        //   }
           
-          onPlayerPosChange(newPos);
-          onObjectsChange(newObjects);
-        }}
+        //   onPlayerPosChange(newPos);
+        //   onObjectsChange(newObjects);
+        // }}
+        onPlayerMove={onPlayerPosChange}
         onObjectsChange={onObjectsChange}
         restrictedTiles={restrictedTiles}
         level={levelsData.currentLevel}

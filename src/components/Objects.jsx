@@ -48,8 +48,14 @@ export const OBJECTS = {
   mountainobject: '⛰️',
   cactus: '🌵',
   rockobject: '🪨',
+  // Death objects
   gravestoneobject: '🪦',
   phoenixbird: '🐦‍🔥',
+  // FURNITURES
+  unlockeddoorobject: '🚪',
+  lockeddoorobject: '🚪',
+  // LIGHT
+  candleobject: '🕯️',
   // GOALS
   goal: '🎯',
   'portal-to-1': '🌀',  // To Level 1
@@ -59,9 +65,25 @@ export const OBJECTS = {
   'portal-to-5': '🌀',  // To Level 5
   ladder: '🪜',
   castle: '🏰',
+  holeobject: '🕳️',
+  // FLOWERS
+  roseobject: '🌹',
+  cherryblossomobject: '🌸',
+  hyacinthobject: '🪻',
+
   // CSS STYLED THINGS
   darkstoneobject: '',        // Dark cobblestone
   lightstoneobject: '',       // Light cobblestone  
   stoneobject: '',            // Medium stone
   rockobject: '',             // Large rock
+  stonepillarobject: '',
+  // TIMBER
+  timberwoodupobject: '',
+  timberwoodsideobject: '',
+  timberwoodsideobjecthalfleft: '',
+  timberwoodsideobjecthalfright: '',
+  timberwoodleftcornerobject: '',
+  timberwoodrightcornerobject: '',
+  // FENCE/WALLS
+  fenceobject: '',
 };

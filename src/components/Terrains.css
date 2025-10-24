@@ -33,7 +33,20 @@ background: linear-gradient(to right, #026802 0%, #006400 50%, #006800 100%);
 }
 
 .tile.soilbrown {
-  background: linear-gradient(to right, #7c3705 0%, #7c3502 50%, #7e3c0d 100%);
+background: linear-gradient(to bottom,
+ #ba4e00 0%, 
+ #542606 10%,
+  #a94700 20%, 
+  #542606 30%, 
+  #a94700 40%, 
+  #542606 50%,
+   #a94700 60%, 
+   #542606 70%,
+    #a94700 80%, 
+    #542606 90%, 
+    #a94700 100%);
+    box-shadow: 0px 0px 0px black;
+    /* border: 1px solid brown; */
 }
 
 /* 🏜️ SAND - Warm desert glow */
