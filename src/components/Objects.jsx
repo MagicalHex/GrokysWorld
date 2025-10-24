@@ -70,6 +70,8 @@ export const OBJECTS = {
   roseobject: '🌹',
   cherryblossomobject: '🌸',
   hyacinthobject: '🪻',
+  // TOOLS
+  toolsobject: '🛠️',
 
   // CSS STYLED THINGS
   darkstoneobject: '',        // Dark cobblestone
@@ -84,6 +86,8 @@ export const OBJECTS = {
   timberwoodsideobjecthalfright: '',
   timberwoodleftcornerobject: '',
   timberwoodrightcornerobject: '',
+  // TIMBER CHOPPED
+  timberwoodchoppedobject: '',
   // FENCE/WALLS
   fenceobject: '',
 };

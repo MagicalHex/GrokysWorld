@@ -1,0 +1,65 @@
+/* src/components/ProgressBar.css */
+.progress-bar-container {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 10;
+  box-shadow: 0 0 6px rgba(33, 150, 243, 0.4);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, 
+    #0D47A1,   /* Deep blue */
+    #1976D2,   /* Bright blue */
+    #42A5F5,   /* Light blue */
+    #90CAF9    /* Soft glow */
+  );
+  background-size: 200% 100%;
+  animation: chop-fill 3s linear forwards, gradient-shift 1.5s ease-in-out infinite;
+  box-shadow: 
+    0 0 8px rgba(33, 150, 243, 0.8),
+    inset 0 0 4px rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle inner glow that pulses */
+.progress-bar-fill::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  animation: shimmer 1.8s infinite;
+  pointer-events: none;
+}
+
+/* Width animation */
+@keyframes chop-fill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* Gradient flow animation */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* Shimmer highlight */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

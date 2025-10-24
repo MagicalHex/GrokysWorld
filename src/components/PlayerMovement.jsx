@@ -7,6 +7,14 @@ const WALKABLE_OBJECTS = new Set([
   // Add more later: 'bridge', 'ladder', etc.
 ]);
 
+// CHOPPABLE OBJECTS (check but don't walk on)
+const CHOPPABLE_OBJECTS = new Set([
+  'treeobject',
+  'pinetreeobject',
+  'darktreeobject',
+  'darkpinetreeobject'
+]);
+
 const PlayerMovement = ({
   playerPos,
   onPlayerMove,
@@ -16,7 +24,8 @@ const PlayerMovement = ({
   rows,
   columns,
   level,
-  onLevelChange
+  onLevelChange,
+  onStartChop  // ← NEW: Callback for chopping
 }) => {
   const [canMove, setCanMove] = useState(true);
   const moveDelay = 300;
@@ -43,6 +52,8 @@ const PlayerMovement = ({
       const targetKey = `${newPos.x},${newPos.y}`;
       const targetObj = objects[targetKey];
 
+      console.log(`Attempting move to ${targetKey} (obj: ${targetObj || 'empty'})`);
+
       // PORTAL: always allowed
       const isPortal = targetObj && targetObj.startsWith('portal-to-');
 
@@ -52,13 +63,22 @@ const PlayerMovement = ({
       // EMPTY TILE
       const isEmpty = !targetObj;
 
-      // FINAL CHECK: Can move if:
-      // - Not restricted
-      // - AND (empty OR portal OR walkable object)
-      if (
-        !restrictedTiles.has(targetKey) &&
-        (isEmpty || isPortal || isWalkableObject)
-      ) {
+      // CHOPPABLE: Start chopping instead of moving
+      const isChoppable = targetObj && CHOPPABLE_OBJECTS.has(targetObj);
+
+      if (restrictedTiles.has(targetKey)) {
+        console.log(`Blocked by restrictedTiles: ${targetKey}`);
+        return;
+      }
+
+      if (isChoppable) {
+        console.log(`Starting chop on ${targetKey}`);
+        if (onStartChop) onStartChop(targetKey); // ← Trigger chopping
+        return; // ← Don't move!
+      }
+
+      // FINAL CHECK: Move if allowed
+      if (isEmpty || isPortal || isWalkableObject) {
         setCanMove(false);
         onPlayerMove(newPos);
         console.log(`Player moved to (${newPos.x}, ${newPos.y})${isPortal ? ' (PORTAL!)' : ''}`);
@@ -75,12 +95,14 @@ const PlayerMovement = ({
         }
 
         setTimeout(() => setCanMove(true), moveDelay);
+      } else {
+        console.log(`Blocked: Not empty/walkable/portal: ${targetKey}`);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [playerPos, onPlayerMove, onExit, objects, restrictedTiles, rows, columns, canMove, level, onLevelChange]);
+  }, [playerPos, onPlayerMove, onExit, objects, restrictedTiles, rows, columns, canMove, level, onLevelChange, onStartChop]);
 
   return null;
 };

@@ -81,8 +81,8 @@
   filter: drop-shadow(0 0 4px #8B0000);
 }
 .object.spider { 
-font-size: 30px;
-  animation: spider-crawl 1s ease-in-out infinite;
+  font-size: 30px;
+  animation: spider-crawl 5s ease-in-out infinite;
   filter: drop-shadow(0 0 3px #8B008B);
   color: #383838;
   text-shadow: 0px 0px 1px black;
@@ -183,6 +183,12 @@ font-size: 60px;
   font-size: 35px; 
   animation: potion-bubble 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
+}
+
+.object.toolsobject { 
+  font-size: 30px; 
+  text-shadow: 0px 0px 10px white;
+      animation: pulse 2s infinite;
 }
 /* === GOALS === */
 .object.goal { 
@@ -326,6 +332,12 @@ font-size: 60px;
     height: 42px;
     width: 30px;
 } */
+ /* PROBABLY THE BEST LOOKING LIKE WOOD FROM BIRD-VIEW */
+ /* .object.timberwoodupobjectright {
+    background: linear-gradient(to right, #8B4513 0%, #8B4513 10%, #ff964b 15%, #ffb27a 30%, #ff9040 50%, #a25835 45%, #654321 50%, #8B4513 60%, #228b2200 60%, #00b80000 100%);
+    height: 42px;
+    width: 40px;
+} */
  .object.timberwoodupobjectright {
     background: linear-gradient(to right,
       #8B4513 0%, 
@@ -425,10 +437,16 @@ font-size: 60px;
     height: 40px;
     background-image: linear-gradient(to right,
     #000000 0%,
-     #343a40 50%, 
-     #b0b0b0 70%,
-      #3c3c3c 80%, 
-      #000000 100%);
-      left: 80%;
-          box-shadow: 0px 0px 4px black;
+    #343a40 50%, 
+    #b0b0b0 70%,
+    #3c3c3c 80%, 
+    #000000 100%);
+    left: 80%;
+    box-shadow: 0px 0px 4px black;
+}
+.object.timberwoodchoppedobject {
+    background: linear-gradient(to bottom, #8B4513 0%, #8B4513 10%, #ff964b 25%, #ffb27a 30%, #ff9040 40%, #a25835 45%, #ff8811 50%, #8B4513 60%, #228b2200 60%, #8B4513 70%, #8B4513 100%);
+    height: 20px;
+    width: 20px;
+    border-radius: 25px;
 }
