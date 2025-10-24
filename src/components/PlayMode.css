@@ -14,7 +14,7 @@
   position: relative;
 }
 
-.health-container {
+/* .health-container {
   display: flex;
   gap: 20px;
   justify-content: center;
@@ -38,7 +38,7 @@
   width: var(--health-width, 100%);
   background: var(--health-color, #4CAF50);
   transition: width 0.2s ease;
-}
+} */
 
 /* Monster-specific override */
 .health-bar--monster .health-bar-fill {

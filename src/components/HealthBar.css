@@ -1,14 +1,26 @@
+.health-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
 .health-bar {
-  width: 50px;
-  height: 4px;
-  background-color: #333;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 2px;
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 7px;
+    background: #000000;
+    /* border-radius: 20px; */
+    border: 1px solid #00749a;
 }
 
 .health-bar-fill {
   height: 100%;
-  transition: width 0.3s ease;
   border-radius: 2px;
+  width: var(--health-width, 100%);
+  background: var(--health-color, #4CAF50);
+  transition: width 0.2s ease;
 }

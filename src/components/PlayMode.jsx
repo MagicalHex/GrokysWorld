@@ -35,11 +35,7 @@ const PlayMode = ({
 const [chopping, setChopping] = useState({
   active: false,
   key: null,
-  progress: 0,
-  timer: null,
-  interval: null,
-  startX: null,
-  startY: null
+  timer: null
 });
 
   // === PICKUP & PERSISTENT DICTIONARIES ===
@@ -55,33 +51,39 @@ const [chopping, setChopping] = useState({
   ]);
 
   // === HANDLE PLAYER MOVE ===
-  const handlePlayerMove = (newPos) => {
-    const newKey = `${newPos.x},${newPos.y}`;
-    const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
-    const targetObj = objects[newKey];
+const handlePlayerMove = (newPos) => {
+  const newKey = `${newPos.x},${newPos.y}`;
+  const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
+  const targetObj = objects[newKey];
 
-    console.log(`handlePlayerMove: from ${oldKey} to ${newKey} (obj: ${targetObj || 'empty'})`);
+  const newObjects = { ...objects };
 
-    const newObjects = { ...objects };
+  // 1. Remove player from old position
+  if (oldKey && newObjects[oldKey] === 'player') {
+    delete newObjects[oldKey];
+  }
 
-    if (oldKey && newObjects[oldKey] === 'player') {
-      delete newObjects[oldKey];
-    }
+  // 2. PICKUP: Delete collectibles
+  if (targetObj && PICKUP_OBJECTS.has(targetObj)) {
+    delete newObjects[newKey];
+    console.log(`Picked up ${targetObj}!`);
+  }
 
-    if (targetObj && PICKUP_OBJECTS.has(targetObj)) {
-      delete newObjects[newKey];
-      console.log(`Picked up ${targetObj}!`);
-      newObjects[newKey] = 'player';
-    } else if (targetObj && PERSISTENT_WALKABLE.has(targetObj)) {
-      // Player goes under
-      newObjects[newKey] = 'player'; // Or don't overwrite if needed
-    } else if (!targetObj?.startsWith('portal-to-')) {
-      newObjects[newKey] = 'player';
-    }
+  // 3. PERSISTENT: DO NOT overwrite!
+  const isPersistent = targetObj && PERSISTENT_WALKABLE.has(targetObj);
 
-    onPlayerMove(newPos);
-    onObjectsChange(newObjects);
-  };
+  // 4. PLACE PLAYER:
+  // - Only if NOT on a persistent object
+  // - OR if it's a portal (we'll handle teleport separately)
+  if (!isPersistent && !targetObj?.startsWith('portal-to-')) {
+    newObjects[newKey] = 'player';
+  }
+  // → If on door/portal → player goes UNDER it (object stays)
+
+  // 5. Update state
+  onPlayerMove(newPos);
+  onObjectsChange(newObjects);
+};
 
   // === HANDLE START CHOP ===
 
@@ -165,7 +167,7 @@ useEffect(() => {
       </div>
       <button onClick={onExit}>Edit Mode</button>
       
-<div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
+      <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
         {grid.map((row, y) =>
           row.map((terrain, x) => {
             const key = `${x},${y}`;

@@ -2,7 +2,7 @@
 .progress-bar-container {
   position: absolute;
   bottom: 4px;
-  left: 4px;
+  left: -4px;
   right: 4px;
   height: 8px;
   background: rgba(0, 0, 0, 0.5);
@@ -11,6 +11,7 @@
   z-index: 10;
   box-shadow: 0 0 6px rgba(33, 150, 243, 0.4);
   border: 1px solid rgba(33, 150, 243, 0.2);
+  width: 3rem;
 }
 
 .progress-bar-fill {

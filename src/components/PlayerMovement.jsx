@@ -10,9 +10,7 @@ const WALKABLE_OBJECTS = new Set([
 // CHOPPABLE OBJECTS (check but don't walk on)
 const CHOPPABLE_OBJECTS = new Set([
   'treeobject',
-  'pinetreeobject',
-  'darktreeobject',
-  'darkpinetreeobject'
+  'pinetreeobject'
 ]);
 
 const PlayerMovement = ({

@@ -13,9 +13,22 @@
 /* === HEROES === */
 /* THIS IS THE SHIELD PLAYER */
 .object.player { 
-  font-size: 35px; 
+  font-size: 40px; 
   animation: hero-glow 2s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 4px #4CAF50);
+  z-index: 20;
+}
+/* THIS IS THE SORCERER PLAYER */
+.player {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  animation: float 3s ease-in-out infinite;
   z-index: 20;
 }
 .object.knight { 
