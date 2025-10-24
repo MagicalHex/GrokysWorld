@@ -18,7 +18,7 @@ export const TERRAINS = {
   wall: '#343a40',
   goal: '#dc3545',
   stone: 'white',
-  darkstone: 'white',
+  darkstone: '#343a40',
   'stone pillar': 'white',
   railway: 'brown',
   // STRUCTURES

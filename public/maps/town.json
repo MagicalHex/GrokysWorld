@@ -27,7 +27,8 @@
     "20,5": "treeobject",
     "4,6": "treeobject",
     "12,6": "treeobject",
-    "23,7": "treeobject",
+    "23,7": "darkpinetreeobject",
+    "22,7": "darkpinetreeobject",
     "1,9": "treeobject",
     "7,10": "treeobject",
     "11,10": "treeobject",
@@ -35,12 +36,11 @@
     "19,10": "treeobject",
     "20,12": "treeobject",
     "13,8": "treeobject",
-    "22,9": "portal-to-2",
-    "22,8": "darkstoneobject", 
-    "23,8": "darkstoneobject",
-    "23,9": "darkstoneobject", 
-    "23,10": "darkstoneobject", 
-    "22,10": "darkstoneobject",
+
+    "23,8": "portal-to-2",
+
+    "23,10": "darkpinetreeobject", 
+    "22,10": "darkpinetreeobject",
     "2,15": "phoenixbird",
 
     "5,0": "timberwoodupobjectleft",
@@ -86,6 +86,16 @@
     "4,12": "fenceobject",
     "4,13": "fenceobject",
     "4,14": "fenceobject",
-    "4,15": "fenceobject"
+    "4,15": "fenceobject",
+
+    "23,12": "stoneobject",
+    "23,13": "stoneobject",
+    "23,15": "stoneobject",
+    "23,14": "stoneobject",
+    "22,15": "stoneobject",
+    "21,15": "stoneobject",
+    "20,14": "stoneobject",
+    "20,13": "stoneobject",
+    "22,14": "holeobject"
   }
 }

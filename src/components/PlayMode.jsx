@@ -10,6 +10,7 @@ import './EditWorld.css';
 import './Terrains.css';
 import './PlayMode.css';
 import './Objects.css';
+import InteractionSystem from './InteractionSystem';
 
 const PlayMode = ({ 
   grid, 
@@ -29,14 +30,15 @@ const PlayMode = ({
   const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
 
-  const CHOP_DURATION = 3000; // 3 seconds
-
-  // CHOPPING STATE
-const [chopping, setChopping] = useState({
-  active: false,
-  key: null,
-  timer: null
+  // === CHOPPING LOGIC MOVED TO InteractionSystem ===
+const interaction = InteractionSystem({
+  playerPos,
+  objects,
+  onObjectsChange,
+  onCancelChop: () => interaction.cancelChop()  // ← self-call
 });
+
+const { handleStartChop, chopping, cancelChop } = interaction;
 
   // === PICKUP & PERSISTENT DICTIONARIES ===
   const PICKUP_OBJECTS = new Set(['spiderweb', 'timber', 'coin', 'potion']);
@@ -47,7 +49,9 @@ const [chopping, setChopping] = useState({
     'portal-to-3',
     'portal-to-4',
     'bridge',
-    'ladder'
+    'ladder',
+    'holeobject',
+    'ropeobject'
   ]);
 
   // === HANDLE PLAYER MOVE ===
@@ -85,43 +89,6 @@ const handlePlayerMove = (newPos) => {
   onObjectsChange(newObjects);
 };
 
-  // === HANDLE START CHOP ===
-
-const handleStartChop = (targetKey) => {
-  if (chopping.active) return;
-
-  console.log(`Chopping started on ${targetKey}`);
-
-  const timer = setTimeout(() => {
-    const updated = { ...objects };
-    delete updated[targetKey];
-    updated[targetKey] = 'timberwoodchoppedobject';
-
-    setChopping({ active: false, key: null, timer: null });
-    onObjectsChange(updated);
-    console.log('TREE CHOPPED! timberwoodchoppedobject placed.');
-  }, CHOP_DURATION);
-
-  setChopping({
-    active: true,
-    key: targetKey,
-    timer
-  });
-};
-
-  // === CANCEL CHOP ON MOVE ===
-useEffect(() => {
-  if (!chopping.active) return;
-
-  return () => {
-    if (chopping.timer) {
-      clearTimeout(chopping.timer);
-      setChopping({ active: false, key: null, timer: null });
-      console.log('Chopping canceled — player moved!');
-    }
-  };
-}, [playerPos, chopping.active, chopping.key, chopping.timer]);
-
   // RETURN
   return (
     <div className="play-mode">
@@ -135,7 +102,8 @@ useEffect(() => {
         columns={columns}
         level={level}
         onLevelChange={onLevelChange}
-        onStartChop={handleStartChop}  // ← NEW PROP
+        onStartChop={handleStartChop}
+        onCancelChop={cancelChop}
       />
       <MonsterMovement
         objects={objects}
@@ -144,8 +112,8 @@ useEffect(() => {
         restrictedTiles={restrictedTiles}
         rows={rows}
         columns={columns}
-        monsterHealths={monsterHealths}  // ✅ PASS SHARED STATE!
-        setMonsterHealths={setMonsterHealths}  // ✅ PASS SETTER!
+        monsterHealths={monsterHealths}
+        setMonsterHealths={setMonsterHealths} 
       />
       {/* ✅ NEW COMBAT SYSTEM */}
       <CombatSystem

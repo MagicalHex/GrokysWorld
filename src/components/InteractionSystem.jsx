@@ -1,56 +1,64 @@
 // src/components/InteractionSystem.jsx
 import React, { useState, useEffect } from 'react';
 
-const CHOP_DURATION = 3000;
+// === CHOPPABLE OBJECTS ===
+const CHOPPABLE_OBJECTS = new Set([
+  'treeobject',
+  'pinetreeobject',
+  'lightstoneobject'  // ← NEW: Mineable!
+]);
+
+// === RESULT MAP ===
+const CHOP_RESULT = {
+  'treeobject': 'timberwoodchoppedobject',
+  'pinetreeobject': 'timberwoodchoppedobject',
+  'lightstoneobject': 'lightstonechoppedobject'  // ← Customize this!
+};
+
+const CHOP_DURATION = 3000; // 3 seconds
 
 const InteractionSystem = ({
-  objects,
   playerPos,
+  objects,
   onObjectsChange,
-  choppingTarget,
-  onChoppingStateChange,
+  onCancelChop
 }) => {
   const [chopping, setChopping] = useState({
     active: false,
     key: null,
-    timer: null,
+    timer: null
   });
 
-  // START CHOPPING
-  useEffect(() => {
-    if (!choppingTarget || chopping.active) return;
+  const handleStartChop = (targetKey) => {
+    if (chopping.active) return;
+
+    const targetObj = objects[targetKey];
+    if (!CHOPPABLE_OBJECTS.has(targetObj)) return;
+
+    console.log(`Mining started on ${targetKey} (${targetObj})`);
 
     const timer = setTimeout(() => {
       const updated = { ...objects };
-      delete updated[choppingTarget];
-      updated[choppingTarget] = 'timberwoodchoppedobject';
-      onObjectsChange(updated);
+      delete updated[targetKey];
+      updated[targetKey] = CHOP_RESULT[targetObj] || 'timberwoodchoppedobject';
 
       setChopping({ active: false, key: null, timer: null });
-      onChoppingStateChange(null);
-      console.log('TREE CHOPPED!');
+      onObjectsChange(updated);
+      console.log(`${targetObj.toUpperCase()} MINED! ${updated[targetKey]} placed.`);
     }, CHOP_DURATION);
 
-    setChopping({ active: true, key: choppingTarget, timer });
-    onChoppingStateChange(choppingTarget);
-    console.log(`Chopping started on ${choppingTarget}`);
-  }, [choppingTarget, chopping.active, objects, onObjectsChange, onChoppingStateChange]);
+    setChopping({ active: true, key: targetKey, timer });
+  };
 
-  // CANCEL ON MOVE
-  useEffect(() => {
-    if (!chopping.active) return;
+  const cancelChop = () => {
+    if (!chopping.active || !chopping.timer) return;
 
-    return () => {
-      if (chopping.timer) {
-        clearTimeout(chopping.timer);
-        setChopping({ active: false, key: null, timer: null });
-        onChoppingStateChange(null);
-        console.log('Chopping canceled — player moved!');
-      }
-    };
-  }, [playerPos, chopping.active, chopping.timer, onChoppingStateChange]);
+    clearTimeout(chopping.timer);
+    setChopping({ active: false, key: null, timer: null });
+    console.log('Mining canceled — player moved!');
+  };
 
-  return null;
+  return { handleStartChop, chopping, cancelChop };
 };
 
 export default InteractionSystem;

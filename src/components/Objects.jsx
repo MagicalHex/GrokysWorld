@@ -58,14 +58,15 @@ export const OBJECTS = {
   candleobject: '🕯️',
   // GOALS
   goal: '🎯',
-  'portal-to-1': '🌀',  // To Level 1
-  'portal-to-2': '🌀',  // To Level 2
-  'portal-to-3': '🌀',  // To Level 3
-  'portal-to-4': '🌀',  // To Level 4
-  'portal-to-5': '🌀',  // To Level 5
+  'portal-to-1': '🌀',
+  'portal-to-2': '🌀',
+  'portal-to-3': '🌀',
+  'portal-to-4': '🌀',
+  'portal-to-5': '🌀',
   ladder: '🪜',
   castle: '🏰',
   holeobject: '🕳️',
+  ropeobject: '🪢',
   // FLOWERS
   roseobject: '🌹',
   cherryblossomobject: '🌸',
@@ -76,6 +77,7 @@ export const OBJECTS = {
   // CSS STYLED THINGS
   darkstoneobject: '',        // Dark cobblestone
   lightstoneobject: '',       // Light cobblestone  
+  lightstonechoppedobject: '',
   stoneobject: '',            // Medium stone
   rockobject: '',             // Large rock
   stonepillarobject: '',

@@ -125,19 +125,22 @@
   animation: agent-pulse 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
-.object.npc { 
+.object.farmer { 
   font-size: 26px; 
   animation: npc-bob 2.5s ease-in-out infinite;
+  text-shadow: 1px 1px 4px black;
 }
 .object.merchant { 
   font-size: 30px; 
   animation: merchant-wave 4s ease-in-out infinite;
+  text-shadow: 1px 1px 4px black;
 }
 
 /* === ENVIRONMENT === */
 .object.treeobject { 
   font-size: 80px; 
   top: -50%;
+  text-shadow: 1px 1px 6px #2e2e2e;
 }
 .object.pinetreeobject { 
   font-size: 80px; 
@@ -197,7 +200,11 @@ font-size: 60px;
   animation: potion-bubble 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
-
+.object.ropeobject {
+      text-shadow: 0px 0px 6px green;
+    filter: brightness(1);
+    animation: pulse 2s infinite;
+}
 .object.toolsobject { 
   font-size: 30px; 
   text-shadow: 0px 0px 10px white;
@@ -297,7 +304,19 @@ font-size: 60px;
       width: 40px;
     height: 40px;
 }
-
+.object.lightstonechoppedobject {
+    background-image: linear-gradient(to bottom right,
+     #ced4da 0%, #adb5bd 25%, #9da5ad 50%,
+      #4a4a4a 75%, #8d949a 100%),
+       radial-gradient(circle at 20% 30%, #b0b0b0 2px, transparent 2px), 
+       radial-gradient(circle at 50% 60%, #a3a5a6 2px, transparent 2px),
+        radial-gradient(circle at 75% 40%, #bbbec2 2px, transparent 2px);
+    border-radius: 8px;
+    width: 25px;
+    height: 25px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
+    filter: brightness(0.9) contrast(1.1);
+}
 /* MEDIUM STONE */
 .object.stoneobject {
     border-radius: 6px;

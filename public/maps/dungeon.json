@@ -1,0 +1,41 @@
+{
+  "name": "Dungeon",
+  "grid": [
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","lightstoneobject","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"]
+  ],
+"objects": {
+  "1,1": "ropeobject",
+  "2,11": "lightstoneobject",
+  "15,1": "lightstoneobject",
+  "20,2": "lightstoneobject",
+  "20,5": "lightstoneobject",
+  "4,6": "lightstoneobject",
+  "3,3": "lightstoneobject",
+  "7,8": "lightstoneobject",
+  "12,2": "lightstoneobject",
+  "18,10": "lightstoneobject",
+  "5,13": "lightstoneobject",
+  "14,6": "lightstoneobject",
+  "9,11": "lightstoneobject",
+  "16,4": "lightstoneobject",
+  "1,7": "lightstoneobject",
+  "21,9": "lightstoneobject",
+  "10,14": "lightstoneobject",
+  "6,1": "lightstoneobject"
+}
+}
