@@ -22,6 +22,9 @@ const PlayMode = ({
   const [pickingUpTile, setPickingUpTile] = useState(null); // Track pickup animation
 
   // ---- INTERACTION SYSTEM ----
+  const [inventory, setInventory] = useState({}); // New: Track inventory here
+
+  // ---- INTERACTION SYSTEM ----
   const interaction = InteractionSystem({
     playerPos,
     objects,
@@ -29,8 +32,11 @@ const PlayMode = ({
     onCancelInteraction: () => interaction.cancelInteraction(),
     rows,
     columns,
-    onItemPickup: (item) => setPickedItem(item)
+    onItemPickup: (item) => setPickedItem(item),
+    inventory, // New: Pass inventory
+    setInventory // New: Pass setInventory
   });
+
 
   const {
     handleStartInteraction,
@@ -40,17 +46,6 @@ const PlayMode = ({
     CHOPPABLE_OBJECTS,
     TALKABLE_OBJECTS
   } = interaction;
-
-  // ---- DETECT DROPPED ITEMS ----
-  useEffect(() => {
-    const newDropped = new Set();
-    Object.keys(objects).forEach(key => {
-      if (objects[key] === 'woodobject' || objects[key] === 'rockobject') {
-        newDropped.add(key);
-      }
-    });
-    setDroppedItems(newDropped);
-  }, [objects]);
 
   // ---- DIALOGUE ACTIONS ----
   const closeDialogue = () => cancelInteraction();
@@ -95,6 +90,17 @@ const PlayMode = ({
     cancelInteraction
   ]);
 
+    // ---- DETECT DROPPED ITEMS (TO MAKE THEM SHINY) ----
+  useEffect(() => {
+    const newDropped = new Set();
+    Object.keys(objects).forEach(key => {
+      if (objects[key] === 'woodobject' || objects[key] === 'rockobject') {
+        newDropped.add(key);
+      }
+    });
+    setDroppedItems(newDropped);
+  }, [objects]);
+
   // ---- PLAYER MOVE (pickup, persistent objects, etc.) ----
   const handlePlayerMove = useCallback((newPos) => {
     const newKey = `${newPos.x},${newPos.y}`;
@@ -107,13 +113,15 @@ const PlayMode = ({
     const PICKUP = new Set(['spiderweb', 'timber', 'coin', 'potion', 'woodobject', 'rockobject']);
     if (targetObj && PICKUP.has(targetObj)) {
       console.log('[PlayMode] Setting picked item:', targetObj);
-      setPickedItem(targetObj);
+      setPickedItem(targetObj); // Triggers inventory
       setPickingUpTile(newKey); // Trigger pickup animation
+
       setTimeout(() => {
         setPickingUpTile(null); // Clear animation after 0.5s
         const updatedObjs = { ...newObjs };
         delete updatedObjs[newKey]; // Remove item after animation
         onObjectsChange(updatedObjs);
+        // setPickedItem(null); // CRITICAL: Clear immediately after animation - NEEDED? Supposed to help to only pick up one dropped
       }, 500); // Match pickupCircle duration
     } else {
       setPickedItem(null);
@@ -175,7 +183,10 @@ const PlayMode = ({
       <PlayerInventory
         interactionActive={interactState.active}
         onItemPickup={pickedItem}
+        onInventoryChange={setInventory} // New: Receive updates
+        inventory={inventory} // Optional: Pass down if needed for display
       />
+
 
       {/* UI */}
       <button onClick={onExit}>Edit Mode</button>
@@ -213,6 +224,10 @@ const PlayMode = ({
       {/* CHAT BUBBLE */}
       {interactState.active && interactState.type === 'talk' && (
         <div className="chat-bubble">
+          <div style={{ fontSize: '40px' }}
+          >
+          🛠️
+          </div>
           <div className="chat-bubble__message">{interactState.message}</div>
           {interactState.choices && (
             <div className="chat-bubble__choices">

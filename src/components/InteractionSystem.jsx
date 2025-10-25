@@ -1,5 +1,6 @@
 // InteractionSystem.jsx
 import React, { useState } from 'react';
+import './InteractionSystem.css';
 
 const CHOPPABLE_OBJECTS = new Set(['treeobject', 'pinetreeobject', 'lightstoneobject']);
 const TALKABLE_OBJECTS = new Set(['farmerobject', 'villagerobject', 'blacksmithobject']);
@@ -27,6 +28,16 @@ const NPC_DIALOGUE = {
     ]
   }
 };
+/** --------------------------------------------------------------
+ *  SHOP DEFINITION – keep it next to NPC_DIALOGUE for easy editing
+ *  -------------------------------------------------------------- */
+const SHOP_DATA = {
+  farmer: [
+    { emoji: '🪚', name: 'Saw', cost: { woodobject: 1, rockobject: 1 }, addsToInventory: 'saw' },
+    { emoji: '🪓', name: 'Axe', cost: { woodobject: 3, rockobject: 3 }, addsToInventory: 'axe' },
+    { emoji: '🗡️', name: 'Dagger', cost: { woodobject: 2, rockobject: 1 }, addsToInventory: 'dagger' }
+  ]
+};
 
 const CHOP_DURATION = 3000;
 
@@ -38,7 +49,10 @@ const InteractionSystem = ({
   onObjectsChange,
   onCancelInteraction,
       rows,
-    columns
+    columns,
+      onItemPickup,
+  inventory, // New: Receive inventory
+  setInventory // New: Receive setInventory
 }) => {
   const [interaction, setInteraction] = useState({
     type: null,
@@ -127,10 +141,58 @@ const InteractionSystem = ({
     setInteraction({ type: null, active: false, key: null, timer: null });
   };
 
-  openShop = (type) => {
-    console.log('Opening shop:', type);
-    cancelInteraction();
+openShop = (type) => {
+  const items = SHOP_DATA[type];
+  if (!items) {
+    say("Sorry, I don't have anything right now.");
+    return;
+  }
+
+  // Format each item as a line with its arrow
+  const arrowIcons = ['Left', 'Up', 'Right'];
+  const lines = items.map((it, i) => 
+    `[${arrowIcons[i]}] ${it.emoji} **${it.name}** – ${Object.entries(it.cost)
+      .map(([k, v]) => `${v} ${k}`).join(', ')}`
+  );
+
+  // Create one choice per item
+  const choices = items.map((it, i) => ({
+    key: ['left', 'up', 'right'][i],
+    text: `Buy ${it.name}`,
+    action: () => buyItem(it)  // We'll define this next
+  }));
+
+  setInteraction(prev => ({
+    ...prev,
+    message: lines.join('\n'),
+    choices
+  }));
+};
+  const buyItem = (item) => {
+    // Check if player has enough resources
+    const hasEnough = Object.entries(item.cost).every(([res, amt]) => 
+      (inventory[res] || 0) >= amt
+    );
+
+    if (!hasEnough) {
+      say("You don't have enough materials!");
+      return;
+    }
+
+    // Deduct cost
+    const newInventory = { ...inventory };
+    Object.entries(item.cost).forEach(([res, amt]) => {
+      newInventory[res] -= amt;
+      if (newInventory[res] === 0) delete newInventory[res];
+    });
+
+    // Add bought item
+    newInventory[item.addsToInventory] = (newInventory[item.addsToInventory] || 0) + 1;
+
+    setInventory(newInventory);
+    say(`You bought the **${item.name}**!`);
   };
+  
   say = (txt) => {
     setInteraction(prev => ({
       ...prev,

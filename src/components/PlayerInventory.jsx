@@ -32,29 +32,36 @@ const InventoryPopup = ({ items, onClose }) => {
   );
 };
 
-const PlayerInventory = ({ interactionActive, onItemPickup }) => {
+const PlayerInventory = ({ interactionActive, onItemPickup, onInventoryChange }) => {
   const [inventory, setInventory] = useState({});
+  const prevPickupRef = React.useRef(null); // Track previous value
 
-  // Handle item pickups
+  // Handle item pickups — ONLY on transition from null/undefined to a value
   useEffect(() => {
-    if (onItemPickup) {
-      console.log('[PlayerInventory] Picked up item:', onItemPickup); // Debug log
-      setInventory(prev => ({
-        ...prev,
-        [onItemPickup]: (prev[onItemPickup] || 0) + 1
-      }));
-    }
-  }, [onItemPickup]);
+    // Only trigger if we JUST picked up something new (not standing on it)
+    if (onItemPickup && onItemPickup !== prevPickupRef.current) {
+      console.log('[PlayerInventory] Picked up item:', onItemPickup);
 
-  // Right Ctrl key handler for inventory toggle
+      const newInventory = {
+        ...inventory,
+        [onItemPickup]: (inventory[onItemPickup] || 0) + 1
+      };
+
+      setInventory(newInventory);
+      if (onInventoryChange) onInventoryChange(newInventory);
+    }
+
+    // Update ref to current value
+    prevPickupRef.current = onItemPickup;
+  }, [onItemPickup, inventory, onInventoryChange]);
+
+  // Right Ctrl key handler
   useEffect(() => {
     const handleInventoryToggle = (e) => {
       if (e.code === 'ControlRight') {
-        console.log('[PlayerInventory] Right Ctrl (ControlRight) pressed – toggling inventory');
         setShowInventory(prev => !prev);
       }
     };
-
     window.addEventListener('keydown', handleInventoryToggle);
     return () => window.removeEventListener('keydown', handleInventoryToggle);
   }, []);
