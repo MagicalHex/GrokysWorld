@@ -30,6 +30,7 @@
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
   animation: float 3s ease-in-out infinite;
   z-index: 20;
+  text-shadow: 1px 1px 6px black;
 }
 .object.knight { 
   font-size: 32px; 
@@ -125,13 +126,13 @@
   animation: agent-pulse 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
-.object.farmer { 
-  font-size: 26px; 
+.object.farmerobject { 
+  font-size: 35px; 
   animation: npc-bob 2.5s ease-in-out infinite;
   text-shadow: 1px 1px 4px black;
 }
-.object.merchant { 
-  font-size: 30px; 
+.object.merchantobject { 
+  font-size: 35px; 
   animation: merchant-wave 4s ease-in-out infinite;
   text-shadow: 1px 1px 4px black;
 }

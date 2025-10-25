@@ -1,95 +1,107 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
-import { useMonsterHealths } from './hooks/useMonsterHealths';
 import HealthBar from './HealthBar';
 import ProgressBar from './ProgressBar';
-import './EditWorld.css';
-import './Terrains.css';
-import './PlayMode.css';
-import './Objects.css';
 import InteractionSystem from './InteractionSystem';
+import './PlayMode.css';
 
-const PlayMode = ({ 
-  grid, 
-  objects, 
-  playerPos, 
-  onExit, 
-  tileSize,
-  rows,
-  columns,
-  onPlayerMove,
-  onObjectsChange,
-  restrictedTiles,
-  level,
-  onLevelChange
+const PlayMode = ({
+  grid, objects, playerPos, onExit, tileSize,
+  rows, columns, onPlayerMove, onObjectsChange,
+  restrictedTiles, level, onLevelChange
 }) => {
-  // HEALTH
   const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
 
-  // === CHOPPING LOGIC MOVED TO InteractionSystem ===
-const interaction = InteractionSystem({
-  playerPos,
-  objects,
-  onObjectsChange,
-  onCancelChop: () => interaction.cancelChop()  // ← self-call
-});
+  // ---- INTERACTION SYSTEM ----
+  const interaction = InteractionSystem({
+    playerPos,
+    objects,
+    onObjectsChange,
+    onCancelInteraction: () => interaction.cancelInteraction()
+  });
 
-const { handleStartChop, chopping, cancelChop } = interaction;
+  const {
+    handleStartInteraction,
+    interaction: interactState,
+    cancelInteraction,
+    setInteraction
+  } = interaction;
 
-  // === PICKUP & PERSISTENT DICTIONARIES ===
-  const PICKUP_OBJECTS = new Set(['spiderweb', 'timber', 'coin', 'potion']);
-  const PERSISTENT_WALKABLE = new Set([
-    'unlockeddoorobject',
-    'portal-to-1',
-    'portal-to-2',
-    'portal-to-3',
-    'portal-to-4',
-    'bridge',
-    'ladder',
-    'holeobject',
-    'ropeobject'
-  ]);
+  // ---- DIALOGUE ACTIONS (injected into InteractionSystem) ----
+  const closeDialogue = () => cancelInteraction();
+  const openShop = (type) => { console.log('Shop:',type); closeDialogue(); };
+  const say = (txt) => setInteraction(prev => ({
+    ...prev,
+    message: txt,
+    choices: [{ key:'up', text:'Thanks!', action: closeDialogue }]
+  }));
 
-  // === HANDLE PLAYER MOVE ===
-const handlePlayerMove = (newPos) => {
-  const newKey = `${newPos.x},${newPos.y}`;
-  const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
-  const targetObj = objects[newKey];
+  // ---- ARROW-KEY DIALOGUE HANDLER ----
+useEffect(() => {
+  const handleChoice = (e) => {
+    // LOG EVERY CALL
+    console.log('[PlayMode] dialogue handler – key:', e.key,
+                'active?', interactState.active,
+                'type?', interactState.type);
 
-  const newObjects = { ...objects };
+    if (!interactState.active || interactState.type !== 'talk') return;
 
-  // 1. Remove player from old position
-  if (oldKey && newObjects[oldKey] === 'player') {
-    delete newObjects[oldKey];
-  }
+    const map = { ArrowUp:0, ArrowLeft:1, ArrowRight:2 };
+    if (e.key === 'ArrowDown') {
+      console.log('[PlayMode] ↓  cancelling dialogue');
+      cancelInteraction();
+      return;
+    }
 
-  // 2. PICKUP: Delete collectibles
-  if (targetObj && PICKUP_OBJECTS.has(targetObj)) {
-    delete newObjects[newKey];
-    console.log(`Picked up ${targetObj}!`);
-  }
+    const idx = map[e.key];
+    if (idx !== undefined && interactState.choices?.[idx]) {
+      console.log('[PlayMode] selecting choice', idx, interactState.choices[idx].text);
+      interactState.choices[idx].action();
+    } else {
+      console.log('[PlayMode] no choice for key', e.key);
+    }
+  };
 
-  // 3. PERSISTENT: DO NOT overwrite!
-  const isPersistent = targetObj && PERSISTENT_WALKABLE.has(targetObj);
+  window.addEventListener('keydown', handleChoice, true); // capture phase
+  return () => window.removeEventListener('keydown', handleChoice, true);
+}, [
+  interactState.active,
+  interactState.type,
+  interactState.choices,
+  cancelInteraction
+]);
 
-  // 4. PLACE PLAYER:
-  // - Only if NOT on a persistent object
-  // - OR if it's a portal (we'll handle teleport separately)
-  if (!isPersistent && !targetObj?.startsWith('portal-to-')) {
-    newObjects[newKey] = 'player';
-  }
-  // → If on door/portal → player goes UNDER it (object stays)
+  // ---- PLAYER MOVE (pickup, persistent objects, etc.) ----
+  const handlePlayerMove = useCallback((newPos) => {
+    const newKey = `${newPos.x},${newPos.y}`;
+    const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
+    const targetObj = objects[newKey];
+    const newObjs = { ...objects };
 
-  // 5. Update state
-  onPlayerMove(newPos);
-  onObjectsChange(newObjects);
-};
+    if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
-  // RETURN
+    const PICKUP = new Set(['spiderweb','timber','coin','potion']);
+    if (targetObj && PICKUP.has(targetObj)) delete newObjs[newKey];
+
+    const PERSIST = new Set([
+      'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
+      'bridge','ladder','holeobject','ropeobject'
+    ]);
+    const isPersist = targetObj && PERSIST.has(targetObj);
+
+    if (!isPersist && !targetObj?.startsWith('portal-to-')) {
+      newObjs[newKey] = 'player';
+    }
+
+    onPlayerMove(newPos);
+    onObjectsChange(newObjs);
+  }, [playerPos, objects, onPlayerMove, onObjectsChange]);
+
+  // ---- RENDER ----
   return (
     <div className="play-mode">
       <PlayerMovement
@@ -102,8 +114,10 @@ const handlePlayerMove = (newPos) => {
         columns={columns}
         level={level}
         onLevelChange={onLevelChange}
-        onStartChop={handleStartChop}
-        onCancelChop={cancelChop}
+        interactionActive={interactState.active}
+        interactionType={interactState.type}   // chopping || talking
+        onStartInteraction={handleStartInteraction}
+        onCancelInteraction={cancelInteraction}
       />
       <MonsterMovement
         objects={objects}
@@ -113,9 +127,8 @@ const handlePlayerMove = (newPos) => {
         rows={rows}
         columns={columns}
         monsterHealths={monsterHealths}
-        setMonsterHealths={setMonsterHealths} 
+        setMonsterHealths={setMonsterHealths}
       />
-      {/* ✅ NEW COMBAT SYSTEM */}
       <CombatSystem
         playerPos={playerPos}
         playerHealth={playerHealth}
@@ -126,52 +139,68 @@ const handlePlayerMove = (newPos) => {
         onObjectsChange={onObjectsChange}
       />
 
-      {/* UI - ✅ PLAYER HEALTH BAR RESTORED */}
+      {/* UI */}
       <p>Arrow keys to move | SPACE to edit</p>
-      <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginBottom: 10 }}>
-        <div>
-          Player: <HealthBar health={playerHealth} color={playerHealth > 50 ? '#4CAF50' : '#f44336'} />
-        </div>
+      <div style={{display:'flex',gap:20,justifyContent:'center',marginBottom:10}}>
+        <div>Player: <HealthBar health={playerHealth} color={playerHealth>50?'#4CAF50':'#f44336'}/></div>
       </div>
       <button onClick={onExit}>Edit Mode</button>
-      
-      <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
-        {grid.map((row, y) =>
-          row.map((terrain, x) => {
-            const key = `${x},${y}`;
-            const obj = objects[key];
-            return (
-              <div
-                key={key}
-                className={`tile ${terrain}`}
-                style={{ width: tileSize, height: tileSize, position: 'relative' }}
-              >
-                {obj && (
-                  <div className={`object ${obj}`}>
-                    {OBJECTS[obj]}
-                    {obj === 'skeleton' && (
-                      <HealthBar health={monsterHealths[key] || 100} color="#FF9800" />
-                    )}
-                    {obj === 'spider' && (
-                      <HealthBar health={monsterHealths[key] || 100} color="#FF9800" />
-                    )}
-                  </div>
-                )}
-                {playerPos && playerPos.x === x && playerPos.y === y && (
-                  <div className="player">
-                    🧙
-                    <HealthBar health={playerHealth} color={playerHealth > 50 ? '#4CAF50' : '#f44336'} />
-                  </div>
-                )}
-                {/* CHOPPING TREES PROGRESSBAR */}
-                {chopping.active && chopping.key === key && (
-                  <ProgressBar />
-                )}
-              </div>
-            );
-          })
-        )}
+
+      {/* GRID */}
+      <div className="play-grid" style={{gridTemplateColumns:`repeat(${columns},${tileSize}px)`}}>
+        {grid.map((row,y)=>row.map((terrain,x)=>{
+          const key=`${x},${y}`;
+          const obj=objects[key];
+          return (
+            <div key={key} className={`tile ${terrain}`} style={{width:tileSize,height:tileSize,position:'relative'}}>
+              {obj && (
+                <div className={`object ${obj}`}>
+                  {OBJECTS[obj]}
+                  {(obj==='skeleton'||obj==='spider') && (
+                    <HealthBar health={monsterHealths[key]||100} color="#FF9800"/>
+                  )}
+                </div>
+              )}
+              {playerPos?.x===x && playerPos?.y===y && (
+                <div className="player">
+                  <HealthBar health={playerHealth} color={playerHealth>50?'#4CAF50':'#f44336'}/>
+                </div>
+              )}
+              {interactState.active && interactState.type==='chop' && interactState.key===key && <ProgressBar/>}
+            </div>
+          );
+        }))}
       </div>
+
+{/* SINGLE CHAT BUBBLE */}
+{interactState.active && interactState.type === 'talk' && (
+  <div
+    className="chat-bubble"
+    style={{
+      left: `${(parseInt(interactState.key.split(',')[0]) * tileSize) + tileSize / 2}px`,
+      top: `${(parseInt(interactState.key.split(',')[1]) * tileSize) + 60}px`, /* ← +60px */
+    }}
+  >
+    <div className="chat-bubble__message">{interactState.message}</div>
+
+    {interactState.choices && (
+      <div className="chat-bubble__choices">
+        {interactState.choices.map((c, i) => {
+          const icons = ['Up', 'Left', 'Right'];
+          return (
+            <div key={i} className="chat-bubble__choice">
+              <span className="chat-bubble__icon">[{icons[i]}]</span>
+              {c.text}
+            </div>
+          );
+        })}
+      </div>
+    )}
+
+    <div className="chat-bubble__hint">Press Down to walk away</div>
+  </div>
+)}
+
     </div>
   );
 };

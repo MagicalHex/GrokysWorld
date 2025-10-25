@@ -1,64 +1,104 @@
-// src/components/InteractionSystem.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-// === CHOPPABLE OBJECTS ===
-const CHOPPABLE_OBJECTS = new Set([
-  'treeobject',
-  'pinetreeobject',
-  'lightstoneobject'  // ← NEW: Mineable!
-]);
+const CHOPPABLE_OBJECTS = new Set(['treeobject','pinetreeobject','lightstoneobject']);
+const TALKABLE_OBJECTS   = new Set(['farmerobject','villagerobject','blacksmithobject']);
 
-// === RESULT MAP ===
 const CHOP_RESULT = {
-  'treeobject': 'timberwoodchoppedobject',
-  'pinetreeobject': 'timberwoodchoppedobject',
-  'lightstoneobject': 'lightstonechoppedobject'  // ← Customize this!
+  treeobject:      'timberwoodchoppedobject',
+  pinetreeobject:  'timberwoodchoppedobject',
+  lightstoneobject:'lightstonechoppedobject'
 };
 
-const CHOP_DURATION = 3000; // 3 seconds
+const NPC_DIALOGUE = {
+  farmerobject: {
+    greeting: "Howdy, partner! Need any crops?",
+    choices: [
+      { key: 'up',    text: "Show me your wares!",   action: () => openShop('farmer') },
+      { key: 'left',  text: "Tell me about the village.", action: () => say("It's peaceful here.") },
+      { key: 'right', text: "Goodbye.",             action: () => closeDialogue() }
+    ]
+  }
+};
+
+const CHOP_DURATION = 3000;
+
+let openShop, say, closeDialogue;   // will be injected by PlayMode
 
 const InteractionSystem = ({
   playerPos,
   objects,
   onObjectsChange,
-  onCancelChop
+  onCancelInteraction
 }) => {
-  const [chopping, setChopping] = useState({
+  const [interaction, setInteraction] = useState({
+    type: null,
     active: false,
     key: null,
-    timer: null
+    timer: null,
+    message: null,
+    npc: null,
+    choices: null
   });
 
-  const handleStartChop = (targetKey) => {
-    if (chopping.active) return;
+  const handleStartInteraction = (targetKey) => {
+    if (interaction.active) return;
+    const obj = objects[targetKey];
 
-    const targetObj = objects[targetKey];
-    if (!CHOPPABLE_OBJECTS.has(targetObj)) return;
+    // ---- CHOPPING ----
+    if (CHOPPABLE_OBJECTS.has(obj)) {
+      const timer = setTimeout(() => {
+        const upd = { ...objects };
+        delete upd[targetKey];
+        upd[targetKey] = CHOP_RESULT[obj];
+        setInteraction({ type:null, active:false, key:null, timer:null });
+        onObjectsChange(upd);
+      }, CHOP_DURATION);
+      setInteraction({ type:'chop', active:true, key:targetKey, timer });
+      return;
+    }
 
-    console.log(`Mining started on ${targetKey} (${targetObj})`);
-
-    const timer = setTimeout(() => {
-      const updated = { ...objects };
-      delete updated[targetKey];
-      updated[targetKey] = CHOP_RESULT[targetObj] || 'timberwoodchoppedobject';
-
-      setChopping({ active: false, key: null, timer: null });
-      onObjectsChange(updated);
-      console.log(`${targetObj.toUpperCase()} MINED! ${updated[targetKey]} placed.`);
-    }, CHOP_DURATION);
-
-    setChopping({ active: true, key: targetKey, timer });
+    // ---- TALKING ----
+    if (TALKABLE_OBJECTS.has(obj)) {
+      const dlg = NPC_DIALOGUE[obj];
+      if (!dlg) return;
+      setInteraction({
+        type:'talk',
+        active:true,
+        key:targetKey,
+        message:dlg.greeting,
+        npc:obj,
+        choices:dlg.choices
+      });
+    }
   };
 
-  const cancelChop = () => {
-    if (!chopping.active || !chopping.timer) return;
-
-    clearTimeout(chopping.timer);
-    setChopping({ active: false, key: null, timer: null });
-    console.log('Mining canceled — player moved!');
+  const cancelInteraction = () => {
+    if (interaction.timer) clearTimeout(interaction.timer);
+    setInteraction({ type:null, active:false, key:null, timer:null });
   };
 
-  return { handleStartChop, chopping, cancelChop };
+  // expose for PlayMode actions
+  openShop = (type) => {
+    console.log('Opening shop:', type);
+    cancelInteraction();
+  };
+  say = (txt) => {
+    setInteraction(prev => ({
+      ...prev,
+      message: txt,
+      choices: [{ key:'up', text:'Thanks!', action: closeDialogue }]
+    }));
+  };
+  closeDialogue = () => cancelInteraction();
+
+  return {
+    handleStartInteraction,
+    interaction,          // <-- public state
+    cancelInteraction,
+    setInteraction,       // <-- needed for `say`
+    CHOPPABLE_OBJECTS,
+    TALKABLE_OBJECTS
+  };
 };
 
 export default InteractionSystem;

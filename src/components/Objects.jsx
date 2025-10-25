@@ -1,6 +1,6 @@
 export const OBJECTS = {
   // HEROES
-  player: '🛡️',
+  player: '🧙',
   knight: '⚔️',
   warrior: '🗡️',
   archer: '🏹',
@@ -33,8 +33,8 @@ export const OBJECTS = {
   agent: '🟣',
   npc: '🔵',
   prince: '🤴',
-  merchant: '🧙‍♂️',
-  farmer: '🧑‍🌾',
+  merchantobject: '🧙‍♂️',
+  farmerobject: '🧑‍🌾',
   // JEWELRY
   diamond: '💎',
   // OBSTACLES
@@ -79,7 +79,6 @@ export const OBJECTS = {
   lightstoneobject: '',       // Light cobblestone  
   lightstonechoppedobject: '',
   stoneobject: '',            // Medium stone
-  rockobject: '',             // Large rock
   stonepillarobject: '',
   // TIMBER
   timberwoodupobject: '',

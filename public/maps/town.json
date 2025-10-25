@@ -19,10 +19,10 @@
     ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"]
   ],
   "objects": {
-    "8,0": "farmer",
+    "8,0": "farmerobject",
     "2,2": "treeobject",
     "2,11": "gravestoneobject",
-    "15,1": "merchant",
+    "15,1": "merchantobject",
     "20,2": "treeobject",
     "20,5": "treeobject",
     "4,6": "treeobject",
