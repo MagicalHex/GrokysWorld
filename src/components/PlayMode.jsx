@@ -1,3 +1,4 @@
+// PlayMode.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
@@ -6,6 +7,7 @@ import CombatSystem from './CombatSystem';
 import HealthBar from './HealthBar';
 import ProgressBar from './ProgressBar';
 import InteractionSystem from './InteractionSystem';
+import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
 
 const PlayMode = ({
@@ -15,65 +17,83 @@ const PlayMode = ({
 }) => {
   const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
+  const [pickedItem, setPickedItem] = useState(null);
+  const [droppedItems, setDroppedItems] = useState(new Set()); // Track dropped items
+  const [pickingUpTile, setPickingUpTile] = useState(null); // Track pickup animation
 
   // ---- INTERACTION SYSTEM ----
   const interaction = InteractionSystem({
     playerPos,
     objects,
     onObjectsChange,
-    onCancelInteraction: () => interaction.cancelInteraction()
+    onCancelInteraction: () => interaction.cancelInteraction(),
+    rows,
+    columns,
+    onItemPickup: (item) => setPickedItem(item)
   });
 
   const {
     handleStartInteraction,
     interaction: interactState,
     cancelInteraction,
-    setInteraction
+    setInteraction,
+    CHOPPABLE_OBJECTS,
+    TALKABLE_OBJECTS
   } = interaction;
 
-  // ---- DIALOGUE ACTIONS (injected into InteractionSystem) ----
+  // ---- DETECT DROPPED ITEMS ----
+  useEffect(() => {
+    const newDropped = new Set();
+    Object.keys(objects).forEach(key => {
+      if (objects[key] === 'woodobject' || objects[key] === 'rockobject') {
+        newDropped.add(key);
+      }
+    });
+    setDroppedItems(newDropped);
+  }, [objects]);
+
+  // ---- DIALOGUE ACTIONS ----
   const closeDialogue = () => cancelInteraction();
-  const openShop = (type) => { console.log('Shop:',type); closeDialogue(); };
+  const openShop = (type) => { console.log('Shop:', type); closeDialogue(); };
   const say = (txt) => setInteraction(prev => ({
     ...prev,
     message: txt,
-    choices: [{ key:'up', text:'Thanks!', action: closeDialogue }]
+    choices: [{ key: 'up', text: 'Thanks!', action: closeDialogue }]
   }));
 
   // ---- ARROW-KEY DIALOGUE HANDLER ----
-useEffect(() => {
-  const handleChoice = (e) => {
-    // LOG EVERY CALL
-    console.log('[PlayMode] dialogue handler – key:', e.key,
-                'active?', interactState.active,
-                'type?', interactState.type);
+  useEffect(() => {
+    const handleChoice = (e) => {
+      console.log('[PlayMode] dialogue handler – key:', e.key,
+                  'active?', interactState.active,
+                  'type?', interactState.type);
 
-    if (!interactState.active || interactState.type !== 'talk') return;
+      if (!interactState.active || interactState.type !== 'talk') return;
 
-    const map = { ArrowUp:0, ArrowLeft:1, ArrowRight:2 };
-    if (e.key === 'ArrowDown') {
-      console.log('[PlayMode] ↓  cancelling dialogue');
-      cancelInteraction();
-      return;
-    }
+      const map = { ArrowUp: 0, ArrowLeft: 1, ArrowRight: 2 };
+      if (e.key === 'ArrowDown') {
+        console.log('[PlayMode] ↓ cancelling dialogue');
+        cancelInteraction();
+        return;
+      }
 
-    const idx = map[e.key];
-    if (idx !== undefined && interactState.choices?.[idx]) {
-      console.log('[PlayMode] selecting choice', idx, interactState.choices[idx].text);
-      interactState.choices[idx].action();
-    } else {
-      console.log('[PlayMode] no choice for key', e.key);
-    }
-  };
+      const idx = map[e.key];
+      if (idx !== undefined && interactState.choices?.[idx]) {
+        console.log('[PlayMode] selecting choice', idx, interactState.choices[idx].text);
+        interactState.choices[idx].action();
+      } else {
+        console.log('[PlayMode] no choice for key', e.key);
+      }
+    };
 
-  window.addEventListener('keydown', handleChoice, true); // capture phase
-  return () => window.removeEventListener('keydown', handleChoice, true);
-}, [
-  interactState.active,
-  interactState.type,
-  interactState.choices,
-  cancelInteraction
-]);
+    window.addEventListener('keydown', handleChoice, true);
+    return () => window.removeEventListener('keydown', handleChoice, true);
+  }, [
+    interactState.active,
+    interactState.type,
+    interactState.choices,
+    cancelInteraction
+  ]);
 
   // ---- PLAYER MOVE (pickup, persistent objects, etc.) ----
   const handlePlayerMove = useCallback((newPos) => {
@@ -84,12 +104,25 @@ useEffect(() => {
 
     if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
-    const PICKUP = new Set(['spiderweb','timber','coin','potion']);
-    if (targetObj && PICKUP.has(targetObj)) delete newObjs[newKey];
+    const PICKUP = new Set(['spiderweb', 'timber', 'coin', 'potion', 'woodobject', 'rockobject']);
+    if (targetObj && PICKUP.has(targetObj)) {
+      console.log('[PlayMode] Setting picked item:', targetObj);
+      setPickedItem(targetObj);
+      setPickingUpTile(newKey); // Trigger pickup animation
+      setTimeout(() => {
+        setPickingUpTile(null); // Clear animation after 0.5s
+        const updatedObjs = { ...newObjs };
+        delete updatedObjs[newKey]; // Remove item after animation
+        onObjectsChange(updatedObjs);
+      }, 500); // Match pickupCircle duration
+    } else {
+      setPickedItem(null);
+      onObjectsChange(newObjs);
+    }
 
     const PERSIST = new Set([
-      'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','holeobject','ropeobject'
+      'unlockeddoorobject', 'portal-to-1', 'portal-to-2', 'portal-to-3', 'portal-to-4',
+      'bridge', 'ladder', 'holeobject', 'ropeobject'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);
 
@@ -98,7 +131,6 @@ useEffect(() => {
     }
 
     onPlayerMove(newPos);
-    onObjectsChange(newObjs);
   }, [playerPos, objects, onPlayerMove, onObjectsChange]);
 
   // ---- RENDER ----
@@ -115,9 +147,11 @@ useEffect(() => {
         level={level}
         onLevelChange={onLevelChange}
         interactionActive={interactState.active}
-        interactionType={interactState.type}   // chopping || talking
+        interactionType={interactState.type}
         onStartInteraction={handleStartInteraction}
         onCancelInteraction={cancelInteraction}
+        CHOPPABLE_OBJECTS={CHOPPABLE_OBJECTS}
+        TALKABLE_OBJECTS={TALKABLE_OBJECTS}
       />
       <MonsterMovement
         objects={objects}
@@ -138,69 +172,64 @@ useEffect(() => {
         setMonsterHealths={setMonsterHealths}
         onObjectsChange={onObjectsChange}
       />
+      <PlayerInventory
+        interactionActive={interactState.active}
+        onItemPickup={pickedItem}
+      />
 
       {/* UI */}
-      <p>Arrow keys to move | SPACE to edit</p>
-      <div style={{display:'flex',gap:20,justifyContent:'center',marginBottom:10}}>
-        <div>Player: <HealthBar health={playerHealth} color={playerHealth>50?'#4CAF50':'#f44336'}/></div>
-      </div>
       <button onClick={onExit}>Edit Mode</button>
 
       {/* GRID */}
-      <div className="play-grid" style={{gridTemplateColumns:`repeat(${columns},${tileSize}px)`}}>
-        {grid.map((row,y)=>row.map((terrain,x)=>{
-          const key=`${x},${y}`;
-          const obj=objects[key];
+      <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
+        {grid.map((row, y) => row.map((terrain, x) => {
+          const key = `${x},${y}`;
+          const obj = objects[key];
           return (
-            <div key={key} className={`tile ${terrain}`} style={{width:tileSize,height:tileSize,position:'relative'}}>
+            <div
+              key={key}
+              className={`tile ${terrain} ${pickingUpTile === key ? 'picking-up' : ''}`}
+              style={{ width: tileSize, height: tileSize, position: 'relative' }}
+            >
               {obj && (
-                <div className={`object ${obj}`}>
+                <div className={`object ${obj} ${droppedItems.has(key) ? 'dropped-item' : ''}`}>
                   {OBJECTS[obj]}
-                  {(obj==='skeleton'||obj==='spider') && (
-                    <HealthBar health={monsterHealths[key]||100} color="#FF9800"/>
+                  {(obj === 'skeleton' || obj === 'spider') && (
+                    <HealthBar health={monsterHealths[key] || 100} color="#FF9800" />
                   )}
                 </div>
               )}
-              {playerPos?.x===x && playerPos?.y===y && (
+              {playerPos?.x === x && playerPos?.y === y && (
                 <div className="player">
-                  <HealthBar health={playerHealth} color={playerHealth>50?'#4CAF50':'#f44336'}/>
+                  <HealthBar health={playerHealth} color={playerHealth > 50 ? '#4CAF50' : '#f44336'} />
                 </div>
               )}
-              {interactState.active && interactState.type==='chop' && interactState.key===key && <ProgressBar/>}
+              {interactState.active && interactState.type === 'chop' && interactState.key === key && <ProgressBar />}
             </div>
           );
         }))}
       </div>
 
-{/* SINGLE CHAT BUBBLE */}
-{interactState.active && interactState.type === 'talk' && (
-  <div
-    className="chat-bubble"
-    style={{
-      left: `${(parseInt(interactState.key.split(',')[0]) * tileSize) + tileSize / 2}px`,
-      top: `${(parseInt(interactState.key.split(',')[1]) * tileSize) + 60}px`, /* ← +60px */
-    }}
-  >
-    <div className="chat-bubble__message">{interactState.message}</div>
-
-    {interactState.choices && (
-      <div className="chat-bubble__choices">
-        {interactState.choices.map((c, i) => {
-          const icons = ['Up', 'Left', 'Right'];
-          return (
-            <div key={i} className="chat-bubble__choice">
-              <span className="chat-bubble__icon">[{icons[i]}]</span>
-              {c.text}
+      {/* CHAT BUBBLE */}
+      {interactState.active && interactState.type === 'talk' && (
+        <div className="chat-bubble">
+          <div className="chat-bubble__message">{interactState.message}</div>
+          {interactState.choices && (
+            <div className="chat-bubble__choices">
+              {interactState.choices.map((c, i) => {
+                const icons = ['Up', 'Left', 'Right'];
+                return (
+                  <div key={i} className="chat-bubble__choice">
+                    <span className="chat-bubble__icon">[{icons[i]}]</span>
+                    {c.text}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
-    )}
-
-    <div className="chat-bubble__hint">Press Down to walk away</div>
-  </div>
-)}
-
+          )}
+          <div className="chat-bubble__hint">Press Down to walk away</div>
+        </div>
+      )}
     </div>
   );
 };

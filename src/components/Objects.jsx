@@ -59,7 +59,7 @@ export const OBJECTS = {
   // GOALS
   goal: '🎯',
   'portal-to-1': '🌀',
-  'portal-to-2': '🌀',
+  'portal-to-2': '',
   'portal-to-3': '🌀',
   'portal-to-4': '🌀',
   'portal-to-5': '🌀',

@@ -103,7 +103,7 @@ useEffect(() => {
   // PORTAL ENTRY POINTS
 const PORTAL_ENTRY_POINTS = {
   1: { x: 1, y: 1 },
-  2: { x: 2, y: 2 },
+  2: { x: 1, y: 2 },
   3: { x: 3, y: 3 },
   4: { x: 4, y: 4 },
   5: { x: 1, y: 1 }, // Dungeon spawn

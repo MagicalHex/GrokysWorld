@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject']);
-const CHOPPABLE_OBJECTS = new Set(['treeobject','pinetreeobject','lightstoneobject']);
-const TALKABLE_OBJECTS   = new Set(['farmerobject','villagerobject','blacksmithobject']);
+const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject', 'woodobject', 'rockobject']);
 
 const PlayerMovement = ({
   playerPos,
@@ -17,7 +15,9 @@ const PlayerMovement = ({
   onStartInteraction,
   onCancelInteraction,
   interactionActive,        // <-- lock flag
-  interactionType   // NEW: 'chop' | 'talk' | null
+  interactionType,   // NEW: 'chop' | 'talk' | null
+  CHOPPABLE_OBJECTS,
+  TALKABLE_OBJECTS
 }) => {
   const [canMove, setCanMove] = useState(true);
   const moveDelay = 300;
@@ -27,8 +27,11 @@ const PlayerMovement = ({
       if (!canMove || !playerPos) return;
 
       // LOG LOCK STATE
-console.log('[PlayerMovement] active:', interactionActive, 'type:', interactionType);
-
+      console.log('[PlayerMovement] active:', interactionActive, 'type:', interactionType);
+      if (e.code === 'ControlRight') {
+        // Allow Right Ctrl to pass through to PlayerInventory
+        return;
+      }
       // === TALKING: FULL LOCK (except SPACE) ===
       if (interactionActive && interactionType === 'talk') {
         if (e.key === ' ') {
@@ -95,7 +98,7 @@ console.log('[PlayerMovement] active:', interactionActive, 'type:', interactionT
   }, [
     playerPos, onPlayerMove, onExit, objects, restrictedTiles,
     rows, columns, level, onLevelChange, onStartInteraction,
-    onCancelInteraction, interactionActive, canMove
+    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS
   ]);
 
   return null;
