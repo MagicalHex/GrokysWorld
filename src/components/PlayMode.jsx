@@ -37,6 +37,15 @@ const PlayMode = ({
   npc: null,
   choices: null
 });
+const [isDead, setIsDead] = useState(false);
+
+// Watch player health
+useEffect(() => {
+  if (playerHealth <= 0 && !isDead) {
+    setIsDead(true);
+    console.log('PLAYER DIED');
+  }
+}, [playerHealth, isDead]);
 
     // ---- DETECT DROPPED ITEMS (TO MAKE THEM SHINY) ----
   useEffect(() => {
@@ -58,7 +67,7 @@ const PlayMode = ({
 
     if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
-    const PICKUP = new Set(['spiderweb', 'timber', 'coin', 'potion', 'woodobject', 'rockobject']);
+    const PICKUP = new Set(['spiderweb', 'timber', 'coin', 'gold', 'potion', 'woodobject', 'rockobject']);
     if (targetObj && PICKUP.has(targetObj)) {
       console.log('[PlayMode] Setting picked item:', targetObj);
       setPickedItem(targetObj); // Triggers inventory
@@ -136,6 +145,28 @@ const PlayMode = ({
         setInventory={setInventory}
       />
 
+      {/* PLAYER DEATH */}
+      {isDead && (
+        <div className="death-screen">
+          <div className="death-message">
+            <h1>You Died</h1>
+            <p>Your adventure ends here...</p>
+            <button onClick={() => {
+              setIsDead(false);
+              setPlayerHealth(100);
+              
+              // OPTIONAL: Reset inventory/monsters if you want a "hard reset"
+              // setInventory({});
+              // setMonsterHealths({});
+
+              // RESPAWN: Level 1 at (2,14) — similar to portal/hole/rope syntax
+              onLevelChange(1, { x: 2, y: 14 });
+            }}>
+              Respawn
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* GRID */}
       <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>

@@ -59,27 +59,33 @@ const CombatSystem = ({
   }, [playerPos, objects, setPlayerHealth, setMonsterHealths]);
 
   // DEAD MONSTER CLEANUP
-  useEffect(() => {
-    const newHealths = { ...monsterHealths };
-    let changed = false;
-    
-    Object.keys(newHealths).forEach(key => {
-      if (newHealths[key] <= 0) {
-        console.log(`💀 ${objects[key]?.toUpperCase()} DEFEATED!`);
-        delete newHealths[key];
-        changed = true;
-      }
-    });
+// CombatSystem.jsx — DEAD MONSTER CLEANUP (updated)
+useEffect(() => {
+  const newHealths = { ...monsterHealths };
+  const newObjects = { ...objects };
+  let changed = false;
 
-    if (changed) {
-      const newObjects = { ...objects };
-      Object.keys(newHealths).forEach(key => {
-        if (monsterHealths[key] <= 0) delete newObjects[key];
-      });
-      onObjectsChange(newObjects);
-      setMonsterHealths(newHealths);
+  Object.keys(newHealths).forEach(key => {
+    if (newHealths[key] <= 0) {
+      const monsterType = objects[key];
+      console.log(`Monster DEFEATED at ${key}: ${monsterType}`);
+
+      // 1. Remove monster object
+      delete newObjects[key];
+      delete newHealths[key];
+      changed = true;
+
+      // 2. DROP 1 GOLD at the same tile
+      newObjects[key] = 'gold'; // or 'goldobject' if you have it
+      console.log(`Dropped coin at ${key}`);
     }
-  }, [monsterHealths, objects, setMonsterHealths, onObjectsChange]);
+  });
+
+  if (changed) {
+    onObjectsChange(newObjects);
+    setMonsterHealths(newHealths);
+  }
+}, [monsterHealths, objects, onObjectsChange, setMonsterHealths]);
 
   return null;
 };
