@@ -4,6 +4,8 @@ export const OBJECTS = {
   knight: '⚔️',
   warrior: '🗡️',
   archer: '🏹',
+  // Companion
+  companion: '🐺',
   // WEAPONS
   sword: '⚔️',
   axe: '🪓',

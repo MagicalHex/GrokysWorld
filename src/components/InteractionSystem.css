@@ -15,7 +15,7 @@
     0 8px 0 #8b5a2b,
     0 12px 20px rgba(0, 0, 0, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.6);
-  max-width: 260px;
+  max-width: 400px;
   text-align: center;
   pointer-events: none;
   z-index: 1000;

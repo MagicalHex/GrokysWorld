@@ -27,9 +27,9 @@ export const NPC_DIALOGUE = {
 
 export const SHOP_DATA = {
   farmer: [
-    { emoji: 'Saw', name: 'Saw', cost: { woodobject: 1, rockobject: 1 }, addsToInventory: 'saw' },
-    { emoji: 'Axe', name: 'Axe', cost: { woodobject: 3, rockobject: 3 }, addsToInventory: 'axe' },
-    { emoji: 'Dagger', name: 'Dagger', cost: { woodobject: 2, rockobject: 1 }, addsToInventory: 'dagger' }
+    { emoji: '🪚', name: 'Saw', cost: { woodobject: 1, rockobject: 1 }, addsToInventory: 'saw' },
+    { emoji: '🪓', name: 'Axe', cost: { woodobject: 3, rockobject: 3 }, addsToInventory: 'axe' },
+    { emoji: '🗡️', name: 'Dagger', cost: { woodobject: 2, rockobject: 1 }, addsToInventory: 'dagger' }
   ]
 };
 

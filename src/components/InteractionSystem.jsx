@@ -129,7 +129,7 @@ interaction,        // ← ADD HERE
 
     const arrowIcons = ['Left', 'Up', 'Right'];
     const lines = items.map((it, i) =>
-      `[${arrowIcons[i]}] ${it.emoji} **${it.name}** – ${Object.entries(it.cost)
+      `${it.emoji} **${it.name}** – ${Object.entries(it.cost)
         .map(([k, v]) => `${v} ${k}`).join(', ')}`
     );
 
@@ -146,26 +146,33 @@ interaction,        // ← ADD HERE
     }));
   };
 
-  const buyItem = (item) => {
-    const hasEnough = Object.entries(item.cost).every(([res, amt]) =>
-      (inventory[res] || 0) >= amt
-    );
+const buyItem = (item) => {
+  // ---- LOG WHAT THE MERCHANT SEES ----
+  console.log('%c[Merchant] Current inventory:', 'color:orange', inventory);
+  console.log('%c[Merchant] Required cost:', 'color:orange', item.cost);
 
-    if (!hasEnough) {
-      say("You don't have enough materials!");
-      return;
-    }
+  const hasEnough = Object.entries(item.cost).every(([res, amt]) => {
+    const owned = inventory[res] ?? 0;
+    console.log(`  → ${res}: need ${amt}, have ${owned}`);
+    return owned >= amt;
+  });
 
-    const newInv = { ...inventory };
-    Object.entries(item.cost).forEach(([res, amt]) => {
-      newInv[res] -= amt;
-      if (newInv[res] <= 0) delete newInv[res];
-    });
-    newInv[item.addsToInventory] = (newInv[item.addsToInventory] || 0) + 1;
+  if (!hasEnough) {
+    say("You don't have enough materials!");
+    return;
+  }
 
-    setInventory(newInv);
-    say(`You bought the **${item.name}**!`);
-  };
+  const newInv = { ...inventory };
+  Object.entries(item.cost).forEach(([res, amt]) => {
+    newInv[res] -= amt;
+    if (newInv[res] <= 0) delete newInv[res];
+  });
+  newInv[item.addsToInventory] = (newInv[item.addsToInventory] ?? 0) + 1;
+
+  console.log('%c[Merchant] Purchase SUCCESS → newInv:', 'color:lime', newInv);
+  setInventory(newInv);
+  say(`You bought the **${item.name}**!`);
+};
 
   const say = (txt) => {
     setInteraction(prev => ({
@@ -226,9 +233,21 @@ interaction,        // ← ADD HERE
       <div className="chat-bubble">
         <div style={{ fontSize: '40px' }}>🛠️</div>
         <div className="chat-bubble__message">
-          {interaction.message.split('\n').map((line, i) => (
-            <div key={i} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-          ))}
+{interaction.message.split('\n').map((line, i) => {
+  // Split by **bold** markers and render <strong>
+  const parts = line.split(/\*\*(.*?)\*\*/g);
+  return (
+    <div key={i}>
+      {parts.map((part, idx) =>
+        idx % 2 === 1 ? (
+          <strong key={idx}>{part}</strong>
+        ) : (
+          <React.Fragment key={idx}>{part}</React.Fragment>
+        )
+      )}
+    </div>
+  );
+})}
         </div>
         {interaction.choices && (
           <div className="chat-bubble__choices">

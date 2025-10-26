@@ -19,7 +19,7 @@ const PlayMode = ({
   rows, columns, onPlayerMove, onObjectsChange,
   restrictedTiles, level, onLevelChange
 }) => {
-const [playerHealth, setPlayerHealth] = useState(100);
+  const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
   const [pickedItem, setPickedItem] = useState(null);
   const [droppedItems, setDroppedItems] = useState(new Set());
@@ -104,8 +104,8 @@ const [playerHealth, setPlayerHealth] = useState(100);
         onLevelChange={onLevelChange}
         onStartInteraction={(key) => interactionRef.current?.handleStartInteraction(key)}
         onCancelInteraction={() => interactionRef.current?.cancelInteraction()}
-interactionActive={interaction.active}
-  interactionType={interaction.type}
+        interactionActive={interaction.active}
+        interactionType={interaction.type}
         CHOPPABLE_OBJECTS={CHOPPABLE_OBJECTS}
         TALKABLE_OBJECTS={TALKABLE_OBJECTS}
       />
@@ -133,6 +133,7 @@ interactionActive={interaction.active}
         onItemPickup={pickedItem}
         onInventoryChange={setInventory} // New: Receive updates
         inventory={inventory} // Optional: Pass down if needed for display
+        setInventory={setInventory}
       />
 
 
@@ -141,8 +142,6 @@ interactionActive={interaction.active}
         {grid.map((row, y) => row.map((terrain, x) => {
           const key = `${x},${y}`;
           const obj = objects[key];
-          // const isChopping = interactionRef.current?.interaction?.type === 'chop' &&
-          //                   interactionRef.current?.interaction?.key === key;
 
           return (
             <div
@@ -150,6 +149,7 @@ interactionActive={interaction.active}
               className={`tile ${terrain} ${pickingUpTile === key ? 'picking-up' : ''}`}
               style={{ width: tileSize, height: tileSize, position: 'relative' }}
             >
+            {/* OBJECTS  */}
               {obj && (
                 <div className={`object ${obj} ${droppedItems.has(key) ? 'dropped-item' : ''}`}>
                   {OBJECTS[obj]}
@@ -158,32 +158,35 @@ interactionActive={interaction.active}
                   )}
                 </div>
               )}
+              {/* PLAYER  */}
               {playerPos?.x === x && playerPos?.y === y && (
-                <div className="player">
+                <div className="player"
+                style={{ fontSize: '38px' }}
+                >🧙
                   <HealthBar health={playerHealth} color={playerHealth > 50 ? '#4CAF50' : '#f44336'} />
                 </div>
               )}
-              {/* {isChopping && <ProgressBar />} */}
+
             </div>
           );
         }))}
       </div>
 
       {/* Interaction UI is now inside InteractionSystem */}
-<InteractionSystem
-  ref={interactionRef}
-  playerPos={playerPos}
-  objects={objects}
-  onObjectsChange={onObjectsChange}
-  onCancelInteraction={() => {}}
-  rows={rows}
-  columns={columns}
-  inventory={inventory}
-  setInventory={setInventory}
-  interaction={interaction}
-  setInteraction={setInteraction}  // ← ADD THIS
-  tileSize={tileSize}
-/>
+      <InteractionSystem
+        ref={interactionRef}
+        playerPos={playerPos}
+        objects={objects}
+        onObjectsChange={onObjectsChange}
+        onCancelInteraction={() => {}}
+        rows={rows}
+        columns={columns}
+        inventory={inventory}
+        setInventory={setInventory}
+        interaction={interaction}
+        setInteraction={setInteraction}
+        tileSize={tileSize}
+      />
 
       <button onClick={onExit}>Edit Mode</button>
     </div>

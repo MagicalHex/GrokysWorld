@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback } from 'react';
-// REMOVE: import { useMonsterHealths } from './hooks/useMonsterHealths';
 
 const MonsterMovement = ({
   objects,

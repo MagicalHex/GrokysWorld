@@ -129,14 +129,18 @@
 .object.farmerobject { 
   font-size: 35px; 
   animation: npc-bob 2.5s ease-in-out infinite;
-  text-shadow: 1px 1px 4px black;
+  text-shadow: 1px 1px 4px green;
 }
 .object.merchantobject { 
   font-size: 35px; 
   animation: merchant-wave 4s ease-in-out infinite;
   text-shadow: 1px 1px 4px black;
 }
-
+.object.companion { 
+  font-size: 35px; 
+  animation: npc-bob 2.5s ease-in-out infinite;
+  text-shadow: 1px 1px 4px green;
+}
 /* === ENVIRONMENT === */
 .object.treeobject {
     font-size: 80px;

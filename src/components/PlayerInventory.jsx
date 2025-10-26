@@ -1,15 +1,11 @@
 // PlayerInventory.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './PlayerInventory.css';
 
 const InventoryPopup = ({ items, onClose }) => {
-  // Helper function to format item names
   const formatItemName = (item, quantity) => {
-    // Remove 'object' suffix
     const baseName = item.replace(/object$/i, '');
-    // Pluralize if quantity >= 2
     const displayName = quantity >= 2 ? `${baseName}s` : baseName;
-    // Capitalize first letter
     return displayName.charAt(0).toUpperCase() + displayName.slice(1);
   };
 
@@ -32,43 +28,48 @@ const InventoryPopup = ({ items, onClose }) => {
   );
 };
 
-const PlayerInventory = ({ interactionActive, onItemPickup, onInventoryChange }) => {
-  const [inventory, setInventory] = useState({});
-  const prevPickupRef = React.useRef(null); // Track previous value
+const PlayerInventory = ({
+  inventory,           // ← from PlayMode (current state)
+  setInventory,        // ← from PlayMode (to mutate)
+  onItemPickup,        // ← item player just stepped on
+  interactionActive,
+}) => {
+  const prevPickupRef = useRef(null);
+  const [showInventory, setShowInventory] = useState(false);
 
-  // Handle item pickups — ONLY on transition from null/undefined to a value
+  // ────── PICKUP LOGIC: Only runs on *new* pickup ──────
   useEffect(() => {
-    // Only trigger if we JUST picked up something new (not standing on it)
     if (onItemPickup && onItemPickup !== prevPickupRef.current) {
-      console.log('[PlayerInventory] Picked up item:', onItemPickup);
+      console.log('[PlayerInventory] Picked up:', onItemPickup);
 
       const newInventory = {
         ...inventory,
-        [onItemPickup]: (inventory[onItemPickup] || 0) + 1
+        [onItemPickup]: (inventory[onItemPickup] || 0) + 1,
       };
 
-      setInventory(newInventory);
-      if (onInventoryChange) onInventoryChange(newInventory);
+      setInventory(newInventory); // ← Use PlayMode's setter
     }
-
-    // Update ref to current value
     prevPickupRef.current = onItemPickup;
-  }, [onItemPickup, inventory, onInventoryChange]);
+  }, [onItemPickup, inventory, setInventory]);
 
-  // Right Ctrl key handler
+  // ────── RIGHT CTRL TOGGLE ──────
   useEffect(() => {
-    const handleInventoryToggle = (e) => {
+    const handleKey = (e) => {
       if (e.code === 'ControlRight') {
-        setShowInventory(prev => !prev);
+        setShowInventory((prev) => !prev);
       }
     };
-    window.addEventListener('keydown', handleInventoryToggle);
-    return () => window.removeEventListener('keydown', handleInventoryToggle);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const [showInventory, setShowInventory] = useState(false);
-
-  return showInventory ? <InventoryPopup items={inventory} onClose={() => setShowInventory(false)} /> : null;
+  // ────── RENDER: Use passed `inventory`, not local state ──────
+  return showInventory ? (
+    <InventoryPopup
+      items={inventory} // ← Live from PlayMode
+      onClose={() => setShowInventory(false)}
+    />
+  ) : null;
 };
 
 export default PlayerInventory;
