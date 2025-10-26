@@ -138,14 +138,16 @@
 }
 
 /* === ENVIRONMENT === */
-.object.treeobject { 
-  font-size: 80px; 
-  top: -50%;
+.object.treeobject {
+    font-size: 80px;
+    top: 50%;
+    transform: translate(-50%, -70%);
   text-shadow: 1px 1px 6px #2e2e2e;
 }
 .object.pinetreeobject { 
   font-size: 80px; 
-  top: -50%;
+    top: 50%;
+    transform: translate(-50%, -70%); /* push up slightly */
 }
 .object.darktreeobject {
   font-size: 80px;

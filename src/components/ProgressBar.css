@@ -1,9 +1,9 @@
 /* src/components/ProgressBar.css */
 .progress-bar-container {
   position: absolute;
-  bottom: 4px;
-  left: -4px;
-  right: 4px;
+  bottom: -150%;
+  left: 90%;
+  /* right: 4px; */
   height: 8px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 4px;

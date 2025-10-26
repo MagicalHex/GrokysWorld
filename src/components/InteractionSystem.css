@@ -1,7 +1,7 @@
 .chat-bubble {
   position: absolute;
   left: 30%;
-  top: 15%; /* ← FIXED: +60px */
+  top: 15%;
   transform: translateX(-50%);
   background: linear-gradient(145deg, #f5f7fa 0%, #e4e8ed 50%, #d0d8e0 100%);
   padding: 14px 18px;

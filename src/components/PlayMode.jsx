@@ -1,94 +1,42 @@
 // PlayMode.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
 import HealthBar from './HealthBar';
-import ProgressBar from './ProgressBar';
 import InteractionSystem from './InteractionSystem';
+import {
+  CHOPPABLE_OBJECTS,
+  TALKABLE_OBJECTS
+} from './InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
+
 
 const PlayMode = ({
   grid, objects, playerPos, onExit, tileSize,
   rows, columns, onPlayerMove, onObjectsChange,
   restrictedTiles, level, onLevelChange
 }) => {
-  const [playerHealth, setPlayerHealth] = useState(100);
+const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
   const [pickedItem, setPickedItem] = useState(null);
-  const [droppedItems, setDroppedItems] = useState(new Set()); // Track dropped items
-  const [pickingUpTile, setPickingUpTile] = useState(null); // Track pickup animation
+  const [droppedItems, setDroppedItems] = useState(new Set());
+  const [pickingUpTile, setPickingUpTile] = useState(null);
+  const [inventory, setInventory] = useState({});
 
-  // ---- INTERACTION SYSTEM ----
-  const [inventory, setInventory] = useState({}); // New: Track inventory here
+  const interactionRef = useRef();
 
-  // ---- INTERACTION SYSTEM ----
-  const interaction = InteractionSystem({
-    playerPos,
-    objects,
-    onObjectsChange,
-    onCancelInteraction: () => interaction.cancelInteraction(),
-    rows,
-    columns,
-    onItemPickup: (item) => setPickedItem(item),
-    inventory, // New: Pass inventory
-    setInventory // New: Pass setInventory
-  });
-
-
-  const {
-    handleStartInteraction,
-    interaction: interactState,
-    cancelInteraction,
-    setInteraction,
-    CHOPPABLE_OBJECTS,
-    TALKABLE_OBJECTS
-  } = interaction;
-
-  // ---- DIALOGUE ACTIONS ----
-  const closeDialogue = () => cancelInteraction();
-  const openShop = (type) => { console.log('Shop:', type); closeDialogue(); };
-  const say = (txt) => setInteraction(prev => ({
-    ...prev,
-    message: txt,
-    choices: [{ key: 'up', text: 'Thanks!', action: closeDialogue }]
-  }));
-
-  // ---- ARROW-KEY DIALOGUE HANDLER ----
-  useEffect(() => {
-    const handleChoice = (e) => {
-      console.log('[PlayMode] dialogue handler – key:', e.key,
-                  'active?', interactState.active,
-                  'type?', interactState.type);
-
-      if (!interactState.active || interactState.type !== 'talk') return;
-
-      const map = { ArrowUp: 0, ArrowLeft: 1, ArrowRight: 2 };
-      if (e.key === 'ArrowDown') {
-        console.log('[PlayMode] ↓ cancelling dialogue');
-        cancelInteraction();
-        return;
-      }
-
-      const idx = map[e.key];
-      if (idx !== undefined && interactState.choices?.[idx]) {
-        console.log('[PlayMode] selecting choice', idx, interactState.choices[idx].text);
-        interactState.choices[idx].action();
-      } else {
-        console.log('[PlayMode] no choice for key', e.key);
-      }
-    };
-
-    window.addEventListener('keydown', handleChoice, true);
-    return () => window.removeEventListener('keydown', handleChoice, true);
-  }, [
-    interactState.active,
-    interactState.type,
-    interactState.choices,
-    cancelInteraction
-  ]);
+  const [interaction, setInteraction] = useState({
+  type: null,
+  active: false,
+  key: null,
+  timer: null,
+  message: null,
+  npc: null,
+  choices: null
+});
 
     // ---- DETECT DROPPED ITEMS (TO MAKE THEM SHINY) ----
   useEffect(() => {
@@ -121,7 +69,7 @@ const PlayMode = ({
         const updatedObjs = { ...newObjs };
         delete updatedObjs[newKey]; // Remove item after animation
         onObjectsChange(updatedObjs);
-        // setPickedItem(null); // CRITICAL: Clear immediately after animation - NEEDED? Supposed to help to only pick up one dropped
+         setPickedItem(null); // CRITICAL: Clear immediately after animation - Supposed to help to only pick up one dropped
       }, 500); // Match pickupCircle duration
     } else {
       setPickedItem(null);
@@ -154,10 +102,10 @@ const PlayMode = ({
         columns={columns}
         level={level}
         onLevelChange={onLevelChange}
-        interactionActive={interactState.active}
-        interactionType={interactState.type}
-        onStartInteraction={handleStartInteraction}
-        onCancelInteraction={cancelInteraction}
+        onStartInteraction={(key) => interactionRef.current?.handleStartInteraction(key)}
+        onCancelInteraction={() => interactionRef.current?.cancelInteraction()}
+interactionActive={interaction.active}
+  interactionType={interaction.type}
         CHOPPABLE_OBJECTS={CHOPPABLE_OBJECTS}
         TALKABLE_OBJECTS={TALKABLE_OBJECTS}
       />
@@ -181,21 +129,21 @@ const PlayMode = ({
         onObjectsChange={onObjectsChange}
       />
       <PlayerInventory
-        interactionActive={interactState.active}
+        interactionActive={interactionRef.current?.interaction?.active}
         onItemPickup={pickedItem}
         onInventoryChange={setInventory} // New: Receive updates
         inventory={inventory} // Optional: Pass down if needed for display
       />
 
 
-      {/* UI */}
-      <button onClick={onExit}>Edit Mode</button>
-
       {/* GRID */}
       <div className="play-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}>
         {grid.map((row, y) => row.map((terrain, x) => {
           const key = `${x},${y}`;
           const obj = objects[key];
+          // const isChopping = interactionRef.current?.interaction?.type === 'chop' &&
+          //                   interactionRef.current?.interaction?.key === key;
+
           return (
             <div
               key={key}
@@ -215,36 +163,29 @@ const PlayMode = ({
                   <HealthBar health={playerHealth} color={playerHealth > 50 ? '#4CAF50' : '#f44336'} />
                 </div>
               )}
-              {interactState.active && interactState.type === 'chop' && interactState.key === key && <ProgressBar />}
+              {/* {isChopping && <ProgressBar />} */}
             </div>
           );
         }))}
       </div>
 
-      {/* CHAT BUBBLE */}
-      {interactState.active && interactState.type === 'talk' && (
-        <div className="chat-bubble">
-          <div style={{ fontSize: '40px' }}
-          >
-          🛠️
-          </div>
-          <div className="chat-bubble__message">{interactState.message}</div>
-          {interactState.choices && (
-            <div className="chat-bubble__choices">
-              {interactState.choices.map((c, i) => {
-                const icons = ['Up', 'Left', 'Right'];
-                return (
-                  <div key={i} className="chat-bubble__choice">
-                    <span className="chat-bubble__icon">[{icons[i]}]</span>
-                    {c.text}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          <div className="chat-bubble__hint">Press Down to walk away</div>
-        </div>
-      )}
+      {/* Interaction UI is now inside InteractionSystem */}
+<InteractionSystem
+  ref={interactionRef}
+  playerPos={playerPos}
+  objects={objects}
+  onObjectsChange={onObjectsChange}
+  onCancelInteraction={() => {}}
+  rows={rows}
+  columns={columns}
+  inventory={inventory}
+  setInventory={setInventory}
+  interaction={interaction}
+  setInteraction={setInteraction}  // ← ADD THIS
+  tileSize={tileSize}
+/>
+
+      <button onClick={onExit}>Edit Mode</button>
     </div>
   );
 };
