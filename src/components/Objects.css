@@ -176,6 +176,12 @@
   animation: sway 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
+.object.angel { 
+  font-size: 40px; 
+  animation: sway 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px #9932CC);
+color: #ffffff5c;
+}
 .object.fireobject { 
   font-size: 35px; 
   animation: potion-bubble 3s ease-in-out infinite;

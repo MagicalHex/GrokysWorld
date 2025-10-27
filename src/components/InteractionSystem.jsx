@@ -23,9 +23,10 @@ const InteractionSystem = forwardRef(({
   columns,
   inventory,
   setInventory,
-interaction,        // ← ADD HERE
+  interaction,        // ← ADD HERE
   setInteraction,     // ← ADD HERE
-  tileSize
+  tileSize,
+  onQueueRespawn
 }, ref) => {
 
   // === CHOPPING LOGIC ===
@@ -62,6 +63,7 @@ interaction,        // ← ADD HERE
 
       if (dropKey) upd[dropKey] = dropItem;
       onObjectsChange(upd);
+      onQueueRespawn({ key: targetKey, type: 'treeobject' });
       setInteraction({ type: null, active: false, key: null, timer: null });
     }, CHOP_DURATION);
 

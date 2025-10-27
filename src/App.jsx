@@ -20,7 +20,9 @@ function App() {
     restrictedTiles,
     rows,
     columns,
-    renderSelector
+    renderSelector,
+    onQueueRespawn,
+    getOriginalSpawns
   } = levelsData;
 
   if (playMode && currentLevelData.playerPos) {
@@ -38,6 +40,8 @@ function App() {
         restrictedTiles={restrictedTiles}
         level={levelsData.currentLevel}
         onLevelChange={onLevelChange}
+        onQueueRespawn={onQueueRespawn}
+        originalSpawns={getOriginalSpawns()} // ← Call it when passing to PlayMode
       />
     );
   }

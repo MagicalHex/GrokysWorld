@@ -17,7 +17,7 @@ import './PlayMode.css';
 const PlayMode = ({
   grid, objects, playerPos, onExit, tileSize,
   rows, columns, onPlayerMove, onObjectsChange,
-  restrictedTiles, level, onLevelChange
+  restrictedTiles, level, onLevelChange, onQueueRespawn, originalSpawns
 }) => {
   const [playerHealth, setPlayerHealth] = useState(100);
   const [monsterHealths, setMonsterHealths] = useState({});
@@ -25,9 +25,8 @@ const PlayMode = ({
   const [droppedItems, setDroppedItems] = useState(new Set());
   const [pickingUpTile, setPickingUpTile] = useState(null);
   const [inventory, setInventory] = useState({});
-
   const interactionRef = useRef();
-
+    // ---- Set states and pass to Inventory, Interaction, Movement components ----
   const [interaction, setInteraction] = useState({
   type: null,
   active: false,
@@ -39,7 +38,7 @@ const PlayMode = ({
 });
 const [isDead, setIsDead] = useState(false);
 
-// Watch player health
+    // ---- Watch Player health (look for 0) ----
 useEffect(() => {
   if (playerHealth <= 0 && !isDead) {
     setIsDead(true);
@@ -136,6 +135,8 @@ useEffect(() => {
         monsterHealths={monsterHealths}
         setMonsterHealths={setMonsterHealths}
         onObjectsChange={onObjectsChange}
+        onQueueRespawn={onQueueRespawn}
+        originalSpawns={originalSpawns}
       />
       <PlayerInventory
         interactionActive={interactionRef.current?.interaction?.active}
@@ -217,6 +218,8 @@ useEffect(() => {
         interaction={interaction}
         setInteraction={setInteraction}
         tileSize={tileSize}
+        onQueueRespawn={onQueueRespawn}
+        originalSpawns={originalSpawns}
       />
 
       <button onClick={onExit}>Edit Mode</button>

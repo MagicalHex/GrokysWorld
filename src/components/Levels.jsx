@@ -1,7 +1,7 @@
 // src/components/Levels.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, prev } from 'react';
 
-// FALLBACK GRIDS (like before)
+// FALLBACK GRIDS
 const createLevel1Grid = () => Array(16).fill().map(() => Array(24).fill('grass'));
 const createLevel2Grid = () => Array(16).fill().map(() => Array(24).fill('sand'));
 const createLevel3Grid = () => createLevel2Grid();
@@ -37,14 +37,14 @@ export const Levels = () => {
   const [rows] = useState(16);
   const [columns] = useState(24);
   
-  // ✅ START WITH FALLBACK GRIDS (no null!)
-const [levels, setLevels] = useState({
-  1: { grid: createLevel1Grid(), objects: {} },
-  2: { grid: createLevel2Grid(), objects: {} },
-  3: { grid: createLevel3Grid(), objects: {} },
-  4: { grid: createLevel4Grid(), objects: {} },
-  5: { name: 'Dungeon', grid: createLevel5Grid(), objects: {} }, // ← darkstone
-});
+// LEVEL DATA WITH ORIGINAL SPAWNS + RESPAWN QUEUE
+  const [levels, setLevels] = useState({
+    1: { grid: createLevel1Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+    2: { grid: createLevel2Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+    3: { grid: createLevel3Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+    4: { grid: createLevel4Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+    5: { name: 'Dungeon', grid: createLevel5Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+  });
   
   const [currentLevel, setCurrentLevel] = useState(1);
   const [selectedTile] = useState(null);
@@ -53,13 +53,29 @@ const [levels, setLevels] = useState({
 
   // LOAD JSON & REPLACE (async, after mount)
 useEffect(() => {
-  loadMaps().then(loadedLevels => {
-    if (loadedLevels) {
-      // MERGE loaded maps with fallbacks (preserve -1!)
-      setLevels(prev => ({
-        ...prev,        // ← keep -1, 1, 2...
-        ...loadedLevels // ← override 1-5 only
-      }));
+    loadMaps().then(loadedLevels => {
+      if (loadedLevels) {
+        setLevels(prev => {
+          const updated = { ...prev };
+          Object.entries(loadedLevels).forEach(([id, data]) => {
+            if (updated[id]) {
+              const originalSpawns = {};
+              Object.entries(data.objects || {}).forEach(([key, type]) => {
+                if (type === 'spider' || type === 'treeobject') {
+                  originalSpawns[key] = type;
+                }
+              });
+
+              updated[id] = {
+                ...updated[id],
+                ...data,
+                originalSpawns,
+                respawnQueue: updated[id].respawnQueue || []
+              };
+            }
+          });
+          return updated;
+        });
 
       // Compute restrictedTiles for ALL levels (including -1)
       const restrictedByLevel = {};
@@ -90,15 +106,15 @@ useEffect(() => {
 }, []);
 
   // GET CURRENT LEVEL DATA (NEVER NULL!)
-  const currentLevelData = levels[currentLevel];
+  // const currentLevelData = levels[currentLevel];
   
   // UPDATE CURRENT LEVEL
-  const updateLevel = (updates) => {
-    setLevels(prev => ({
-      ...prev,
-      [currentLevel]: { ...prev[currentLevel], ...updates }
-    }));
-  };
+  // const updateLevel = (updates) => {
+  //   setLevels(prev => ({
+  //     ...prev,
+  //     [currentLevel]: { ...prev[currentLevel], ...updates }
+  //   }));
+  // };
 
   // PORTAL ENTRY POINTS
 const PORTAL_ENTRY_POINTS = {
@@ -110,28 +126,28 @@ const PORTAL_ENTRY_POINTS = {
 };
 
   // PROPER onLevelChange FUNCTION
-const onLevelChange = (newLevel, customSpawn = null) => {
-  const levelKey = String(newLevel);
-  if (!levels[levelKey]) {
-    console.error(`Level ${levelKey} not found!`);
-    return;
-  }
+// const onLevelChange = (newLevel, customSpawn = null) => {
+//   const levelKey = String(newLevel);
+//   if (!levels[levelKey]) {
+//     console.error(`Level ${levelKey} not found!`);
+//     return;
+//   }
 
-  const entryPos = customSpawn || PORTAL_ENTRY_POINTS[levelKey] || { x: 1, y: 1 };
-  const levelName = levels[levelKey]?.name || `Level ${levelKey}`;
+//   const entryPos = customSpawn || PORTAL_ENTRY_POINTS[levelKey] || { x: 1, y: 1 };
+//   const levelName = levels[levelKey]?.name || `Level ${levelKey}`;
 
-  console.log(`Going to ${levelName} at ${entryPos.x},${entryPos.y}`);
+//   console.log(`Going to ${levelName} at ${entryPos.x},${entryPos.y}`);
 
-  setLevels(prev => ({
-    ...prev,
-    [levelKey]: {
-      ...prev[levelKey],
-      playerPos: entryPos
-    }
-  }));
+//   setLevels(prev => ({
+//     ...prev,
+//     [levelKey]: {
+//       ...prev[levelKey],
+//       playerPos: entryPos
+//     }
+//   }));
 
-  setCurrentLevel(Number(levelKey));
-};
+//   setCurrentLevel(Number(levelKey));
+// };
 
   // handleGridChange FOR BLOCKING TILES AND UPDATING PER LEVEL
 const handleGridChange = (newGrid, levelId = currentLevel) => {
@@ -154,28 +170,112 @@ const handleGridChange = (newGrid, levelId = currentLevel) => {
   updateLevel({ grid: newGrid }, levelId);
 };
 
-  return {
+// --- GLOBAL RESPAWN TICKER (runs forever) ---
+  const respawnIntervalRef = useRef(null);
+
+  useEffect(() => {
+    respawnIntervalRef.current = setInterval(() => {
+      const now = Date.now();
+      setLevels(prev => {
+        const updated = { ...prev };
+        let changed = false;
+
+        Object.keys(updated).forEach(levelId => {
+          const level = updated[levelId];
+          if (!level.respawnQueue || level.respawnQueue.length === 0) return;
+
+          const newQueue = [];
+          level.respawnQueue.forEach(item => {
+            if (now >= item.timestamp) {
+              // TIME TO RESPAWN
+              const { key, type } = item;
+              const currentObj = level.objects[key];
+
+              // Only respawn if tile is empty or has stump/coin
+              const canRespawn =
+                !currentObj ||
+                currentObj === 'timberwoodchoppedobject' ||
+                currentObj === 'coin';
+
+              if (canRespawn) {
+                level.objects = { ...level.objects, [key]: type };
+                if (type === 'spider') {
+                  // Optional: reset health if you track per-level
+                }
+                console.log(`Respawned ${type} at ${key} (Level ${levelId})`);
+                changed = true;
+              } else {
+                // Still blocked → re-queue in 5s
+                newQueue.push({ ...item, timestamp: now + 5000 });
+              }
+            } else {
+              newQueue.push(item);
+            }
+          });
+
+          level.respawnQueue = newQueue;
+        });
+
+        return changed ? updated : prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(respawnIntervalRef.current);
+  }, []);
+
+  // --- QUEUE RESPAWN FROM ANY LEVEL ---
+  const onQueueRespawn = (levelId, { key, type }) => {
+    const timestamp = Date.now() + 3000; // 30s
+    setLevels(prev => ({
+      ...prev,
+      [levelId]: {
+        ...prev[levelId],
+        respawnQueue: [...(prev[levelId].respawnQueue || []), { key, type, timestamp }]
+      }
+    }));
+    console.log(`Queued ${type} respawn at ${key} in 30s (Level ${levelId})`);
+  };
+
+  // --- CURRENT LEVEL DATA ---
+  const currentLevelData = levels[currentLevel] || levels[1];
+
+  const updateLevel = (updates, levelId = currentLevel) => {
+    setLevels(prev => ({
+      ...prev,
+      [levelId]: { ...prev[levelId], ...updates }
+    }));
+  };
+
+  const onLevelChange = (newLevel, customSpawn = null) => {
+    const levelKey = String(newLevel);
+    if (!levels[levelKey]) return;
+
+    const entryPos = customSpawn || PORTAL_ENTRY_POINTS[levelKey] || { x: 1, y: 1 };
+    updateLevel({ playerPos: entryPos }, levelKey);
+    setCurrentLevel(Number(levelKey));
+  };
+
+return {
     currentLevelData,
     currentLevel,
     setCurrentLevel,
-    // restrictedTiles,
-    // Pass current level's restricted tiles
-  get restrictedTiles() {
-    return restrictedTilesByLevel[currentLevel] || new Set();
-  },
+    get restrictedTiles() {
+      return restrictedTilesByLevel[currentLevel] || new Set();
+    },
     handleGridChange,
-    onObjectsChange: (newObjects) => updateLevel({ objects: newObjects }),
-    onPlayerPosChange: (newPos) => updateLevel({ playerPos: newPos }),
+    onObjectsChange: (newObjects, levelId = currentLevel) => 
+      updateLevel({ objects: newObjects }, levelId),
+    onPlayerPosChange: (newPos, levelId = currentLevel) => 
+      updateLevel({ playerPos: newPos }, levelId),
     onLevelChange,
+    onQueueRespawn: (payload) => onQueueRespawn(currentLevel, payload),
+    getOriginalSpawns: (levelId = currentLevel) => levels[levelId]?.originalSpawns || {},
     rows,
     columns,
     renderSelector: () => (
       <div>
         <label>Level: </label>
-        <select 
-          value={currentLevel} 
-          onChange={(e) => onLevelChange(Number(e.target.value))}
-        >
+        <select value={currentLevel} onChange={e => onLevelChange(Number(e.target.value))}>
           {Object.entries(levels).map(([id, data]) => (
             <option key={id} value={id}>
               {data.name ? `${data.name} (Level ${id})` : `Level ${id}`}
