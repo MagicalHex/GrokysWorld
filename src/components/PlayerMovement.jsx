@@ -89,7 +89,7 @@ const PlayerMovement = ({
 
           const CUSTOM_SPAWNS = {
             'portal-1': { x: 22, y: 8 },
-            'rope-1':   { x: 21, y: 14 },
+            'rope-2':   { x: 6, y: 12 },
           };
 
           const key = `${type}-${level}`;

@@ -1,5 +1,5 @@
 {
-  "name": "Mossy Slime Cave",
+  "name": "Mossy Slime Cave 2",
   "grid": [
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc"],
     ["msc", "mscd", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd"],
@@ -19,7 +19,7 @@
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd"]
   ],
   "objects": {
-    "1,1": "rope-to-2",
+    "1,1": "rope-to-3",
     "5,3": "skeleton",
     "12,6": "skeleton",
     "18,9": "skeleton",
@@ -28,6 +28,6 @@
     "8,8": "stoneobject",
     "10,10": "stoneobject",
     "14,4": "stoneobject",
-    "22,14": "hole-to-6"
+        "22,4": "backpack"
   }
 }

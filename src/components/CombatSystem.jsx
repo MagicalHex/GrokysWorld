@@ -17,7 +17,7 @@ const WEAPON_DAMAGE_RANGES = {
 
 // MONSTERS
 const MONSTER_DAMAGE_RANGES = {
-  skeleton: { min:  5, max: 12 },
+  skeleton: { min:  5, max: 20 },
   spider:   { min:  0, max: 15 },   // as requested
 };
 

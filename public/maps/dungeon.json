@@ -19,7 +19,7 @@
     ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"]
   ],
 "objects": {
-  "1,1": "rope-to-1",
+  "1,1": "rope-to-2",
   "2,11": "lightstoneobject",
   "15,1": "lightstoneobject",
   "20,2": "lightstoneobject",

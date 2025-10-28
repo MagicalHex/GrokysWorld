@@ -8,6 +8,7 @@ const FALLBACKS = {
   3: () => createFallbackGrid(16, 24, 'sand'),
   4: () => createFallbackGrid(16, 24, 'sand'),
   5: () => createFallbackGrid(16, 24, 'darkstone'),
+  6: () => createFallbackGrid(16, 24, 'darkstone'),
 };
 
 export const loadMaps = async () => {
@@ -18,6 +19,7 @@ export const loadMaps = async () => {
       fetch('/maps/slimecave.json').then(r => r.json()),
       fetch('/maps/stonecave.json').then(r => r.json()),
       fetch('/maps/dungeon.json').then(r => r.json()),
+      fetch('/maps/slimecave1.json').then(r => r.json()),
     ]);
 
     return maps.reduce((acc, map, i) => {

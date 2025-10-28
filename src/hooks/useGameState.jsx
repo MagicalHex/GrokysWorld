@@ -9,7 +9,8 @@ const PORTAL_ENTRY_POINTS = {
   2: { x: 1, y: 2 }, 
   3: { x: 3, y: 3 }, 
   4: { x: 4, y: 4 }, 
-  5: { x: 1, y: 1 } };
+  5: { x: 1, y: 1 },
+  6: { x: 2, y: 2 }, };
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
@@ -45,13 +46,54 @@ export const useGameState = () => {
   /* --------------------------------------------------------------
      3. onLevelChange – must be defined *before* anything that uses it
      -------------------------------------------------------------- */
+     // USED THIS CODE BUT PLAYER OBJECT GOT STUCK IN LEVEL CHANGE
+  // const onLevelChange = useCallback((newLevel, customSpawn = null) => {
+  //   const id = String(newLevel);
+  //   if (!levels[id]) return;
+  //   const pos = customSpawn || PORTAL_ENTRY_POINTS[id] || { x: 1, y: 1 };
+  //   updateLevel(id, { playerPos: pos });
+  //   setCurrentLevel(Number(id));
+  // }, [levels, updateLevel]);
+
+  // NEW CODE, A BIT STRESS IMPLEMENTED, HELPS WITH PLAYER OBJECT NOT GETTING STUCK
   const onLevelChange = useCallback((newLevel, customSpawn = null) => {
-    const id = String(newLevel);
-    if (!levels[id]) return;
-    const pos = customSpawn || PORTAL_ENTRY_POINTS[id] || { x: 1, y: 1 };
-    updateLevel(id, { playerPos: pos });
-    setCurrentLevel(Number(id));
-  }, [levels, updateLevel]);
+  const id = String(newLevel);
+  if (!levels[id]) return;
+
+  const pos = customSpawn || PORTAL_ENTRY_POINTS[id] || { x: 1, y: 1 };
+  const newKey = `${pos.x},${pos.y}`;
+
+  // STEP 1: Clear 'player' from ALL levels
+  const cleanedLevels = Object.fromEntries(
+    Object.entries(levels).map(([levelId, level]) => {
+      const newObjects = { ...level.objects };
+      let changed = false;
+
+      Object.keys(newObjects).forEach(key => {
+        if (newObjects[key] === 'player') {
+          delete newObjects[key];
+          changed = true;
+        }
+      });
+
+      return [levelId, { ...level, objects: changed ? newObjects : level.objects }];
+    })
+  );
+
+  // STEP 2: Place player in new level
+  cleanedLevels[id] = {
+    ...cleanedLevels[id],
+    playerPos: pos,
+    objects: {
+      ...cleanedLevels[id].objects,
+      [newKey]: 'player'
+    }
+  };
+
+  // STEP 3: Update state
+  setLevels(cleanedLevels);
+  setCurrentLevel(Number(id));
+}, [levels, setLevels]);
 
   /* --------------------------------------------------------------
      4. Respawn (uses onLevelChange → safe now)
@@ -209,22 +251,23 @@ const clearPendingPickup = useCallback(() => {
 // ──────────────────────────────────────────────────────────────
 // 1. Helper: get original key from monsterId (only for monsters)
 // ──────────────────────────────────────────────────────────────
-const getOriginalKey = (monsterId, levels) => {
-  if (typeof monsterId !== 'string') return null;
-  const parts = monsterId.split('_');
-  if (parts.length !== 4) return null;
-
-  const levelId = Number(parts[1]);
-  const x = Number(parts[2]);
-  const y = Number(parts[3]);
-  const candidate = `${x},${y}`;
-
-  const orig = levels[levelId]?.originalSpawns?.[candidate];
-  if (orig && (orig === parts[0] || orig === monsterId)) {
-    return candidate;
+const getOriginalKey = useCallback((monsterId, levels) => {
+  // First: Check originalSpawns (fast)
+  if (originalSpawns[monsterId]) {
+    return originalSpawns[monsterId];
   }
+
+  // Fallback: Search levels (slower, for legacy)
+  for (const [levelId, level] of Object.entries(levels)) {
+    for (const [key, value] of Object.entries(level.objects || {})) {
+      if (value === monsterId) {
+        return key;
+      }
+    }
+  }
+
   return null;
-};
+}, [originalSpawns, levels]);
 
 // ──────────────────────────────────────────────────────────────
 // Respawn delay map – define once, use everywhere
@@ -233,7 +276,7 @@ const RESPAWN_DELAYS = {
   treeobject: 1500,     // 15 seconds
   lightstoneobject: 2000,    // 20 seconds (example)
   spider: 30000,         // 30 seconds
-  skeleton: 45000,       // 45 seconds (example)
+  skeleton: 30000,       // 45 seconds (example)
   default: 10000         // fallback
 };
 
