@@ -104,10 +104,7 @@ if (
 ) {
   const weapon = getEquippedWeapon(inventory);
   const { min, max } = WEAPON_DAMAGE_RANGES[weapon] ?? WEAPON_DAMAGE_RANGES.fist;
-  const baseDmg = randInt(min, max);
-
-  // Optional tiny monster-type bonus (kept from your original code)
-  const dmg = baseDmg + (type === 'skeleton' ? 0 : 5);
+  const dmg = randInt(min, max);
 
   const curHealth = globalMonsterHealths[monsterId] ?? 100;
   const newHealth = Math.max(0, curHealth - dmg);

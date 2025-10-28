@@ -45,7 +45,9 @@ function App() {
       </div>
     );
   }
+  // -------- DEBUG AREA
 console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealths);
+
   if (playMode && currentLevelData.playerPos) {
     return (
 <PlayMode

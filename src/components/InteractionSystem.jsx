@@ -27,7 +27,7 @@ const InteractionSystem = forwardRef(({
   setInteraction,     // ← ADD HERE
   tileSize,
   onQueueRespawn,
-  level
+  onInventoryChange
 }, ref) => {
 
   // === CHOPPING LOGIC ===
@@ -39,7 +39,7 @@ const InteractionSystem = forwardRef(({
     const timer = setTimeout(() => {
       const upd = { ...objects };
       delete upd[targetKey];
-      upd[targetKey] = CHOP_RESULT[obj];
+      upd[targetKey] = CHOP_RESULT[obj]; // e.g. 'timberwoodchoppedobject'
 
       // Drop item nearby
       const [x, y] = targetKey.split(',').map(Number);
@@ -62,14 +62,17 @@ const InteractionSystem = forwardRef(({
         if (dropKey) break;
       }
 
-      if (dropKey) upd[dropKey] = dropItem;
-      onObjectsChange(upd);
-      onQueueRespawn({ key: targetKey, type: 'treeobject' });
-      setInteraction({ type: null, active: false, key: null, timer: null });
-    }, CHOP_DURATION);
+if (dropKey) upd[dropKey] = dropItem;
+    onObjectsChange(upd);
 
-    setInteraction({ type: 'chop', active: true, key: targetKey, timer });
-  };
+    // FIXED: Pass the ORIGINAL type
+    onQueueRespawn({ key: targetKey, type: obj }); // ← obj is 'treeobject' or 'lightstoneobject'
+
+    setInteraction({ type: null, active: false, key: null, timer: null });
+  }, CHOP_DURATION);
+
+  setInteraction({ type: 'chop', active: true, key: targetKey, timer });
+};
 
   // === TALKING LOGIC ===
   const startTalking = (targetKey) => {
@@ -173,7 +176,7 @@ const buyItem = (item) => {
   newInv[item.addsToInventory] = (newInv[item.addsToInventory] ?? 0) + 1;
 
   console.log('%c[Merchant] Purchase SUCCESS → newInv:', 'color:lime', newInv);
-  setInventory(newInv);
+  onInventoryChange(newInv);
   say(`You bought the **${item.name}**!`);
 };
 

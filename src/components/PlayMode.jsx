@@ -49,11 +49,12 @@ useEffect(() => {
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
+  useEffect(() => {
+  console.trace('[PlayMode] rendered — why?');
+}, []);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
-  const [pickedItem, setPickedItem] = useState(null);
-  const [pickingUpTile, setPickingUpTile] = useState(null);
   const interactionRef = useRef();
   const [interaction, setInteraction] = useState({
     type: null,
@@ -113,6 +114,9 @@ useEffect(() => {
   clearPendingPickup,
   // setPickingUpTile   // <-- comment out if you don’t need the flash
 ]);
+const removePickupPopup = useCallback((id) => {
+  setPickupPopups(prev => prev.filter(p => p.id !== id));
+}, []);
 
   /* --------------------------------------------------------------
      2. Dropped-item shine detection
@@ -160,7 +164,6 @@ useEffect(() => {
         rows={rows}
         columns={columns}
         monsterHealths={monsterHealths}
-        onMonsterHealthChange={onMonsterHealthChange}
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
       />
@@ -212,7 +215,7 @@ useEffect(() => {
             return (
               <div
                 key={key}
-                className={`tile ${terrain} ${pickingUpTile === key ? 'picking-up' : ''}`}
+                className={`tile ${terrain}`}
                 style={{ width: tileSize, height: tileSize, position: 'relative' }}
               >
                 {/* OBJECTS */}

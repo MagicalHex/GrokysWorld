@@ -9,8 +9,7 @@ const MonsterMovement = ({
   rows,
   columns,
   globalMonsterHealths,
-  monsterTypes,
-  onMonsterHealthChange,
+  monsterTypes
 }) => {
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 

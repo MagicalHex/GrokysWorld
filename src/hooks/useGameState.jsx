@@ -176,8 +176,8 @@ const getOriginalKey = (monsterId, levels) => {
 // Respawn delay map – define once, use everywhere
 // ──────────────────────────────────────────────────────────────
 const RESPAWN_DELAYS = {
-  treeobject: 15000,     // 15 seconds
-  stoneobject: 20000,    // 20 seconds (example)
+  treeobject: 1500,     // 15 seconds
+  lightstoneobject: 2000,    // 20 seconds (example)
   spider: 30000,         // 30 seconds
   skeleton: 45000,       // 45 seconds (example)
   default: 10000         // fallback
@@ -260,7 +260,7 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
       // Can we place it?
       const occupied = level.objects[key];
       const canPlace = !occupied ||
-        ['gold', 'coin', 'timberwoodchoppedobject'].includes(occupied);
+        ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject'].includes(occupied);
 
       if (!canPlace) {
         // Try again in 1s
