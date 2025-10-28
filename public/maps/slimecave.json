@@ -1,24 +1,32 @@
 {
-  "name": "Scorching Desert",
+  "name": "Mossy Slime Cave",
   "grid": [
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"],
-    ["sand", "cactus", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"],
-    ["sand", "cactus", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"],
-    ["sand", "cactus", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"],
-    ["sand", "cactus", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"],
-    ["sand", "cactus", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "cactus", "sand", "sand", "sand", "sand"],
-    ["sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand", "sand"]
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc"],
+    ["msc", "mscd", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd"],
+    ["msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "msc"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd"],
+    ["msc", "mscd", "msc", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc"],
+    ["msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "msc"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc"],
+    ["msc", "mscd", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "msc"],
+    ["msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "msc"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "msc", "msc"],
+    ["msc", "mscd", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd"],
+    ["msc", "msc", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "msc", "msc"],
+    ["msc", "msc", "mscd", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc"],
+    ["msc", "mscd", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "mscd", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc"],
+    ["msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "msc", "msc", "mscd"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscd"]
   ],
   "objects": {
-    "12,8": "oasis"
+    "1,1": "rope-to-2",
+    "5,3": "skeleton",
+    "12,6": "skeleton",
+    "18,9": "skeleton",
+    "3,12": "skeleton",
+    "15,14": "skeleton",
+    "8,8": "stoneobject",
+    "10,10": "stoneobject",
+    "14,4": "stoneobject"
   }
 }

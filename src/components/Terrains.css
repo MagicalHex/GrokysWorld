@@ -329,7 +329,7 @@ background: linear-gradient(to bottom,
 
 
 /* CAVE FLOORS */
-.tile.slimecave {
+.tile.msc {
 background: 
   radial-gradient(circle at 30% 40%, #1e3a1e 1px, transparent 1px),
   radial-gradient(circle at 70% 60%, #162916 1px, transparent 1px),
@@ -337,4 +337,13 @@ background:
   #1a2a1a;
 background-size: 50px 50px, 70px 70px, 100% 100%, 100% 100%;
 filter: brightness(0.8) contrast(1.1);
+}
+.tile.mscd {
+  background: 
+    radial-gradient(circle at 30% 40%, #162916 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, #101c10 1px, transparent 1px),
+    linear-gradient(145deg, #233823 0%, #142814 30%, #1a2a1a 60%, #0f160f 100%),
+    #121f12;
+  background-size: 50px 50px, 70px 70px, 100% 100%, 100% 100%;
+  filter: brightness(0.7) contrast(1.15);
 }

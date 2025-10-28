@@ -68,27 +68,44 @@ const PlayerMovement = ({
       }
 
       // ---- WALKABLE ----
-      const isPortal = targetObj?.startsWith('portal-to-');
-      const isHole   = targetObj === 'holeobject';
-      const isRope   = targetObj === 'ropeobject';
       const isWalkable = !targetObj || WALKABLE_OBJECTS.has(targetObj);
+      const teleportMatch = targetObj?.match(/^(portal|rope|hole)-to-(\d+)$/);
+      const isLegacyRope = targetObj === 'ropeobject';
+      const isLegacyHole = targetObj === 'holeobject';
 
-      if (!isWalkable && !isPortal && !isHole && !isRope) return;
+      if (!isWalkable && !teleportMatch && !isLegacyRope && !isLegacyHole) return;
 
       setCanMove(false);
       onPlayerMove(newPos);
 
-      // ---- PORTAL / HOLE / ROPE ----
-      if (isPortal) {
-        setTimeout(() => {
-          const to = parseInt(targetObj.split('-to-')[1],10);
-          if (to === 1) onLevelChange(to, {x:22,y:8});
-          else onLevelChange(to);
-        },100);
-      } else if (isHole) {
-        setTimeout(() => onLevelChange(5),100);
-      } else if (isRope) {
-        setTimeout(() => onLevelChange(1,{x:21,y:14}),100);
+      // === TELEPORT LOGIC ===
+      if (teleportMatch || isLegacyRope || isLegacyHole) {
+        let level;
+        let customSpawn = null;
+
+        if (teleportMatch) {
+          const [, type, levelStr] = teleportMatch;
+          level = parseInt(levelStr, 10);
+
+          const CUSTOM_SPAWNS = {
+            'portal-1': { x: 22, y: 8 },
+            'rope-1':   { x: 21, y: 14 },
+          };
+
+          const key = `${type}-${level}`;
+          customSpawn = CUSTOM_SPAWNS[key] || null;
+        } 
+        // FALLBACKS, SHOULD NOT BE USED
+        else if (isLegacyRope) {
+          level = 1;
+          customSpawn = { x: 21, y: 14 };
+        } 
+        else if (isLegacyHole) {
+          level = 5;
+          customSpawn = null;  // use default
+        }
+
+        setTimeout(() => onLevelChange(level, customSpawn), 100);
       }
 
       setTimeout(() => setCanMove(true), moveDelay);

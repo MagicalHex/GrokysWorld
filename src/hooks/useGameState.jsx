@@ -4,9 +4,15 @@ import { loadMaps } from '../data/loadMaps';
 
 const ROWS = 16;
 const COLS = 24;
-const PORTAL_ENTRY_POINTS = { 1: { x: 1, y: 1 }, 2: { x: 1, y: 2 }, 3: { x: 3, y: 3 }, 4: { x: 4, y: 4 }, 5: { x: 1, y: 1 } };
+const PORTAL_ENTRY_POINTS = { 
+  1: { x: 1, y: 1 }, 
+  2: { x: 1, y: 2 }, 
+  3: { x: 3, y: 3 }, 
+  4: { x: 4, y: 4 }, 
+  5: { x: 1, y: 1 } };
+  
 const RESTRICTED_TERRAIN = new Set([
-  'stone', 'darkstone', 'stonepillar', 'grassnowalk',
+  'stone', 'stonepillar', 'grassnowalk',
   'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'
 ]);
 
@@ -100,7 +106,7 @@ export const useGameState = () => {
   } else {
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','holeobject','ropeobject'
+      'bridge','ladder','hole-to-5','rope-to-1'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);
     if (!isPersist && !targetObj?.startsWith('portal-to-')) {
@@ -116,14 +122,14 @@ export const useGameState = () => {
   });
 
   // ---- 5. Portal / hole / rope ------------------------------------
-  if (targetObj?.startsWith('portal-to-')) {
-    const to = parseInt(targetObj.split('-to-')[1],10);
-    setTimeout(() => (to===1 ? onLevelChange(to,{x:22,y:8}) : onLevelChange(to)), 100);
-  } else if (targetObj === 'holeobject') {
-    setTimeout(() => onLevelChange(5), 100);
-  } else if (targetObj === 'ropeobject') {
-    setTimeout(() => onLevelChange(1,{x:21,y:14}), 100);
-  }
+  // if (targetObj?.startsWith('portal-to-')) {
+  //   const to = parseInt(targetObj.split('-to-')[1],10);
+  //   setTimeout(() => (to===1 ? onLevelChange(to,{x:22,y:8}) : onLevelChange(to)), 100);
+  // } else if (targetObj === 'holeobject') {
+  //   setTimeout(() => onLevelChange(5), 100);
+  // } else if (targetObj === 'ropeobject') {
+  //   setTimeout(() => onLevelChange(1,{x:21,y:14}), 100);
+  // }
 }, [
   currentLevel, levels, updateLevel, onLevelChange
 ]);

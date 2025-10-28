@@ -22,7 +22,6 @@ function App() {
     onObjectsChange,
     onLevelChange,
     onQueueRespawn,
-    scheduleRespawn,
     getOriginalSpawns,
     currentLevel,
     globalPlayerHealth,
