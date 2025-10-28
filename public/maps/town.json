@@ -83,11 +83,12 @@
     "12,4": "timberwoodsideobjecthalfleft",
     "18,4": "timberwoodsideobjecthalfright",
 
-    "4,12": "fenceobject",
-    "4,13": "fenceobject",
-    "4,14": "fenceobject",
-    "4,15": "fenceobject",
+    "4,12": "stoneobjecthalf",
+    "4,13": "stoneobjecthalf",
+    "4,14": "stoneobjecthalf",
+    "4,15": "stoneobjecthalf",
 
+    "23,11": "stoneobjecthalf",
     "23,12": "stoneobject",
     "23,13": "stoneobject",
     "23,15": "stoneobject",
@@ -95,6 +96,7 @@
     "22,15": "stoneobject",
     "21,15": "stoneobject",
     "20,14": "stoneobject",
+    "20,15": "stoneobjecthalf",
     "20,13": "stoneobject",
 
     "22,14": "hole-to-5"

@@ -62,7 +62,7 @@ export const OBJECTS = {
   candleobject: '🕯️',
   // GOALS
   goal: '🎯',
-  'portal-to-1': '🌀',
+  'portal-to-1': '🏠',
   'portal-to-2': '',
   'portal-to-3': '🌀',
   'portal-to-4': '🌀',
@@ -86,6 +86,7 @@ export const OBJECTS = {
   lightstoneobject: '',       // Light cobblestone  
   lightstonechoppedobject: '',
   stoneobject: '',            // Medium stone
+  stoneobjecthalf: '',            // Medium stone
   stonepillarobject: '',
   // TIMBER
   timberwoodupobject: '',

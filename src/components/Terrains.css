@@ -330,20 +330,12 @@ background: linear-gradient(to bottom,
 
 /* CAVE FLOORS */
 .tile.msc {
-background: 
-  radial-gradient(circle at 30% 40%, #1e3a1e 1px, transparent 1px),
-  radial-gradient(circle at 70% 60%, #162916 1px, transparent 1px),
-  linear-gradient(145deg, #2d4a2d 0%, #1a331a 30%, #243324 60%, #162016 100%),
-  #1a2a1a;
-background-size: 50px 50px, 70px 70px, 100% 100%, 100% 100%;
-filter: brightness(0.8) contrast(1.1);
+    background: linear-gradient(145deg, #1f361f 0%, #1a331a 50%, #243324 70%, #163416 100%), #173e17;
+    box-shadow: inset 0 0px 1px #00800059;
 }
 .tile.mscd {
-  background: 
-    radial-gradient(circle at 30% 40%, #162916 1px, transparent 1px),
-    radial-gradient(circle at 70% 60%, #101c10 1px, transparent 1px),
-    linear-gradient(145deg, #233823 0%, #142814 30%, #1a2a1a 60%, #0f160f 100%),
-    #121f12;
-  background-size: 50px 50px, 70px 70px, 100% 100%, 100% 100%;
-  filter: brightness(0.7) contrast(1.15);
+background: 
+    linear-gradient(145deg, #162716 0%, #132413 50%, #1a261a 70%, #0f220f 100%),
+    #112b11;
+  box-shadow: inset 0 0px 1px #00400059;
 }

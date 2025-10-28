@@ -120,16 +120,7 @@ export const useGameState = () => {
     playerPos: newPos,
     pendingPickup: pickupItem          // <-- NEW flag
   });
-
-  // ---- 5. Portal / hole / rope ------------------------------------
-  // if (targetObj?.startsWith('portal-to-')) {
-  //   const to = parseInt(targetObj.split('-to-')[1],10);
-  //   setTimeout(() => (to===1 ? onLevelChange(to,{x:22,y:8}) : onLevelChange(to)), 100);
-  // } else if (targetObj === 'holeobject') {
-  //   setTimeout(() => onLevelChange(5), 100);
-  // } else if (targetObj === 'ropeobject') {
-  //   setTimeout(() => onLevelChange(1,{x:21,y:14}), 100);
-  // }
+  
 }, [
   currentLevel, levels, updateLevel, onLevelChange
 ]);
