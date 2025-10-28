@@ -57,6 +57,8 @@ export default function CombatSystem({
   isDead,
   setIsDead,
   inventory,               // <-- NEW PROP
+  healPopup,
+  onHealPopupFinish
 }) {
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const lastPlayerAttack = useRef(0);
@@ -74,6 +76,42 @@ export default function CombatSystem({
     setPopups(prev => [...prev, { id, x, y, dmg, isPlayer }]);
   };
 
+  // ADD THIS useEffect in CombatSystem
+const prevHealthRef = useRef(playerHealth);
+
+useEffect(() => {
+  if (playerHealth < prevHealthRef.current && playerHealth > 0) {
+    const dmg = prevHealthRef.current - playerHealth;
+    addPopup(playerPos.x, playerPos.y, dmg, true);
+  }
+  prevHealthRef.current = playerHealth;
+}, [playerHealth, playerPos]);
+  // -----------------------------------------------------------------
+// 2.1 HANDLE HEAL POPUP FROM PARENT
+// -----------------------------------------------------------------
+useEffect(() => {
+  if (!healPopup) return;
+
+  const id = `heal-${Date.now()}-${Math.random()}`;
+  const popup = {
+    id,
+    x: healPopup.x,
+    y: healPopup.y,
+    dmg: healPopup.damage,
+    isPlayer: false,
+    isHeal: true,
+  };
+
+  setPopups(prev => [...prev, popup]);
+
+  // Auto-remove after animation (1.5s total)
+  const timer = setTimeout(() => {
+    setPopups(prev => prev.filter(p => p.id !== id));
+    onHealPopupFinish?.();
+  }, 1500);
+
+  return () => clearTimeout(timer);
+}, [healPopup, onHealPopupFinish]);
   // -----------------------------------------------------------------
   // 3. Combat loop
   // -----------------------------------------------------------------
@@ -128,12 +166,14 @@ if (
   const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
   const dmg = randInt(min, max);
 
-  onPlayerHealthChange(prev => {
-    const newHealth = Math.max(0, prev - dmg);
-    if (newHealth <= 0 && !isDead) setIsDead(true);
-    addPopup(playerPos.x, playerPos.y, dmg, true);
-    return newHealth;
-  });
+  onPlayerHealthChange(prev => Math.max(0, prev - dmg));
+
+  // onPlayerHealthChange(prev => {
+  //   const newHealth = Math.max(0, prev - dmg);
+  //   if (newHealth <= 0 && !isDead) setIsDead(true);
+  //   addPopup(playerPos.x, playerPos.y, dmg, true);
+  //   return newHealth;
+  // });
 
   lastMonsterAttack.current[monsterId] = now;
 }
@@ -154,7 +194,9 @@ if (
     onObjectsChange,
     isDead,
     setIsDead,
-    inventory,               // <-- dependency
+    inventory,
+    healPopup,
+  onHealPopupFinish,
   ]);
 
   // -----------------------------------------------------------------
@@ -174,18 +216,19 @@ if (
   // -----------------------------------------------------------------
   // 5. Render popups (they live inside the tile-map coordinate system)
   // -----------------------------------------------------------------
-  return (
-    <>
-      {popups.map(p => (
-        <DamagePopup
-          key={p.id}
-          x={p.x}
-          y={p.y}
-          damage={p.dmg}
-          isPlayer={p.isPlayer}
-          onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
-        />
-      ))}
-    </>
-  );
+return (
+  <>
+    {popups.map(p => (
+      <DamagePopup
+        key={p.id}
+        x={p.x}
+        y={p.y}
+        damage={p.dmg}
+        isPlayer={p.isPlayer}
+        isHeal={p.isHeal}  // NEW
+        onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+      />
+    ))}
+  </>
+);
 }

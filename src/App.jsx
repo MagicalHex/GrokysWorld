@@ -34,7 +34,9 @@ function App() {
     isDead,
     setIsDead,
     respawnPlayer,
-    monsterTypes
+    monsterTypes,
+    healPopup,
+    onHealPopupFinish
   } = game;
 
   if (isLoading) {
@@ -78,6 +80,8 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
   pendingPickup={game.pendingPickup}
   clearPendingPickup={game.clearPendingPickup}
   monsterTypes={monsterTypes}
+  healPopup={healPopup}
+onHealPopupFinish={onHealPopupFinish}
       />
     );
   }

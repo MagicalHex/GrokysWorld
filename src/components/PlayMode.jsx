@@ -38,7 +38,9 @@ const PlayMode = ({
   respawnPlayer,
   pendingPickup,    
   clearPendingPickup,
-  monsterTypes
+  monsterTypes,
+  healPopup,
+  onHealPopupFinish
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -182,6 +184,8 @@ const removePickupPopup = useCallback((id) => {
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
         inventory={globalInventory}
+        healPopup={healPopup}
+        onHealPopupFinish={onHealPopupFinish}
       />
 
       {/* ---------- INVENTORY ---------- */}
