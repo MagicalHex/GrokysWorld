@@ -54,6 +54,7 @@ export const OBJECTS = {
   gravestoneobject: '🪦',
   phoenixbird: '🐦‍🔥',
   angel: '🪽',
+  dove: '🕊️',
   // FURNITURES
   unlockeddoorobject: '🚪',
   lockeddoorobject: '🚪',

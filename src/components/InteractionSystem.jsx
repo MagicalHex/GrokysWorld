@@ -26,7 +26,8 @@ const InteractionSystem = forwardRef(({
   interaction,        // ← ADD HERE
   setInteraction,     // ← ADD HERE
   tileSize,
-  onQueueRespawn
+  onQueueRespawn,
+  level
 }, ref) => {
 
   // === CHOPPING LOGIC ===

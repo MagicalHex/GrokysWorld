@@ -1,47 +1,82 @@
+// App.jsx - Updated to pass new props to PlayMode
 import React, { useState } from 'react';
+import { useGameState } from './hooks/useGameState';
 import EditWorld from './components/EditWorld';
 import PlayMode from './components/PlayMode';
-import { Levels } from './components/Levels';
+import LevelSelector from './components/LevelSelector';
 import './App.css';
 
 function App() {
   const [mode, setMode] = useState('free');
   const [playMode, setPlayMode] = useState(false);
 
-  // Get levels data
-  const levelsData = Levels();
-
+  const game = useGameState();
   const {
+    isLoading,
     currentLevelData,
-    handleGridChange,
-    onObjectsChange,
-    onPlayerPosChange,
-    onLevelChange,
-    restrictedTiles,
+    renderSelector,
     rows,
     columns,
-    renderSelector,
+    restrictedTiles,
+    onPlayerPosChange,
+    onObjectsChange,
+    onLevelChange,
     onQueueRespawn,
-    getOriginalSpawns
-  } = levelsData;
+    scheduleRespawn,
+    getOriginalSpawns,
+    currentLevel,
+    globalPlayerHealth,
+    onPlayerHealthChange, 
+    monsterHealths,
+    globalMonsterHealths,
+    onMonsterHealthChange,
+    globalInventory,
+    onInventoryChange, 
+    isDead,
+    setIsDead,
+    respawnPlayer,
+    monsterTypes
+  } = game;
 
+  if (isLoading) {
+    return (
+      <div className="loading-screen">
+        <h2>Loading Groky's World... 🚀</h2>
+        <p>Fetching maps and spawning spiders...</p>
+      </div>
+    );
+  }
+console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealths);
   if (playMode && currentLevelData.playerPos) {
     return (
-      <PlayMode 
-        grid={currentLevelData.grid} 
+<PlayMode
+        grid={currentLevelData.grid}
         objects={currentLevelData.objects}
         playerPos={currentLevelData.playerPos}
         onExit={() => setPlayMode(false)}
         tileSize={40}
         rows={rows}
         columns={columns}
-        onPlayerMove={onPlayerPosChange}
         onObjectsChange={onObjectsChange}
         restrictedTiles={restrictedTiles}
-        level={levelsData.currentLevel}
+        level={currentLevel}
         onLevelChange={onLevelChange}
         onQueueRespawn={onQueueRespawn}
-        originalSpawns={getOriginalSpawns()} // ← Call it when passing to PlayMode
+        originalSpawns={getOriginalSpawns()}
+        globalPlayerHealth={globalPlayerHealth}
+        onPlayerHealthChange={onPlayerHealthChange}
+        monsterHealths={monsterHealths}
+        globalMonsterHealths={globalMonsterHealths} // Updated
+        onMonsterHealthChange={onMonsterHealthChange}
+        globalInventory={globalInventory}
+        onInventoryChange={onInventoryChange}
+        isDead={isDead}
+        setIsDead={game.setIsDead}
+        respawnPlayer={respawnPlayer}
+        onPlayerMoveAttempt={game.onPlayerMoveAttempt}
+  pendingPickup={game.pendingPickup}
+  clearPendingPickup={game.clearPendingPickup}
+  monsterTypes={monsterTypes}
       />
     );
   }
@@ -49,9 +84,8 @@ function App() {
   return (
     <div className="App">
       <header>
-        {/* <h1 className="grokysworld">🚀 Grokys World</h1> */}
         <div>
-          {renderSelector()}
+          <LevelSelector renderSelector={renderSelector} />
           <button onClick={() => setMode('rpg')}>RPG</button>
           <button onClick={() => setMode('sports')}>Sports</button>
           <button onClick={() => setMode('shooter')}>Shooter</button>
@@ -64,9 +98,9 @@ function App() {
         grid={currentLevelData.grid}
         objects={currentLevelData.objects}
         playerPos={currentLevelData.playerPos}
-        onGridChange={handleGridChange}
-        onObjectsChange={onObjectsChange}
-        onPlayerPosChange={onPlayerPosChange}
+        onGridChange={game.handleGridChange}
+        onObjectsChange={game.onObjectsChange}
+        onPlayerPosChange={game.onPlayerPosChange}
         tileSize={40}
         mode={mode}
         rows={rows}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject', 'woodobject', 'rockobject', 'gold', 'angel']);
+const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject', 'woodobject', 'rockobject', 'gold', 'angel', 'dove']);
 
 const PlayerMovement = ({
   playerPos,

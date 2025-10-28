@@ -1,5 +1,5 @@
 // src/components/Levels.jsx
-import React, { useState, useEffect, useRef, prev } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // FALLBACK GRIDS
 const createLevel1Grid = () => Array(16).fill().map(() => Array(24).fill('grass'));
@@ -43,7 +43,7 @@ export const Levels = () => {
     2: { grid: createLevel2Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
     3: { grid: createLevel3Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
     4: { grid: createLevel4Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
-    5: { name: 'Dungeon', grid: createLevel5Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
+    5: { grid: createLevel5Grid(), objects: {}, originalSpawns: {}, respawnQueue: [] },
   });
   
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -104,6 +104,7 @@ useEffect(() => {
     }
   });
 }, []);
+
 
   // GET CURRENT LEVEL DATA (NEVER NULL!)
   // const currentLevelData = levels[currentLevel];
