@@ -1,7 +1,49 @@
 // src/components/CombatSystem.jsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { DamagePopup } from './DamagePopup';   // <-- we’ll create this next
 
-const CombatSystem = ({
+// Random integer in [min, max] inclusive
+const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// -------------------------------------------------------------------
+// 1. Weapon → damage table (feel free to move this to a constants file)
+// -------------------------------------------------------------------
+// PLAYER WEAPONS
+const WEAPON_DAMAGE_RANGES = {
+  fist:   { min:  8, max: 15 },
+  dagger: { min: 12, max: 20 },
+  sword:  { min: 18, max: 25 },
+};
+
+// MONSTERS
+const MONSTER_DAMAGE_RANGES = {
+  skeleton: { min:  5, max: 12 },
+  spider:   { min:  0, max: 15 },   // as requested
+};
+
+const getEquippedWeapon = (inventory) => {
+  // Safety: if inventory is null/undefined, default to fist
+  if (!inventory) return 'fist';
+
+  // Case 1: Array of items → find one with .equipped = true
+  if (Array.isArray(inventory)) {
+    const equipped = inventory.find(item => item.equipped);
+    return equipped?.type || 'fist';
+  }
+
+  // Case 2: Object with direct keys → look for truthy "equipped" weapon
+  if (typeof inventory === 'object') {
+    // Example: { sword: true }, { equipped: 'dagger' }, etc.
+    if (inventory.equipped) return inventory.equipped;
+    if (inventory.sword) return 'sword';
+    if (inventory.dagger) return 'dagger';
+    // add more as needed
+  }
+
+  return 'fist'; // fallback
+};
+
+export default function CombatSystem({
   playerPos,
   playerHealth,
   onPlayerHealthChange,
@@ -14,23 +56,36 @@ const CombatSystem = ({
   originalSpawns = {},
   isDead,
   setIsDead,
-}) => {
+  inventory,               // <-- NEW PROP
+}) {
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const lastPlayerAttack = useRef(0);
   const lastMonsterAttack = useRef({});
-  const PLAYER_COOLDOWN = 1500; // Player attacks every 1.5s
-  const MONSTER_COOLDOWN = 3000; // Monsters attack every 3s
+  const PLAYER_COOLDOWN = 1500;
+  const MONSTER_COOLDOWN = 3000;
 
-  useEffect(() => {
-    console.log('[CombatSystem] globalMonsterHealths:', globalMonsterHealths);
-    console.log('[CombatSystem] monsterTypes:', monsterTypes);
-  }, [globalMonsterHealths, monsterTypes]);
+  // -----------------------------------------------------------------
+  // 2. Damage-popups state (array of {id, x, y, dmg, isPlayer})
+  // -----------------------------------------------------------------
+  const [popups, setPopups] = useState([]);
 
+  const addPopup = (x, y, dmg, isPlayer = false) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    setPopups(prev => [...prev, { id, x, y, dmg, isPlayer }]);
+  };
+
+  // -----------------------------------------------------------------
+  // 3. Combat loop
+  // -----------------------------------------------------------------
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       const newObjects = { ...objects };
       let objectsChanged = false;
+
+      // ---- PLAYER WEAPON -------------------------------------------------
+      // const weapon = getEquippedWeapon(inventory);
+      // const playerDmg = WEAPON_DAMAGE[weapon] ?? WEAPON_DAMAGE.fist;
 
       Object.entries(objects).forEach(([key, monsterId]) => {
         const type = monsterTypes[monsterId];
@@ -40,45 +95,54 @@ const CombatSystem = ({
         const [mx, my] = key.split(',').map(Number);
         const isAdjacent = distance({ x: mx, y: my }, playerPos) === 1;
 
-        // === PLAYER ATTACK ===
-        if (isAdjacent && now - lastPlayerAttack.current >= PLAYER_COOLDOWN) {
-          const dmg = type === 'skeleton' ? 20 : 25;
-          console.log('[CombatSystem] Player attacks', type, 'at key:', key, 'id:', monsterId);
-          if (globalMonsterHealths[monsterId] === undefined) {
-            console.log('[CombatSystem] Initializing health for', monsterId);
-            onMonsterHealthChange(monsterId, 100);
-          }
-          console.log('  → Current health:', globalMonsterHealths[monsterId] ?? 100);
-          console.log('  → Damage:', dmg);
-          const newHealth = Math.max(0, (globalMonsterHealths[monsterId] ?? 100) - dmg);
-          console.log('  → Setting health to:', newHealth);
-          onMonsterHealthChange(monsterId, newHealth);
-          console.log('  → onMonsterHealthChange called');
+        // ==================== PLAYER ATTACK ====================
+// === PLAYER ATTACK ===
+if (
+  !isDead &&
+  isAdjacent &&
+  now - lastPlayerAttack.current >= PLAYER_COOLDOWN
+) {
+  const weapon = getEquippedWeapon(inventory);
+  const { min, max } = WEAPON_DAMAGE_RANGES[weapon] ?? WEAPON_DAMAGE_RANGES.fist;
+  const baseDmg = randInt(min, max);
 
-          if (newHealth <= 0) {
-            // Transform spider into loot
-            newObjects[key] = 'gold';
-            objectsChanged = true;
-          }
+  // Optional tiny monster-type bonus (kept from your original code)
+  const dmg = baseDmg + (type === 'skeleton' ? 0 : 5);
 
-          lastPlayerAttack.current = now;
-        }
+  const curHealth = globalMonsterHealths[monsterId] ?? 100;
+  const newHealth = Math.max(0, curHealth - dmg);
 
-        // === MONSTER ATTACK ===
-        if (isAdjacent && now - (lastMonsterAttack.current[monsterId] ?? 0) >= MONSTER_COOLDOWN) {
-          const dmg = type === 'skeleton' ? 10 : 15;
-          onPlayerHealthChange((prev) => {
-            const newHealth = Math.max(0, prev - dmg);
-            if (newHealth <= 0 && !isDead) setIsDead(true);
-            return newHealth;
-          });
-          lastMonsterAttack.current[monsterId] = now;
-        }
+  onMonsterHealthChange(monsterId, newHealth);
+  addPopup(mx, my, dmg);   // show the *actual* rolled damage
+
+  if (newHealth <= 0) {
+    newObjects[key] = 'gold';
+    objectsChanged = true;
+  }
+
+  lastPlayerAttack.current = now;
+}
+// === MONSTER ATTACK ===
+if (
+  !isDead &&
+  isAdjacent &&
+  now - (lastMonsterAttack.current[monsterId] ?? 0) >= MONSTER_COOLDOWN
+) {
+  const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
+  const dmg = randInt(min, max);
+
+  onPlayerHealthChange(prev => {
+    const newHealth = Math.max(0, prev - dmg);
+    if (newHealth <= 0 && !isDead) setIsDead(true);
+    addPopup(playerPos.x, playerPos.y, dmg, true);
+    return newHealth;
+  });
+
+  lastMonsterAttack.current[monsterId] = now;
+}
       });
 
-      if (objectsChanged) {
-        onObjectsChange(newObjects);
-      }
+      if (objectsChanged) onObjectsChange(newObjects);
     }, 500);
 
     return () => clearInterval(interval);
@@ -91,26 +155,40 @@ const CombatSystem = ({
     monsterTypes,
     onMonsterHealthChange,
     onObjectsChange,
-    onQueueRespawn,
-    originalSpawns,
     isDead,
     setIsDead,
+    inventory,               // <-- dependency
   ]);
 
+  // -----------------------------------------------------------------
+  // 4. Player death → dove
+  // -----------------------------------------------------------------
   useEffect(() => {
     if (playerHealth > 0 || !isDead) return;
-    console.log('[CombatSystem] Player is dead, replacing with dove at', `${playerPos.x},${playerPos.y}`);
     const newObjects = { ...objects };
     const pk = `${playerPos.x},${playerPos.y}`;
     if (newObjects[pk] === 'player') {
       delete newObjects[pk];
       newObjects[pk] = 'dove';
-      console.log('[CombatSystem] Dove placed, updating objects');
       onObjectsChange(newObjects);
     }
   }, [playerHealth, playerPos, objects, onObjectsChange, isDead]);
 
-  return null;
-};
-
-export default CombatSystem;
+  // -----------------------------------------------------------------
+  // 5. Render popups (they live inside the tile-map coordinate system)
+  // -----------------------------------------------------------------
+  return (
+    <>
+      {popups.map(p => (
+        <DamagePopup
+          key={p.id}
+          x={p.x}
+          y={p.y}
+          damage={p.dmg}
+          isPlayer={p.isPlayer}
+          onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+        />
+      ))}
+    </>
+  );
+}

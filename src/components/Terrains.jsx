@@ -7,12 +7,15 @@ export const TERRAINS = {
 
   soilbrown: '#7c3502',
 
-  // SAND
+  // ENVIRONMENT
   sand: '#ffc107',
   water: '#17a2b8',
   mountain: '#6c757d',
   forest: '#155724',
   field: '#28a745',
+
+  // CAVE
+  slimecave: 'green',
   
   // WALLS
   wall: '#343a40',

@@ -17,14 +17,15 @@ const PlayerMovement = ({
   interactionActive,        // <-- lock flag
   interactionType,   // NEW: 'chop' | 'talk' | null
   CHOPPABLE_OBJECTS,
-  TALKABLE_OBJECTS
+  TALKABLE_OBJECTS,
+  isDead
 }) => {
   const [canMove, setCanMove] = useState(true);
   const moveDelay = 300;
 
   useEffect(() => {
     const handleKey = (e) => {
-      if (!canMove || !playerPos) return;
+      if (!canMove || !playerPos || isDead) return;
 
       // LOG LOCK STATE
       console.log('[PlayerMovement] active:', interactionActive, 'type:', interactionType);

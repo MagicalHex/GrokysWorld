@@ -1,0 +1,41 @@
+.damage-popup {
+  position: absolute;
+transform: translate(-50%, -50%) translate(10px, 10x);
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: var(--dmg-color, #ffb84d);
+  text-shadow:
+    0 0 4px rgba(0,0,0,0.6),
+    0 0 8px rgba(0,0,0,0.4);
+  pointer-events: none;
+  animation: floatUp 1.2s ease-out forwards;
+  z-index: 100;
+}
+
+/* Floating + fade out */
+@keyframes floatUp {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -120%) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -160%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Optional “critical hit” flash (just add a class from JS if you want) */
+.damage-popup.crit {
+  color: #ff2b2b;
+  animation: floatUpCrit 1.2s ease-out forwards;
+}
+@keyframes floatUpCrit {
+  0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  70%  { transform: translate(-50%, -140%) scale(1.5); opacity: 1; }
+  100% { transform: translate(-50%, -180%) scale(1.3); opacity: 0; }
+}

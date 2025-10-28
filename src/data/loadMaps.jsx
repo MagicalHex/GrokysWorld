@@ -15,8 +15,8 @@ export const loadMaps = async () => {
     const maps = await Promise.all([
       fetch('/maps/town.json').then(r => r.json()),
       fetch('/maps/wilderness.json').then(r => r.json()),
-      fetch('/maps/desert.json').then(r => r.json()),
-      fetch('/maps/beach.json').then(r => r.json()),
+      fetch('/maps/slimecave.json').then(r => r.json()),
+      fetch('/maps/stonecave.json').then(r => r.json()),
       fetch('/maps/dungeon.json').then(r => r.json()),
     ]);
 

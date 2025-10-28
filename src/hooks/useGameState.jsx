@@ -441,9 +441,6 @@ useEffect(() => {
   clearPendingPickup,          // <-- expose to PlayMode
   pendingPickup: levels[currentLevel]?.pendingPickup ?? null,
 
-    // <<< NEW >>>
-    onPlayerMoveAttempt,
-
     // UI helpers
     renderSelector: () => (
       <select value={currentLevel} onChange={e => onLevelChange(Number(e.target.value))}>

@@ -67,9 +67,9 @@ export const OBJECTS = {
   'portal-to-3': '🌀',
   'portal-to-4': '🌀',
   'portal-to-5': '🌀',
+  holeobject: '🕳️',
   ladder: '🪜',
   castle: '🏰',
-  holeobject: '🕳️',
   ropeobject: '🪢',
   // FLOWERS
   roseobject: '🌹',

@@ -138,6 +138,7 @@ useEffect(() => {
         interactionType={interaction.type}
         CHOPPABLE_OBJECTS={CHOPPABLE_OBJECTS}
         TALKABLE_OBJECTS={TALKABLE_OBJECTS}
+        isDead={isDead}
       />
 
       {/* ---------- AI / COMBAT ---------- */}
@@ -167,6 +168,7 @@ useEffect(() => {
         setIsDead={setIsDead}
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
+        inventory={globalInventory}
       />
 
       {/* ---------- INVENTORY ---------- */}
