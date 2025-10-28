@@ -9,6 +9,7 @@ import InteractionSystem from './InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS } from './InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
+import { PickupPopup } from './PickupPopup';
 
 const PlayMode = ({
   grid,
@@ -64,45 +65,54 @@ useEffect(() => {
     choices: null
   });
 
+const [pickupPopups, setPickupPopups] = useState([]); // [{id, x, y, item}]
 /* --------------------------------------------------------------
-     1. React to a pickup that the hook just queued
-     -------------------------------------------------------------- */
-  useEffect(() => {
-    if (!pendingPickup) return;
+   1. React to a pickup that the hook just queued
+   -------------------------------------------------------------- */
+useEffect(() => {
+  if (!pendingPickup) return;
 
-    // Find the tile that contains the item
-    const key = Object.keys(objects).find(k => objects[k] === pendingPickup);
-    if (!key) return;
+  // Find the tile that contains the item
+  const key = Object.keys(objects).find(k => objects[k] === pendingPickup);
+  if (!key) {
+    clearPendingPickup();
+    return;
+  }
 
-    setPickingUpTile(key);                 // start animation
+  // ---- Parse coordinates -------------------------------------------------
+  const [x, y] = key.split(',').map(Number);
 
-    const timer = setTimeout(() => {
-      // 1. Remove the item from the world
-      onObjectsChange(prev => {
-        const copy = { ...prev };
-        delete copy[key];
-        return copy;
-      });
+  // ---- 1. Add floating popup ------------------------------------------------
+  const popupId = `${Date.now()}-${key}`;
+  setPickupPopups(prev => [...prev, { id: popupId, x, y, item: pendingPickup }]);
 
-      // 2. Add to inventory
-      onInventoryChange(prev => ({
-        ...prev,
-        [pendingPickup]: (prev[pendingPickup] ?? 0) + 1
-      }));
+  // ---- 2. Remove the item from the world ---------------------------------
+  onObjectsChange(prev => {
+    const copy = { ...prev };
+    delete copy[key];
+    return copy;
+  });
 
-      // 3. Clean the flag
-      clearPendingPickup();
-      setPickingUpTile(null);
-    }, 500); // matches CSS animation
+  // ---- 3. Add to inventory ------------------------------------------------
+  onInventoryChange(prev => ({
+    ...prev,
+    [pendingPickup]: (prev[pendingPickup] ?? 0) + 1
+  }));
 
-    return () => clearTimeout(timer);
-  }, [
-    pendingPickup,
-    objects,
-    onObjectsChange,
-    onInventoryChange,
-    clearPendingPickup
-  ]);
+  // ---- 4. Clean the flag --------------------------------------------------
+  clearPendingPickup();
+
+  // (optional) keep a tiny flash on the tile if you still want it
+  // setPickingUpTile(key);
+  // setTimeout(() => setPickingUpTile(null), 100);
+}, [
+  pendingPickup,
+  objects,
+  onObjectsChange,
+  onInventoryChange,
+  clearPendingPickup,
+  // setPickingUpTile   // <-- comment out if you don’t need the flash
+]);
 
   /* --------------------------------------------------------------
      2. Dropped-item shine detection
@@ -232,6 +242,16 @@ useEffect(() => {
           })
         )}
       </div>
+      {/* ---------- PICKUP POPUPS (float above everything) ---------- */}
+      {pickupPopups.map(p => (
+        <PickupPopup
+          key={p.id}
+          x={p.x}
+          y={p.y}
+          item={p.item}
+          onFinish={() => removePickupPopup(p.id)}
+        />
+      ))}
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem
