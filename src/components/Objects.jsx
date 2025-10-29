@@ -106,4 +106,6 @@ export const OBJECTS = {
   timberwoodchoppedobject: '',
   // FENCE/WALLS
   fenceobject: '',
+  // MONSTERS
+  cavespider: '',
 };

@@ -1,22 +1,22 @@
 {
   "name": "Mossy Slime Cave 2",
   "grid": [
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "mscd", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "stonepillar", "mscv", "mscv", "mscv", "stonepillar", "mscv", "mscv", "mscv", "stonepillar", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "mscd", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "stonepillar", "none", "none", "none", "stonepillar", "none", "none", "none", "stonepillar", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp"],
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp"],
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp"],
     ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp", "mscsp"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "stonepillar", "mscv", "mscv", "mscv", "stonepillar", "mscv", "mscv", "mscv", "stonepillar", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"],
-    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv", "mscv"]
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "stonepillar", "none", "none", "none", "stonepillar", "none", "none", "none", "stonepillar", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
+    ["msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "msc", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"]
   ],
   "objects": {
     "1,1": "rope-to-3",
@@ -33,12 +33,12 @@
     "11,14": "stoneobjecthalf",
     "11,15": "stoneobjecthalf",
 
-    "14,4": "candleobject",
-    "14,11": "candleobject",
-    "18,4": "candleobject",
-    "18,11": "candleobject",
-    "22,4": "candleobject",
-    "22,11": "candleobject",
+    "14,4": "fireobject",
+    "14,11": "fireobject",
+    "18,4": "fireobject",
+    "18,11": "fireobject",
+    "22,4": "fireobject",
+    "22,11": "fireobject",
     "23,7": "chest-closed"
 
   }
