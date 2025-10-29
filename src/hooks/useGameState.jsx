@@ -31,7 +31,7 @@ export const useGameState = () => {
   const [globalMonsterHealths, setGlobalMonsterHealths] = useState({}); // New state
   const [monsterTypes, setMonsterTypes] = useState({}); // New: Maps ID to type (e.g., { 'spider_2_18_2': 'spider' })
   const [originalSpawns, setOriginalSpawns] = useState({});
-  const [lastDamageTime, setLastDamageTime] = useState(0); // activate regen 7 seconds out of combat
+const [lastDamageTime, setLastDamageTime] = useState(Date.now());
 
   /* --------------------------------------------------------------
      2. Helper: update a single level (must be defined first)
@@ -113,58 +113,90 @@ export const useGameState = () => {
 const onHealPopup = useCallback((x, y) => {
   setHealPopup({ x, y, damage: 1, isHeal: true });
 }, []);
+// const onPlayerHealthChange = useCallback((newHealth) => {
+//   const prevHealth = globalPlayerHealth;
+//   setGlobalPlayerHealth(newHealth);
+
+//   // If health decreased → record damage time
+//   if (newHealth < prevHealth) {
+//     setLastDamageTime(Date.now());
+//   }
+
+//   if (newHealth <= 0 && !isDead) {
+//     setIsDead(true);
+//   }
+// }, [globalPlayerHealth, isDead]);
+// Add these refs
+useEffect(() => {
+  const levelData = levels[currentLevel];
+  if (levelData?.playerPos) {
+    playerPosRef.current = levelData.playerPos;
+  }
+}, [currentLevel, levels]);
+// const lastDamageTimeRef = useRef(Date.now());
+const playerPosRef = useRef({ x: 0, y: 0 });
+
+// Update refs when needed
+// useEffect(() => {
+//   lastDamageTimeRef.current = lastDamageTime;
+// }, [lastDamageTime]);
+
+const onDamageTaken = useCallback(() => {
+  const now = Date.now();
+  console.log('[DAMAGE] Player hit! Resetting regen timer.', new Date(now).toLocaleTimeString());
+  setLastDamageTime(now);
+}, []);
+// onPlayerHealthChange — now updates lastDamageTimeRef
 const onPlayerHealthChange = useCallback((newHealth) => {
   const prevHealth = globalPlayerHealth;
   setGlobalPlayerHealth(newHealth);
 
-  // If health decreased → record damage time
-  if (newHealth < prevHealth) {
-    setLastDamageTime(Date.now());
-  }
+  // if (newHealth < prevHealth) {
+  //   lastDamageTimeRef.current = Date.now(); // ← Update ref!
+  // }
 
   if (newHealth <= 0 && !isDead) {
     setIsDead(true);
   }
 }, [globalPlayerHealth, isDead]);
-// HEALTH REGEN: +1 every 2 sec if not hit in 7 sec
-useEffect(() => {
-  if (isDead || globalPlayerHealth >= 100 || globalPlayerHealth <= 0) return;
-
-  // Get current player position
-  const currentLevelData = levels[currentLevel] || {};
-  const playerPos = currentLevelData.playerPos;
-  if (!playerPos) return; // Safety
-
-  const now = Date.now();
-  const timeSinceDamage = now - lastDamageTime;
-
-  if (timeSinceDamage < 7000) return;
-
-  const interval = setInterval(() => {
-    const currentTime = Date.now();
-    if (currentTime - lastDamageTime >= 7000 && globalPlayerHealth < 100) {
-      onPlayerHealthChange(globalPlayerHealth + 1);
-      if (onHealPopup) {
-        onHealPopup(playerPos.x, playerPos.y); // Now in scope!
-      }
-    }
-  }, 2000);
-
-  return () => clearInterval(interval);
-}, [
-  isDead,
-  globalPlayerHealth,
-  lastDamageTime,
-  levels,           // ADD
-  currentLevel,     // ADD
-  onPlayerHealthChange,
-  onHealPopup,
-]);
-
 // Reset popup after animation
 const onHealPopupFinish = useCallback(() => {
   setHealPopup(null);
 }, []);
+// HEALTH REGEN: +1 every 2 sec if not hit in 7 sec
+// useEffect(() => {
+//   if (isDead || globalPlayerHealth >= 100 || globalPlayerHealth <= 0) return;
+
+//   // Get current player position
+//   const currentLevelData = levels[currentLevel] || {};
+//   const playerPos = currentLevelData.playerPos;
+//   if (!playerPos) return; // Safety
+
+//   const now = Date.now();
+//   const timeSinceDamage = now - lastDamageTime;
+
+//   if (timeSinceDamage < 7000) return;
+
+//   const interval = setInterval(() => {
+//     const currentTime = Date.now();
+//     if (currentTime - lastDamageTime >= 7000 && globalPlayerHealth < 100) {
+//       onPlayerHealthChange(globalPlayerHealth + 1);
+//       if (onHealPopup) {
+//         onHealPopup(playerPos.x, playerPos.y); // Now in scope!
+//       }
+//     }
+//   }, 2000);
+
+//   return () => clearInterval(interval);
+// }, [
+//   isDead,
+//   globalPlayerHealth,
+//   lastDamageTime,
+//   levels,           // ADD
+//   currentLevel,     // ADD
+//   onPlayerHealthChange,
+//   onHealPopup,
+// ]);
 
   const onInventoryChange = useCallback((updater) => {
     setGlobalInventory(prev => (typeof updater === 'function' ? updater(prev) : updater));
@@ -547,7 +579,10 @@ useEffect(() => {
     globalMonsterHealths,
     monsterTypes,
     healPopup,
+    onHealPopup,
     onHealPopupFinish,
+    onDamageTaken,
+    lastDamageTime,
 
     setCurrentLevel,
     onLevelChange,

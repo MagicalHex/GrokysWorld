@@ -50,7 +50,8 @@ export default function CombatSystem({
   setIsDead,
   inventory,
   healPopup,
-  onHealPopupFinish
+  onHealPopupFinish,
+  onDamageTaken
 }) {
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 
@@ -85,6 +86,7 @@ export default function CombatSystem({
       setIsDead,
       inventory,
       addPopup: refs.current.addPopup, // preserve function
+      onDamageTaken
     };
   }, [
     playerPos,
@@ -98,6 +100,7 @@ export default function CombatSystem({
     isDead,
     setIsDead,
     inventory,
+    onDamageTaken
   ]);
 
   // === DAMAGE POPUPS ===
@@ -206,21 +209,27 @@ export default function CombatSystem({
         }
 
         // === MONSTER ATTACK ===
-        if (
-          isAdjacent &&
-          now - (lastMonsterAttack[monsterId] ?? 0) >= MONSTER_COOLDOWN
-        ) {
-          const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
-          const dmg = randInt(min, max);
+if (
+  isAdjacent &&
+  now - (lastMonsterAttack[monsterId] ?? 0) >= MONSTER_COOLDOWN
+) {
+  const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
+  const dmg = randInt(min, max);
 
-          onPlayerHealthChange(prev => {
-            const newHealth = Math.max(0, prev - dmg);
-            if (newHealth <= 0 && !isDead) setIsDead(true);
-            return newHealth;
-          });
+  onPlayerHealthChange(prev => {
+    const newHealth = Math.max(0, prev - dmg);
+    if (newHealth <= 0 && !isDead) setIsDead(true);
+    
+    // TELL REGEN SYSTEM: "PLAYER GOT HIT!"
+    if (newHealth < prev && onDamageTaken) {
+      onDamageTaken();
+    }
 
-          lastMonsterAttack[monsterId] = now;
-        }
+    return newHealth;
+  });
+
+  lastMonsterAttack[monsterId] = now;
+}
       });
 
       if (objectsChanged) {

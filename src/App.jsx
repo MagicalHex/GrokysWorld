@@ -43,7 +43,10 @@ useEffect(() => {
     respawnPlayer,
     monsterTypes,
     healPopup,
-    onHealPopupFinish
+    onHealPopup,
+    onHealPopupFinish,
+    lastDamageTime,
+    onDamageTaken
   } = game;
 
   if (isLoading) {
@@ -89,7 +92,10 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
         clearPendingPickup={game.clearPendingPickup}
         monsterTypes={monsterTypes}
         healPopup={healPopup}
+        onHealPopup={onHealPopup}
         onHealPopupFinish={onHealPopupFinish}
+        lastDamageTime={lastDamageTime}
+        onDamageTaken={onDamageTaken}
       />
     );
   }

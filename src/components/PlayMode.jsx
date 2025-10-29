@@ -4,6 +4,7 @@ import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
+import HealthRegenSystem from './HealthRegenSystem';
 import HealthBar from './HealthBar';
 import InteractionSystem from './InteractionSystem/InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS } from './InteractionSystem/InteractionConstants';
@@ -41,7 +42,10 @@ const PlayMode = ({
   clearPendingPickup,
   monsterTypes,
   healPopup,
-  onHealPopupFinish
+  onHealPopup,
+  onHealPopupFinish,
+  lastDamageTime,
+  onDamageTaken
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -52,6 +56,10 @@ useEffect(() => {
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
+  useEffect(() => {
+  console.log('[PlayMode] lastDamageTime prop:', lastDamageTime, typeof lastDamageTime);
+  }, [lastDamageTime]);
+
 //   useEffect(() => {
 //   console.trace('[PlayMode] rendered — why?');
 // }, []);
@@ -188,6 +196,15 @@ const removePickupPopup = useCallback((id) => {
         inventory={globalInventory}
         healPopup={healPopup}
         onHealPopupFinish={onHealPopupFinish}
+        onDamageTaken={onDamageTaken}
+      />
+      <HealthRegenSystem
+        playerHealth={globalPlayerHealth}
+        onPlayerHealthChange={onPlayerHealthChange}
+        isDead={isDead}
+        onHealPopup={onHealPopup}
+        playerPos={playerPos}
+        lastDamageTime={lastDamageTime}
       />
 
       {/* ---------- INVENTORY ---------- */}
