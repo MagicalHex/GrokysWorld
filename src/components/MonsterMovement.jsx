@@ -1,5 +1,6 @@
-// src/components/MonsterMovement.jsx
-import React, { useEffect, useCallback } from 'react';
+// MonsterMovement.jsx
+import React, { useEffect, useCallback, useRef } from 'react';
+import { subscribe } from '../utils/gameLoop';
 
 const MonsterMovement = ({
   objects,
@@ -11,54 +12,106 @@ const MonsterMovement = ({
   globalMonsterHealths,
   monsterTypes
 }) => {
+  // === REFS TO HOLD LATEST VALUES ===
+  const refs = useRef({
+    objects,
+    playerPos,
+    restrictedTiles,
+    rows,
+    columns,
+    globalMonsterHealths,
+    monsterTypes,
+    onObjectsChange,
+  });
+
+  // Update refs on every render
+  useEffect(() => {
+    refs.current = {
+      objects,
+      playerPos,
+      restrictedTiles,
+      rows,
+      columns,
+      globalMonsterHealths,
+      monsterTypes,
+      onObjectsChange,
+    };
+  }, [
+    objects,
+    playerPos,
+    restrictedTiles,
+    rows,
+    columns,
+    globalMonsterHealths,
+    monsterTypes,
+    onObjectsChange,
+  ]);
+
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 
-  const getBestMove = useCallback(
-    (mx, my, monsterType) => {
-      const distToPlayer = distance({ x: mx, y: my }, playerPos);
-      const maxChaseDistance = monsterType === 'spider' ? 12 : 7;
-      if (distToPlayer > maxChaseDistance) return null;
+  const getBestMove = useCallback((mx, my, monsterType) => {
+    const { playerPos, objects, restrictedTiles, rows, columns } = refs.current;
 
-      const directions = [
-        { x: mx, y: my - 1 },
-        { x: mx, y: my + 1 },
-        { x: mx - 1, y: my },
-        { x: mx + 1, y: my },
-      ];
+    const distToPlayer = distance({ x: mx, y: my }, playerPos);
+    const maxChaseDistance = monsterType === 'spider' ? 12 : 7;
+    if (distToPlayer > maxChaseDistance) return null;
 
-      let bestMove = null;
-      let bestDist = Infinity;
-      directions.forEach((dir) => {
-        const targetKey = `${dir.x},${dir.y}`;
-        const targetObj = objects[targetKey];
+    const directions = [
+      { x: mx, y: my - 1 },
+      { x: mx, y: my + 1 },
+      { x: mx - 1, y: my },
+      { x: mx + 1, y: my },
+    ];
 
-        const isWalkable =
-          !targetObj ||
-          targetObj === 'spiderweb' ||
-          targetObj.startsWith('portal-to-');
+    let bestMove = null;
+    let bestDist = Infinity;
 
-        if (
-          dir.x >= 0 && dir.x < columns &&
-          dir.y >= 0 && dir.y < rows &&
-          isWalkable &&
-          !restrictedTiles.has(targetKey) &&
-          !(dir.x === playerPos.x && dir.y === playerPos.y)
-        ) {
-          const distToPlayer = distance(dir, playerPos);
-          if (distToPlayer < bestDist) {
-            bestDist = distToPlayer;
-            bestMove = dir;
-          }
+    for (const dir of directions) {
+      const targetKey = `${dir.x},${dir.y}`;
+      const targetObj = objects[targetKey];
+
+      const isWalkable =
+        !targetObj ||
+        targetObj === 'spiderweb' ||
+        targetObj.startsWith('portal-to-');
+
+      if (
+        dir.x >= 0 && dir.x < columns &&
+        dir.y >= 0 && dir.y < rows &&
+        isWalkable &&
+        !restrictedTiles.has(targetKey) &&
+        !(dir.x === playerPos.x && dir.y === playerPos.y)
+      ) {
+        const distToPlayer = distance(dir, playerPos);
+        if (distToPlayer < bestDist) {
+          bestDist = distToPlayer;
+          bestMove = dir;
         }
-      });
+      }
+    }
 
-      return bestMove;
-    },
-    [playerPos, objects, restrictedTiles, rows, columns]
-  );
+    return bestMove;
+  }, []); // ← NOW EMPTY! No deps!
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    let lastMoveTime = 0;
+    const MOVE_INTERVAL = 500;
+
+    const unsubscribe = subscribe((delta, time) => {
+      if (time - lastMoveTime < MOVE_INTERVAL) return;
+      lastMoveTime = time;
+
+      const {
+        objects,
+        playerPos,
+        restrictedTiles,
+        rows,
+        columns,
+        globalMonsterHealths,
+        monsterTypes,
+        onObjectsChange,
+      } = refs.current;
+
       const monsters = [];
       Object.entries(objects).forEach(([key, monsterId]) => {
         const type = monsterTypes[monsterId];
@@ -80,12 +133,12 @@ const MonsterMovement = ({
 
       if (moves.length === 0) return;
 
-      // Collision resolution
       const targetCounts = {};
       moves.forEach((move) => {
         const toKey = `${move.to.x},${move.to.y}`;
         targetCounts[toKey] = (targetCounts[toKey] || 0) + 1;
       });
+
       const validMoves = moves.filter((move) => {
         const toKey = `${move.to.x},${move.to.y}`;
         return targetCounts[toKey] === 1;
@@ -94,27 +147,17 @@ const MonsterMovement = ({
       if (validMoves.length === 0) return;
 
       const newObjects = { ...objects };
-
       validMoves.forEach(({ from, monsterId, to }) => {
         const toKey = `${to.x},${to.y}`;
         delete newObjects[from];
         newObjects[toKey] = monsterId;
       });
-      onObjectsChange(newObjects);
-    }, 500);
 
-    return () => clearInterval(interval);
-  }, [
-    getBestMove,
-    objects,
-    onObjectsChange,
-    playerPos,
-    restrictedTiles,
-    rows,
-    columns,
-    globalMonsterHealths,
-    monsterTypes,
-  ]);
+      onObjectsChange(newObjects);
+    });
+
+    return unsubscribe;
+  }, [getBestMove]); // ← Only depends on getBestMove (now stable)
 
   return null;
 };

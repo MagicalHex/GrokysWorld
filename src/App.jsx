@@ -1,14 +1,20 @@
 // App.jsx - Updated to pass new props to PlayMode
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameState } from './hooks/useGameState';
 import EditWorld from './components/EditWorld';
 import PlayMode from './components/PlayMode';
 import LevelSelector from './components/LevelSelector';
 import './App.css';
+import { startGameLoop } from './utils/gameLoop';
 
 function App() {
   const [mode, setMode] = useState('free');
   const [playMode, setPlayMode] = useState(false);
+
+  // App.jsx
+useEffect(() => {
+  startGameLoop();
+}, []);
 
   const game = useGameState();
   const {
