@@ -166,14 +166,11 @@ if (
   const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
   const dmg = randInt(min, max);
 
-  onPlayerHealthChange(prev => Math.max(0, prev - dmg));
-
-  // onPlayerHealthChange(prev => {
-  //   const newHealth = Math.max(0, prev - dmg);
-  //   if (newHealth <= 0 && !isDead) setIsDead(true);
-  //   addPopup(playerPos.x, playerPos.y, dmg, true);
-  //   return newHealth;
-  // });
+  onPlayerHealthChange(prev => {
+    const newHealth = Math.max(0, prev - dmg);
+    if (newHealth <= 0 && !isDead) setIsDead(true);
+    return newHealth;
+  });
 
   lastMonsterAttack.current[monsterId] = now;
 }

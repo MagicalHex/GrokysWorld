@@ -664,6 +664,7 @@ font-size: 60px;
   }
 }
 
+/* SHOULDN'T THIS BE IN TERRAIN.CSS? */
 /* Pickup animation for expanding circle-border */
 .tile.picking-up::after {
   content: '';
@@ -688,4 +689,35 @@ font-size: 60px;
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
+}
+
+.object.sword {
+  background-image: url('/ownemojis/sword-emoji.webp');
+  background-size: 100% 100%;        /* Slightly smaller than tile */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.object.chest-closed {
+  background-image: url('/ownemojis/chest-closed.webp');
+  background-size: 100% 100%;        /* Slightly smaller than tile */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.object.chest-open {
+  background-image: url('/ownemojis/chest-open.webp');
+  background-size: 100% 100%;        /* Slightly smaller than tile */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  display: block;
 }

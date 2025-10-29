@@ -306,7 +306,7 @@ background: linear-gradient(to bottom,
   radial-gradient(circle at 75% 75%, #000000 1px, #00000000 1px);
   box-shadow: inset 0 0px 1px #6c757d;
   border: 1px solid transparent;
-  /* border-radius: 20px; */
+  border-radius: 10px;
 }
 
 /* 🎯 GOAL - Fiery red gradient */
@@ -338,4 +338,56 @@ background:
     linear-gradient(145deg, #162716 0%, #132413 50%, #1a261a 70%, #0f220f 100%),
     #112b11;
   box-shadow: inset 0 0px 1px #00400059;
+}
+.tile.mscv {
+background: 
+    radial-gradient(circle at 30% 30%, #0a0a0a 0%, #000000 70%),
+    linear-gradient(145deg, #0c0c0c 0%, #080808 50%, #0f0f0f 70%, #050505 100%);
+  background-color: #000000;
+  box-shadow: 
+    inset 0 0 8px rgba(0, 0, 0, 0.9),
+    inset 0 0 20px rgba(20, 20, 40, 0.4),
+    0 0 6px rgba(0, 0, 0, 0.8);
+  border: 1px solid #11111100;
+}
+/* Optional: faint mist/falling dust effect */
+/* .tile.mscl::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 8px,
+      rgba(40, 40, 60, 0.03) 8px,
+      rgba(40, 40, 60, 0.03) 16px
+    );
+  pointer-events: none;
+  animation: void-mist 8s linear infinite;
+}
+
+@keyframes void-mist {
+  from { transform: translateX(0); }
+  to { transform: translateX(-16px); }
+} */
+ .tile.mscsp {
+  background: 
+    linear-gradient(145deg, #4a4a4a 0%, #3a3a3a 50%, #555555 70%, #333333 100%),
+    #3c3c3c;
+  box-shadow: 
+    inset 0 1px 1px rgba(255,255,255,0.1),
+    0 1px 2px rgba(0,0,0,0.6);
+  border: 1px solid #2a2a2a;
+  position: relative;
+}
+
+/* Wear & tear */
+.tile.mscsp::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><path fill="%23333333" d="M0 0h1v1H0zM2 2h1v1H2z"/></svg>');
+  opacity: 0.3;
+  pointer-events: none;
 }

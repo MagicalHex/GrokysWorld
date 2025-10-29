@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import './InteractionSystem.css';
 import ProgressBar from './ProgressBar';
+import { QuestPopup } from './QuestPopup';
 
 // IMPORT ALL FROM CONSTANTS
 import {
@@ -11,24 +12,58 @@ import {
   CHOP_DROPS,
   NPC_DIALOGUE,
   SHOP_DATA,
-  CHOP_DURATION
+  CHOP_DURATION,
+  OPENABLE_OBJECTS,
+  OPEN_RESULT,
+  OPEN_DROPS,
+  OPEN_MESSAGES
 } from './InteractionConstants';
 
 const InteractionSystem = forwardRef(({
-  playerPos,
   objects,
   onObjectsChange,
   onCancelInteraction,
   rows,
   columns,
   inventory,
-  setInventory,
-  interaction,        // ← ADD HERE
-  setInteraction,     // ← ADD HERE
+  interaction,
+  setInteraction,
   tileSize,
   onQueueRespawn,
   onInventoryChange
 }, ref) => {
+// === QUEST POPUP STATE ===
+  const [questPopup, setQuestPopup] = useState(null); // { x, y, message }
+
+  const showQuestPopup = (x, y, message) => {
+    setQuestPopup({ x, y, message });
+    setTimeout(() => setQuestPopup(null), 3500); // auto-clear
+  };
+
+  // === OPENING LOGIC (CHESTS) ===
+const startOpening = (targetKey) => {
+  if (interaction.active) return;
+  const obj = objects[targetKey];
+  if (!OPENABLE_OBJECTS.has(obj)) return;
+
+  const upd = { ...objects };
+  const newType = OPEN_RESULT[obj];
+  upd[targetKey] = newType;
+
+  const item = OPEN_DROPS[obj];
+  onInventoryChange(prev => ({
+    ...prev,
+    [item]: (prev[item] ?? 0) + 1
+  }));
+
+  // SHOW POPUP INSIDE THIS COMPONENT
+  const [x, y] = targetKey.split(',').map(Number);
+  const message = OPEN_MESSAGES[obj];
+  showQuestPopup(x, y, message);
+
+  onObjectsChange(upd);
+  setInteraction({ type: null, active: false, key: null, timer: null });
+};
 
   // === CHOPPING LOGIC ===
   const startChopping = (targetKey) => {
@@ -195,9 +230,11 @@ const buyItem = (item) => {
   };
 
   // === PUBLIC API ===
-  const handleStartInteraction = (targetKey) => {
+    const handleStartInteraction = (targetKey) => {
     if (interaction.active) return;
-    startChopping(targetKey) || startTalking(targetKey);
+    startChopping(targetKey) || 
+    startTalking(targetKey) || 
+    startOpening(targetKey);  // ← NEW
   };
 
   const cancelInteraction = () => {
@@ -232,73 +269,88 @@ const buyItem = (item) => {
   }, [interaction.active, interaction.type, interaction.choices]);
 
   // === RENDER ===
-  if (!interaction.active) return null;
+  // if (!interaction.active) return null;
+    // === RENDER ===
+  if (!interaction.active && !questPopup) return null;
 
-  if (interaction.type === 'talk') {
-    return (
-      <div className="chat-bubble">
-        <div style={{ fontSize: '40px' }}>🛠️</div>
-        <div className="chat-bubble__message">
-{interaction.message.split('\n').map((line, i) => {
-  // Split by **bold** markers and render <strong>
-  const parts = line.split(/\*\*(.*?)\*\*/g);
+  const chopX = interaction.type === 'chop' && interaction.key ? 
+    Number(interaction.key.split(',')[0]) : null;
+  const chopY = interaction.type === 'chop' && interaction.key ? 
+    Number(interaction.key.split(',')[1]) : null;
+
   return (
-    <div key={i}>
-      {parts.map((part, idx) =>
-        idx % 2 === 1 ? (
-          <strong key={idx}>{part}</strong>
-        ) : (
-          <React.Fragment key={idx}>{part}</React.Fragment>
-        )
-      )}
-    </div>
-  );
-})}
-        </div>
-        {interaction.choices && (
-          <div className="chat-bubble__choices">
-            {interaction.choices.slice(0, 3).map((c, i) => {
-              const icons = ['Up', 'Left', 'Right'];
+    <>
+      {/* TALKING */}
+      {interaction.type === 'talk' && (
+        <div className="chat-bubble">
+          <div style={{ fontSize: '40px' }}>🛠️</div>
+          <div className="chat-bubble__message">
+            {interaction.message.split('\n').map((line, i) => {
+              const parts = line.split(/\*\*(.*?)\*\*/g);
               return (
-                <div key={i} className="chat-bubble__choice">
-                  <span className="chat-bubble__icon">[{icons[i]}]</span>
-                  {c.text}
+                <div key={i}>
+                  {parts.map((part, idx) =>
+                    idx % 2 === 1 ? (
+                      <strong key={idx}>{part}</strong>
+                    ) : (
+                      <React.Fragment key={idx}>{part}</React.Fragment>
+                    )
+                  )}
                 </div>
               );
             })}
           </div>
-        )}
-        <div className="chat-bubble__hint">Press Down to walk away</div>
-      </div>
-    );
-  }
-if (interaction.type === 'chop' && interaction.key && tileSize != null) {
-  const [x, y] = interaction.key.split(',').map(Number);
-  if (isNaN(x) || isNaN(y)) return null;
+          {interaction.choices && (
+            <div className="chat-bubble__choices">
+              {interaction.choices.slice(0, 3).map((c, i) => {
+                const icons = ['Up', 'Left', 'Right'];
+                return (
+                  <div key={i} className="chat-bubble__choice">
+                    <span className="chat-bubble__icon">[{icons[i]}]</span>
+                    {c.text}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <div className="chat-bubble__hint">Press Down to walk away</div>
+        </div>
+      )}
 
-  const left = x * tileSize;
-  const top = y * tileSize;
+      {/* CHOPPING */}
+      {interaction.type === 'chop' && chopX !== null && chopY !== null && tileSize != null && (
+        <div
+          style={{
+            position: 'absolute',
+            left: `${chopX * tileSize}px`,
+            top: `${chopY * tileSize}px`,
+            width: tileSize,
+            height: tileSize,
+            pointerEvents: 'none',
+            zIndex: 10,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            paddingBottom: '10px',
+          }}
+        >
+          <ProgressBar />
+        </div>
+      )}
 
-  return (
-<div
-  style={{
-    position: 'absolute',
-    left: `${left}px`,
-    top: `${top}px`,
-    width: tileSize,
-    height: tileSize,
-    pointerEvents: 'none',
-    zIndex: 10,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingBottom: '10px',  // above ground
-  }}
->
-  <ProgressBar />
-</div>
+      {/* QUEST POPUP */}
+      {questPopup && (
+        <QuestPopup
+          message={questPopup.message}
+          x={questPopup.x}
+          y={questPopup.y}
+          tileSize={tileSize}
+          onClose={() => setQuestPopup(null)}
+        />
+      )}
+    </>
   );
-}
+
 
 return null;
 });

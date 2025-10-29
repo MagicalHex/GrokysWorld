@@ -1,0 +1,43 @@
+/* QuestPopup.css */
+.quest-popup {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  animation: quest-float 3s ease-out forwards;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-shadow: 
+    0 0 5px #ff0,
+    0 0 10px #f80,
+    0 0 15px #f40;
+  color: #ffcc00;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.quest-popup__text {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid #ff9900;
+  box-shadow: 0 0 15px rgba(255, 150, 0, 0.6);
+}
+
+@keyframes quest-float {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}

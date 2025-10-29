@@ -7,7 +7,8 @@ export const OBJECTS = {
   // Companion
   companion: '🐺',
   // WEAPONS
-  sword: '⚔️',
+  sword: '',
+  doublesword: '⚔️',
   axe: '🪓',
   dagger: '🗡️',
   bow: '🏹',
@@ -78,6 +79,8 @@ export const OBJECTS = {
   castle: '🏰',
   // QUEST ITEMS
   'backpack': '🎒',
+  'chest-open': '',
+  'chest-closed': '',
   // FLOWERS
   roseobject: '🌹',
   cherryblossomobject: '🌸',

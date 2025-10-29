@@ -18,6 +18,7 @@ const PlayerMovement = ({
   interactionType,   // NEW: 'chop' | 'talk' | null
   CHOPPABLE_OBJECTS,
   TALKABLE_OBJECTS,
+  OPENABLE_OBJECTS,
   isDead
 }) => {
   const [canMove, setCanMove] = useState(true);
@@ -62,7 +63,8 @@ const PlayerMovement = ({
       // ---- INTERACT (chop / talk) ----
       const isChoppable = targetObj && CHOPPABLE_OBJECTS.has(targetObj);
       const isTalkable  = targetObj && TALKABLE_OBJECTS.has(targetObj);
-      if (isChoppable || isTalkable) {
+      const isOpenable = targetObj && OPENABLE_OBJECTS.has(targetObj);
+      if (isChoppable || isTalkable || isOpenable) {
         onStartInteraction(targetKey);
         return;
       }
@@ -90,6 +92,7 @@ const PlayerMovement = ({
           const CUSTOM_SPAWNS = {
             'portal-1': { x: 22, y: 8 },
             'rope-2':   { x: 6, y: 12 },
+            'rope-3':   { x: 22, y: 15 },
           };
 
           const key = `${type}-${level}`;
@@ -116,7 +119,7 @@ const PlayerMovement = ({
   }, [
     playerPos, onPlayerMove, onExit, objects, restrictedTiles,
     rows, columns, level, onLevelChange, onStartInteraction,
-    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS
+    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS
   ]);
 
   return null;

@@ -5,16 +5,16 @@ import { loadMaps } from '../data/loadMaps';
 const ROWS = 16;
 const COLS = 24;
 const PORTAL_ENTRY_POINTS = { 
-  1: { x: 1, y: 1 }, 
-  2: { x: 1, y: 2 }, 
-  3: { x: 3, y: 3 }, 
-  4: { x: 4, y: 4 }, 
-  5: { x: 1, y: 1 },
-  6: { x: 2, y: 2 }, };
+  1: { x: 1, y: 1 }, // Town
+  2: { x: 1, y: 2 }, // Wilderness
+  3: { x: 1, y: 2 }, // Slimecave
+  4: { x: 4, y: 4 }, // StoneCave
+  5: { x: 1, y: 2 }, // Dungeon
+  6: { x: 1, y: 2 }, }; // Slimecave 1
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
-  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft'
+  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv'
 ]);
 
 export const useGameState = () => {

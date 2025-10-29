@@ -6,7 +6,7 @@ import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
 import HealthBar from './HealthBar';
 import InteractionSystem from './InteractionSystem';
-import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS } from './InteractionConstants';
+import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS } from './InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
 import { PickupPopup } from './PickupPopup';
@@ -51,9 +51,9 @@ useEffect(() => {
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
-  useEffect(() => {
-  console.trace('[PlayMode] rendered — why?');
-}, []);
+//   useEffect(() => {
+//   console.trace('[PlayMode] rendered — why?');
+// }, []);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -154,6 +154,7 @@ const removePickupPopup = useCallback((id) => {
         interactionType={interaction.type}
         CHOPPABLE_OBJECTS={CHOPPABLE_OBJECTS}
         TALKABLE_OBJECTS={TALKABLE_OBJECTS}
+        OPENABLE_OBJECTS={OPENABLE_OBJECTS}
         isDead={isDead}
       />
 

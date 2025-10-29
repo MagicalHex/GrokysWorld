@@ -17,6 +17,8 @@ export const TERRAINS = {
   // CAVE
   msc: 'green', // msc = mossy cave tile
   mscd: 'darkgreen',
+  mscl: 'darkgreen', // void
+  mscsp: 'darkgreen',
   
   // WALLS
   wall: '#343a40',

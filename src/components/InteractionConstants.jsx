@@ -34,3 +34,17 @@ export const SHOP_DATA = {
 };
 
 export const CHOP_DURATION = 3000;
+
+export const OPENABLE_OBJECTS = new Set(['chest-closed']);
+
+export const OPEN_RESULT = {
+  'chest-closed': 'chest-open'
+};
+
+export const OPEN_DROPS = {
+  'chest-closed': 'dungeon key'
+};
+
+export const OPEN_MESSAGES = {
+  'chest-closed': "You just found a key! ... and something doesn't feel right."
+};
