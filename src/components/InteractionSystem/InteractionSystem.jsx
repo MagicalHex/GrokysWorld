@@ -25,6 +25,7 @@ const InteractionSystem = forwardRef(({
   setInteraction,
   tileSize,
   onQueueRespawn,
+  spawnMonster,
   onInventoryChange
 }, ref) => {
 
@@ -46,7 +47,7 @@ const InteractionSystem = forwardRef(({
   });
 
   const { startOpening } = useQuesting({
-    objects, onObjectsChange, onInventoryChange, interaction, setInteraction, showQuestPopup
+    objects, onObjectsChange, onInventoryChange, interaction, setInteraction, showQuestPopup, spawnMonster
   });
 
   // === PUBLIC API ===

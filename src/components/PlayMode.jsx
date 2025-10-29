@@ -26,6 +26,7 @@ const PlayMode = ({
   onLevelChange,
   onQueueRespawn,
   originalSpawns,
+  spawnMonster,
   globalPlayerHealth,
   onPlayerHealthChange,
   monsterHealths,
@@ -227,7 +228,7 @@ const removePickupPopup = useCallback((id) => {
             {obj && (
             <div className={`object ${monsterTypes[obj] || obj} ${droppedItems.has(key) ? 'dropped-item' : ''}`}>
               {OBJECTS[monsterTypes[obj] || obj]}
-              {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider') && (
+              {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider' || monsterTypes[obj] === 'cavespider') && (
                 <HealthBar
                   key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
                   health={globalMonsterHealths[obj] ?? 100}
@@ -276,6 +277,7 @@ const removePickupPopup = useCallback((id) => {
         tileSize={tileSize}
         onQueueRespawn={onQueueRespawn}
         originalSpawns={originalSpawns}
+        spawnMonster={spawnMonster}
         level={level}
       />
 

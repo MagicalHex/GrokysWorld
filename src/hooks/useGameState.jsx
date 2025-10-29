@@ -14,7 +14,7 @@ const PORTAL_ENTRY_POINTS = {
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
-  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv'
+  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none'
 ]);
 
 export const useGameState = () => {
@@ -273,11 +273,12 @@ const getOriginalKey = useCallback((monsterId, levels) => {
 // Respawn delay map – define once, use everywhere
 // ──────────────────────────────────────────────────────────────
 const RESPAWN_DELAYS = {
-  treeobject: 1500,     // 15 seconds
-  lightstoneobject: 2000,    // 20 seconds (example)
-  spider: 30000,         // 30 seconds
-  skeleton: 30000,       // 45 seconds (example)
-  default: 10000         // fallback
+  treeobject: 1500,
+  lightstoneobject: 2000,
+  spider: 30000,
+  skeleton: 30000,
+  cavespider: 50000,        // ← 2 seconds
+  default: 10000
 };
 
 // ──────────────────────────────────────────────────────────────
@@ -295,21 +296,29 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
   let monsterId = null;
 
   // ─── Overload 1: monsterId (string) → respawn at original tile
-  if (typeof arg1 === 'string' && arg2 === undefined || typeof arg2 === 'number') {
-    monsterId = arg1;
-    const parts = monsterId.split('_');
-    type = parts[0];
-    delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type); // ← USE TYPE DELAY (respawn time based on object)
+if (typeof arg1 === 'string') {
+  monsterId = arg1;
+  const parts = monsterId.split('_');
+  type = parts[0];
+  delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
+  const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false; // ← NEW
 
-    const origKey = getOriginalKey(monsterId, levels);
+  let origKey;
+  if (forceSpawn) {
+    // Fake monster → use x_y from ID
+    const x = parts[2], y = parts[3];
+    origKey = `${x},${y}`;
+  } else {
+    origKey = getOriginalKey(monsterId, levels);
     if (!origKey) {
       console.warn('[useGameState] No original key for monster:', monsterId);
       return;
     }
+  }
 
-    levelId = Number(parts[1]);
-    key = origKey;
-    isMonster = true;
+  levelId = Number(parts[1]);
+  key = origKey;
+  isMonster = true;
 
   // ─── Overload 2: levelId, key, type, delay → trees, stones, etc.
   } else {
@@ -401,7 +410,7 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
 }, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes]);
 
 // ──────────────────────────────────────────────────────────────
-//  uses per-type delay
+//  RESPAWN, PART OF ABOVE
 // ──────────────────────────────────────────────────────────────
 const onQueueRespawn = useCallback((levelId, { key, type }) => {
   console.log('[useGameState] onQueueRespawn called:', { levelId, key, type });
@@ -409,6 +418,25 @@ const onQueueRespawn = useCallback((levelId, { key, type }) => {
   scheduleRespawn(levelId, key, type, delay);
 }, [scheduleRespawn]);
 
+// ──────────────────────────────────────────────────────────────
+//  SPAWN
+// ──────────────────────────────────────────────────────────────
+// useGameState.jsx
+const spawnMonster = useCallback(
+  (key, type, delay = 0) => {
+    console.log('[useGameState] spawnMonster', { levelId: currentLevel, key, type, delay });
+
+    const [x, y] = key.split(',');
+    const fakeMonsterId = `${type}_${currentLevel}_${x}_${y}`;
+
+    // ALWAYS forceSpawn = true — this is for quests/events only
+    scheduleRespawn(fakeMonsterId, delay, true);
+  },
+  [currentLevel, scheduleRespawn]
+);
+
+// ------------------------
+// GRID CHANGES
   const handleGridChange = useCallback((newGrid, levelId = currentLevel) => {
     const restricted = new Set();
     newGrid.forEach((row, y) => {
@@ -435,7 +463,7 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
   if (newHealth > 0) return;
 
   const type = monsterTypes[monsterId];
-  if (!['spider', 'skeleton'].includes(type)) return;
+  if (!['spider', 'skeleton', 'cavespider'].includes(type)) return;
 
   // Uses per-type delay from RESPAWN_DELAYS (e.g. 30s for spider)
   scheduleRespawn(monsterId); // ← delay auto-determined by type
@@ -461,7 +489,7 @@ useEffect(() => {
       /* ---------- objects → monster IDs ---------- */
       const objects = { ...data.objects || {} };
       Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (['skeleton', 'spider'].includes(type)) {
+        if (['skeleton', 'spider', 'cavespider'].includes(type)) {
           const [x, y] = key.split(',').map(Number);
           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
           objects[key] = monsterId;
@@ -528,6 +556,7 @@ useEffect(() => {
     handleGridChange,
     onQueueRespawn: payload => onQueueRespawn(currentLevel, payload),
     getOriginalSpawns: id => levels[id]?.originalSpawns || {},
+    spawnMonster,
 
     onPlayerHealthChange,
     onInventoryChange,

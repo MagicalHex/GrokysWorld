@@ -20,6 +20,7 @@
   ],
   "objects": {
     "1,1": "rope-to-3",
+
     "11,5": "stoneobject",
     "11,10": "stoneobject",
     "11,0": "stoneobjecthalf",
@@ -41,5 +42,6 @@
     "22,11": "fireobject",
     "23,7": "chest-closed"
 
+    
   }
 }

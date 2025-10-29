@@ -62,7 +62,7 @@ const MonsterMovement = ({
       const monsters = [];
       Object.entries(objects).forEach(([key, monsterId]) => {
         const type = monsterTypes[monsterId];
-        if (['skeleton', 'spider'].includes(type)) {
+        if (['skeleton', 'spider', 'cavespider'].includes(type)) {
           const [x, y] = key.split(',').map(Number);
           const health = globalMonsterHealths[monsterId] ?? 100;
           if (health > 0) {
