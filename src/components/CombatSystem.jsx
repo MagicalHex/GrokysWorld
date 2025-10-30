@@ -10,7 +10,7 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 // 1. Weapon → damage table
 // -------------------------------------------------------------------
 const WEAPON_DAMAGE_RANGES = {
-  fist:   { min:  8, max: 15 },
+  fist:   { min:  40, max: 50 },
   dagger: { min: 12, max: 20 },
   sword:  { min: 18, max: 25 },
 };
@@ -51,7 +51,7 @@ export default function CombatSystem({
   inventory,
   healPopup,
   onHealPopupFinish,
-  onDamageTaken
+  setLastDamageTime
 }) {
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 
@@ -85,8 +85,7 @@ export default function CombatSystem({
       isDead,
       setIsDead,
       inventory,
-      addPopup: refs.current.addPopup, // preserve function
-      onDamageTaken
+      addPopup: refs.current.addPopup // preserve function
     };
   }, [
     playerPos,
@@ -99,8 +98,7 @@ export default function CombatSystem({
     onObjectsChange,
     isDead,
     setIsDead,
-    inventory,
-    onDamageTaken
+    inventory
   ]);
 
   // === DAMAGE POPUPS ===
@@ -215,18 +213,33 @@ if (
 ) {
   const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
   const dmg = randInt(min, max);
+onPlayerHealthChange(prev => {
+  const newHealth = Math.max(0, prev - dmg);
 
-  onPlayerHealthChange(prev => {
-    const newHealth = Math.max(0, prev - dmg);
-    if (newHealth <= 0 && !isDead) setIsDead(true);
+  // UPDATE lastDamageTime RIGHT HERE
+  if (newHealth < prev) {
+    const now = Date.now();
+    console.log('[DAMAGE] Player hit! Resetting regen timer.', new Date(now).toLocaleTimeString());
+    setLastDamageTime(now);  // DIRECT! NO CALLBACK!
+  }
+
+  if (newHealth <= 0 && !isDead) {
+    setIsDead(true);
+  }
+
+  return newHealth;
+});
+  // onPlayerHealthChange(prev => {
+  //   const newHealth = Math.max(0, prev - dmg);
+  //   if (newHealth <= 0 && !isDead) setIsDead(true);
     
-    // TELL REGEN SYSTEM: "PLAYER GOT HIT!"
-    if (newHealth < prev && onDamageTaken) {
-      onDamageTaken();
-    }
+  //   // TELL REGEN SYSTEM: "PLAYER GOT HIT!"
+  //   // if (newHealth < prev && onDamageTaken) {
+  //   //   onDamageTaken();
+  //   // }
 
-    return newHealth;
-  });
+  //   return newHealth;
+  // });
 
   lastMonsterAttack[monsterId] = now;
 }

@@ -46,7 +46,7 @@ useEffect(() => {
     onHealPopup,
     onHealPopupFinish,
     lastDamageTime,
-    onDamageTaken
+    setLastDamageTime
   } = game;
 
   if (isLoading) {
@@ -95,7 +95,7 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
         onHealPopup={onHealPopup}
         onHealPopupFinish={onHealPopupFinish}
         lastDamageTime={lastDamageTime}
-        onDamageTaken={onDamageTaken}
+        setLastDamageTime={setLastDamageTime}
       />
     );
   }

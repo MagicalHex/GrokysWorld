@@ -110,94 +110,33 @@ const [lastDamageTime, setLastDamageTime] = useState(Date.now());
      -------------------------------------------------------------- */
      const [healPopup, setHealPopup] = useState(null);
 
-const onHealPopup = useCallback((x, y) => {
-  setHealPopup({ x, y, damage: 1, isHeal: true });
+const onHealPopup = useCallback((x, y, amount) => {
+  setHealPopup({ x, y, damage: amount, isHeal: true });
 }, []);
-// const onPlayerHealthChange = useCallback((newHealth) => {
-//   const prevHealth = globalPlayerHealth;
-//   setGlobalPlayerHealth(newHealth);
 
-//   // If health decreased → record damage time
-//   if (newHealth < prevHealth) {
-//     setLastDamageTime(Date.now());
-//   }
-
-//   if (newHealth <= 0 && !isDead) {
-//     setIsDead(true);
-//   }
-// }, [globalPlayerHealth, isDead]);
-// Add these refs
+// Level and player pos
 useEffect(() => {
   const levelData = levels[currentLevel];
   if (levelData?.playerPos) {
     playerPosRef.current = levelData.playerPos;
   }
 }, [currentLevel, levels]);
-// const lastDamageTimeRef = useRef(Date.now());
+
 const playerPosRef = useRef({ x: 0, y: 0 });
 
-// Update refs when needed
-// useEffect(() => {
-//   lastDamageTimeRef.current = lastDamageTime;
-// }, [lastDamageTime]);
+const onPlayerHealthChange = useCallback((setter) => {
+  setGlobalPlayerHealth(prev => {
+    const newHealth = typeof setter === 'function' ? setter(prev) : setter;
+    if (newHealth <= 0 && !isDead) setIsDead(true);
+    return newHealth;
+  });
+}, [isDead]);
 
-const onDamageTaken = useCallback(() => {
-  const now = Date.now();
-  console.log('[DAMAGE] Player hit! Resetting regen timer.', new Date(now).toLocaleTimeString());
-  setLastDamageTime(now);
-}, []);
-// onPlayerHealthChange — now updates lastDamageTimeRef
-const onPlayerHealthChange = useCallback((newHealth) => {
-  const prevHealth = globalPlayerHealth;
-  setGlobalPlayerHealth(newHealth);
-
-  // if (newHealth < prevHealth) {
-  //   lastDamageTimeRef.current = Date.now(); // ← Update ref!
-  // }
-
-  if (newHealth <= 0 && !isDead) {
-    setIsDead(true);
-  }
-}, [globalPlayerHealth, isDead]);
 // Reset popup after animation
 const onHealPopupFinish = useCallback(() => {
   setHealPopup(null);
 }, []);
-// HEALTH REGEN: +1 every 2 sec if not hit in 7 sec
-// useEffect(() => {
-//   if (isDead || globalPlayerHealth >= 100 || globalPlayerHealth <= 0) return;
-
-//   // Get current player position
-//   const currentLevelData = levels[currentLevel] || {};
-//   const playerPos = currentLevelData.playerPos;
-//   if (!playerPos) return; // Safety
-
-//   const now = Date.now();
-//   const timeSinceDamage = now - lastDamageTime;
-
-//   if (timeSinceDamage < 7000) return;
-
-//   const interval = setInterval(() => {
-//     const currentTime = Date.now();
-//     if (currentTime - lastDamageTime >= 7000 && globalPlayerHealth < 100) {
-//       onPlayerHealthChange(globalPlayerHealth + 1);
-//       if (onHealPopup) {
-//         onHealPopup(playerPos.x, playerPos.y); // Now in scope!
-//       }
-//     }
-//   }, 2000);
-
-//   return () => clearInterval(interval);
-// }, [
-//   isDead,
-//   globalPlayerHealth,
-//   lastDamageTime,
-//   levels,           // ADD
-//   currentLevel,     // ADD
-//   onPlayerHealthChange,
-//   onHealPopup,
-// ]);
-
+// Inventory
   const onInventoryChange = useCallback((updater) => {
     setGlobalInventory(prev => (typeof updater === 'function' ? updater(prev) : updater));
   }, []);
@@ -284,22 +223,27 @@ const clearPendingPickup = useCallback(() => {
 // 1. Helper: get original key from monsterId (only for monsters)
 // ──────────────────────────────────────────────────────────────
 const getOriginalKey = useCallback((monsterId, levels) => {
-  // First: Check originalSpawns (fast)
-  if (originalSpawns[monsterId]) {
-    return originalSpawns[monsterId];
+  console.log('[getOriginalKey] Called for:', monsterId);
+
+  if (!monsterId || typeof monsterId !== 'string') {
+    console.warn('→ Invalid monsterId:', monsterId);
+    return null;
   }
 
-  // Fallback: Search levels (slower, for legacy)
-  for (const [levelId, level] of Object.entries(levels)) {
-    for (const [key, value] of Object.entries(level.objects || {})) {
-      if (value === monsterId) {
-        return key;
-      }
-    }
+  const parts = monsterId.split('_');
+  if (parts.length < 4) {
+    console.warn('→ Invalid format:', parts);
+    return null;
   }
 
-  return null;
-}, [originalSpawns, levels]);
+  // EXTRACT FROM ID: spider_2_21_2 → x=21, y=2
+  const x = parts[2];
+  const y = parts[3];
+  const key = `${x},${y}`;
+
+  console.log('→ Extracted from ID:', key);
+  return key;
+}, [levels]);
 
 // ──────────────────────────────────────────────────────────────
 // Respawn delay map – define once, use everywhere
@@ -307,9 +251,9 @@ const getOriginalKey = useCallback((monsterId, levels) => {
 const RESPAWN_DELAYS = {
   treeobject: 1500,
   lightstoneobject: 2000,
-  spider: 30000,
+  spider: 2000,
   skeleton: 30000,
-  cavespider: 50000,        // ← 2 seconds
+  cavespider: 50000,      
   default: 10000
 };
 
@@ -323,85 +267,116 @@ const getRespawnDelay = (type) => {
 // 2. Unified scheduleRespawn – handles BOTH monsters and static objects
 // ──────────────────────────────────────────────────────────────
 const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
+  console.log('[scheduleRespawn] CALLED WITH:', { arg1, arg2, arg3, arg4 });
+  console.log('typeof arg1:', typeof arg1);
+
   let levelId, key, type, delay = 3000;
   let isMonster = false;
   let monsterId = null;
 
-  // ─── Overload 1: monsterId (string) → respawn at original tile
-if (typeof arg1 === 'string') {
-  monsterId = arg1;
-  const parts = monsterId.split('_');
-  type = parts[0];
-  delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
-  const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false; // ← NEW
+  // ─── Overload 1: monsterId (string)
+  if (typeof arg1 === 'string') {
+    monsterId = arg1;
+    console.log('→ [MONSTER PATH] monsterId =', monsterId);
 
-  let origKey;
-  if (forceSpawn) {
-    // Fake monster → use x_y from ID
-    const x = parts[2], y = parts[3];
-    origKey = `${x},${y}`;
-  } else {
-    origKey = getOriginalKey(monsterId, levels);
-    if (!origKey) {
-      console.warn('[useGameState] No original key for monster:', monsterId);
+    const parts = monsterId.split('_');
+    console.log('→ parts =', parts);
+
+    if (parts.length < 4) {
+      console.warn('→ Invalid monsterId format:', monsterId);
       return;
     }
-  }
 
-  levelId = Number(parts[1]);
-  key = origKey;
-  isMonster = true;
+    type = parts[0];
+    levelId = Number(parts[1]);
+    delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
+    const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false;
 
-  // ─── Overload 2: levelId, key, type, delay → trees, stones, etc.
+    console.log('→ type:', type, 'levelId:', levelId, 'delay:', delay, 'forceSpawn:', forceSpawn);
+
+    let origKey;
+    if (forceSpawn) {
+      const x = parts[2], y = parts[3];
+      origKey = `${x},${y}`;
+      console.log('→ forceSpawn: using x,y from ID →', origKey);
+    } else {
+      console.log('→ Calling getOriginalKey for:', monsterId);
+      origKey = getOriginalKey(monsterId, levels);
+      console.log('→ getOriginalKey returned:', origKey);
+      if (!origKey) {
+        console.warn('→ [FATAL] No original key for:', monsterId);
+        return;
+      }
+    }
+
+    key = origKey;
+    isMonster = true;
+
+  // ─── Overload 2: levelId, key, type, delay
   } else {
     levelId = arg1;
     key = arg2;
     type = arg3;
     delay = arg4 ?? 3000;
     isMonster = false;
+    console.log('→ [STATIC PATH] levelId:', levelId, 'key:', key, 'type:', type, 'delay:', delay);
   }
 
-  const timestamp = Date.now() + delay;
+  console.log('→ FINAL: levelId=', levelId, 'key=', key, 'type=', type, 'isMonster=', isMonster);
 
-  // ─── Prevent duplicate queue entries
+  const timestamp = Date.now() + delay;
+  console.log('→ timestamp =', new Date(timestamp).toLocaleTimeString());
+
+  // ─── Prevent duplicate
   const queue = levels[levelId]?.respawnQueue || [];
   const alreadyQueued = queue.some(i => i.key === key && i.type === type);
   if (alreadyQueued) {
-    console.log('[useGameState] Respawn already queued:', { levelId, key, type });
+    console.log('→ [DUPLICATE] Already queued:', { levelId, key, type });
     return;
   }
 
   // ─── Add to queue
+  console.log('→ Adding to queue:', { levelId, key, type, timestamp });
   updateLevel(levelId, prev => ({
     ...prev,
     respawnQueue: [...(prev.respawnQueue || []), { key, type, timestamp }]
   }));
 
-  // ─── Set up the actual respawn timeout
+  // ─── Set timeout
+  console.log('→ setTimeout in', delay, 'ms');
   const timerId = setTimeout(() => {
+    console.log('[TIMER FIRED] for:', { levelId, key, type, monsterId });
+
     setLevels(prevLevels => {
       const level = prevLevels[levelId];
-      if (!level) return prevLevels;
+      if (!level) {
+        console.warn('→ Level not found:', levelId);
+        return prevLevels;
+      }
 
       const now = Date.now();
+      console.log('→ now:', now, 'timestamp:', timestamp, 'too early?', now < timestamp);
 
-      // Too early? Reschedule
       if (now < timestamp) {
+        console.log('→ Too early → rescheduling in', timestamp - now, 'ms');
         if (isMonster) {
+          console.log('→ RECALL: scheduleRespawn(monsterId, delay)');
           scheduleRespawn(monsterId, timestamp - now);
         } else {
+          console.log('→ RECALL: scheduleRespawn(levelId, key, type, delay)');
           scheduleRespawn(levelId, key, type, timestamp - now);
         }
         return prevLevels;
       }
 
-      // Can we place it?
       const occupied = level.objects[key];
+      console.log('→ Tile occupied by:', occupied);
+
       const canPlace = !occupied ||
         ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject'].includes(occupied);
 
       if (!canPlace) {
-        // Try again in 1s
+        console.log('→ Cannot place → retry in 1s');
         if (isMonster) {
           scheduleRespawn(monsterId, 1000);
         } else {
@@ -410,10 +385,12 @@ if (typeof arg1 === 'string') {
         return prevLevels;
       }
 
-      // ─── Place the object
+      console.log('→ PLACING:', isMonster ? 'MONSTER' : 'STATIC');
+
       if (isMonster) {
         const [x, y] = key.split(',').map(Number);
         const newMonsterId = `${type}_${levelId}_${x}_${y}`;
+        console.log('→ Spawning new monster:', newMonsterId, 'at', key);
         setGlobalMonsterHealths(p => ({ ...p, [newMonsterId]: 100 }));
         setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
 
@@ -426,7 +403,6 @@ if (typeof arg1 === 'string') {
           }
         };
       } else {
-        // Static object (tree, stone, etc.)
         return {
           ...prevLevels,
           [levelId]: {
@@ -439,7 +415,7 @@ if (typeof arg1 === 'string') {
     });
   }, delay);
 
-}, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes]);
+}, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes, getOriginalKey]);
 
 // ──────────────────────────────────────────────────────────────
 //  RESPAWN, PART OF ABOVE
@@ -581,8 +557,8 @@ useEffect(() => {
     healPopup,
     onHealPopup,
     onHealPopupFinish,
-    onDamageTaken,
-    lastDamageTime,
+    // lastDamageTime, NOTE THAT THIS IS COMMENTED OUT. It works at this level but blocks HealthRegen component for some reason
+    setLastDamageTime,
 
     setCurrentLevel,
     onLevelChange,

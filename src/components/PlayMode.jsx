@@ -45,7 +45,7 @@ const PlayMode = ({
   onHealPopup,
   onHealPopupFinish,
   lastDamageTime,
-  onDamageTaken
+  setLastDamageTime
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -56,9 +56,9 @@ useEffect(() => {
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
-  useEffect(() => {
-  console.log('[PlayMode] lastDamageTime prop:', lastDamageTime, typeof lastDamageTime);
-  }, [lastDamageTime]);
+  // useEffect(() => {
+  // console.log('[PlayMode] lastDamageTime prop:', lastDamageTime, typeof lastDamageTime);
+  // }, [lastDamageTime]);
 
 //   useEffect(() => {
 //   console.trace('[PlayMode] rendered — why?');
@@ -196,7 +196,7 @@ const removePickupPopup = useCallback((id) => {
         inventory={globalInventory}
         healPopup={healPopup}
         onHealPopupFinish={onHealPopupFinish}
-        onDamageTaken={onDamageTaken}
+        setLastDamageTime={setLastDamageTime}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -205,6 +205,7 @@ const removePickupPopup = useCallback((id) => {
         onHealPopup={onHealPopup}
         playerPos={playerPos}
         lastDamageTime={lastDamageTime}
+        setLastDamageTime={setLastDamageTime}
       />
 
       {/* ---------- INVENTORY ---------- */}

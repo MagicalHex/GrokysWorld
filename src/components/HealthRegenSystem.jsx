@@ -3,16 +3,17 @@ import React, { useEffect, useRef } from 'react';
 import { subscribe } from '../utils/gameLoop';
 
 const REGEN_DELAY = 7000;
-const REGEN_INTERVAL = 2000;
-const HEAL_AMOUNT = 1;
+const REGEN_INTERVAL = 7000;
+const HEAL_AMOUNT = 7;
 
+// HealthRegenSystem.jsx
 export default function HealthRegenSystem({
   playerHealth,
   onPlayerHealthChange,
   isDead,
   onHealPopup,
   playerPos,
-  lastDamageTime,   // ← LIVE FROM useGameState
+  lastDamageTime,
 }) {
   const refs = useRef({
     playerHealth,
@@ -20,40 +21,46 @@ export default function HealthRegenSystem({
     onPlayerHealthChange,
     onHealPopup,
     playerPos,
-    lastDamageTime
+    lastDamageTime, // THIS IS NOT USED. IT IS COMMENTED OUT IN useGameState
   });
 
+  // Update refs on every render
   useEffect(() => {
-    refs.current = {
-      playerHealth,
-      isDead,
-      onPlayerHealthChange,
-      onHealPopup,
-      playerPos,
-      lastDamageTime
-    };
+    refs.current.playerHealth = playerHealth;
+    refs.current.isDead = isDead;
+    refs.current.onPlayerHealthChange = onPlayerHealthChange;
+    refs.current.onHealPopup = onHealPopup;
+    refs.current.playerPos = playerPos;
+    refs.current.lastDamageTime = lastDamageTime;  // ← ALWAYS FRESH
   }, [playerHealth, isDead, onPlayerHealthChange, onHealPopup, playerPos, lastDamageTime]);
-useEffect(() => {
-  console.log('[REGEN EFFECT] Subscribed with lastDamageTime:', lastDamageTime);
-}, [lastDamageTime]);
+
+  // SUBSCRIBE ONLY ONCE
   useEffect(() => {
     let lastRegenTime = 0;
 
     const unsubscribe = subscribe((delta, time) => {
       const { playerHealth, isDead, onPlayerHealthChange, onHealPopup, playerPos, lastDamageTime } = refs.current;
 
+      // Early exit
       if (isDead || playerHealth >= 100 || playerHealth <= 0) return;
-      if (time - lastDamageTime < REGEN_DELAY) return;
+
+      const timeSinceDamage = time - lastDamageTime;
+      if (timeSinceDamage < REGEN_DELAY) {
+        // Optional: reset regen timer on new damage
+        // lastRegenTime = time;
+        return;
+      }
+
       if (time - lastRegenTime < REGEN_INTERVAL) return;
 
       lastRegenTime = time;
-      console.log('[REGEN] +1 HP →', playerHealth + 1, '| Time since damage:', (time - lastDamageTime)/1000, 'sec');
+      console.log('[REGEN] +1 HP →', playerHealth + 1, '| Since damage:', timeSinceDamage / 1000, 's');
       onPlayerHealthChange(playerHealth + HEAL_AMOUNT);
-      onHealPopup?.(playerPos.x, playerPos.y);
+      onHealPopup?.(playerPos.x, playerPos.y, HEAL_AMOUNT);
     });
 
     return unsubscribe;
-  }, [lastDamageTime]); // This triggers resubscribe when damage taken
+  }, []); // ← NEVER RESUBSCRIBE
 
   return null;
 }
