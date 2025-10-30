@@ -6,6 +6,8 @@ export const TERRAINS = {
   grassnowalk: '#28a745',
 
   soilbrown: '#7c3502',
+  mudground: '#5d4037',
+    mudgroundtograss: '#5d4037',
 
   // ENVIRONMENT
   sand: '#ffc107',

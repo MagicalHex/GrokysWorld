@@ -1,6 +1,6 @@
 // InteractionConstants.js
 export const CHOPPABLE_OBJECTS = new Set(['treeobject', 'pinetreeobject', 'lightstoneobject']);
-export const TALKABLE_OBJECTS = new Set(['farmerobject', 'villagerobject', 'blacksmithobject']);
+export const TALKABLE_OBJECTS = new Set(['farmer001', 'mechanic001', 'villagerobject', 'blacksmithobject']);
 
 export const CHOP_RESULT = {
   treeobject: 'timberwoodchoppedobject',
@@ -15,8 +15,16 @@ export const CHOP_DROPS = {
 };
 
 export const NPC_DIALOGUE = {
-  farmerobject: {
+  farmer001: {
     greeting: "Howdy, partner! Need any crops?",
+    choices: [
+      { key: 'up', text: "Show me your wares!", action: 'openShop', type: 'farmer' },
+      { key: 'left', text: "Tell me about the village.", action: 'say', message: "It's peaceful here." },
+      { key: 'right', text: "Goodbye.", action: 'close' }
+    ]
+  },
+    mechanic001: {
+    greeting: "Hello, partner! Need anything?",
     choices: [
       { key: 'up', text: "Show me your wares!", action: 'openShop', type: 'farmer' },
       { key: 'left', text: "Tell me about the village.", action: 'say', message: "It's peaceful here." },

@@ -37,12 +37,14 @@ export const OBJECTS = {
   npc: '🔵',
   prince: '🤴',
   merchantobject: '🧙‍♂️',
-  farmerobject: '🧑‍🌾',
+  farmer001: '🧑‍🌾',
+  mechanic001: '👨‍🔧',
   // JEWELRY
   diamond: '💎',
   // OBSTACLES
   spiderweb: '🕸️',
   fireobject: '🔥',
+  campfireobject: '🔥',
   woodobject: '🪵',
   treeobject: '🌳',
   pinetreeobject: '🌲',
@@ -95,6 +97,7 @@ export const OBJECTS = {
   stoneobject: '',            // Medium stone
   stoneobjecthalf: '',            // Medium stone
   stonepillarobject: '',
+  campfirestoneobject: '',
   // TIMBER
   timberwoodupobject: '',
   timberwoodsideobject: '',
@@ -102,10 +105,26 @@ export const OBJECTS = {
   timberwoodsideobjecthalfright: '',
   timberwoodleftcornerobject: '',
   timberwoodrightcornerobject: '',
+
+  campfirebenchobject_bottom: '',
+  campfirebenchobject_right:  '',
+  campfirebenchobject_top:    '',
+  campfirebenchobject_left:   '',
+  
   // TIMBER CHOPPED
   timberwoodchoppedobject: '',
   // FENCE/WALLS
   fenceobject: '',
   // MONSTERS
   cavespider: '',
+  // ITEMS - ARMORS
+  'dark-armor': '',
+  'knights-armor': '',
+  'wing-armor': '',
+  // ITEMS - WEAPONS
+  'short-sword': '',
+  // NPCS
+  'half-elf-merchant': '',
+  'human-merchant': '',
+  'player-image': '',
 };

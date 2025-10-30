@@ -173,7 +173,8 @@ const onHealPopupFinish = useCallback(() => {
   } else {
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','hole-to-5','rope-to-1', 'rope-to-2'
+      'bridge','ladder','hole-to-5','rope-to-1', 'rope-to-2',
+      'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);
     if (!isPersist && !targetObj?.startsWith('portal-to-')) {

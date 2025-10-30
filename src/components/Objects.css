@@ -14,7 +14,6 @@
 /* THIS IS THE SHIELD PLAYER */
 .object.player { 
   font-size: 40px; 
-  /* animation: hero-glow 2s ease-in-out infinite alternate; */
   filter: drop-shadow(0 0 4px #4CAF50);
   z-index: 20;
 }
@@ -126,7 +125,12 @@
   animation: agent-pulse 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
-.object.farmerobject { 
+.object.farmer001 { 
+  font-size: 35px; 
+  animation: npc-bob 2.5s ease-in-out infinite;
+  text-shadow: 1px 1px 4px green;
+}
+.object.mechanic001 { 
   font-size: 35px; 
   animation: npc-bob 2.5s ease-in-out infinite;
   text-shadow: 1px 1px 4px green;
@@ -196,6 +200,43 @@ color: #ffffff5c;
   filter: drop-shadow(0 0 4px #9932CC);
   text-shadow: 0px 0px 10px white;
 }
+.object.campfireobject { 
+font-size: 50px;
+    animation: sway 2s ease-in-out infinite;
+    text-shadow: 0 0 8px #fff, 0 0 16px #c6ff00;
+        top: 20%;
+    left: 40%;
+}
+.object[class*="campfirebenchobject"] {
+  width: 40px;
+  height: 42px;
+
+  background: 
+    linear-gradient(to bottom,
+      #8B4513 0%, #8B4513 10%,
+      #ff964b 10%, #ff964b 25%,
+      #ffb27a 25%, #ffb27a 30%,
+      #ff9040 30%, #ff9040 40%,
+      #a25835 40%, #a25835 45%,
+      #654321 45%, #654321 50%,
+      #8B4513 50%, #8B4513 60%,
+      transparent 60%, transparent 100%
+    );
+
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+
+  transform-origin: center;
+  display: inline-block;
+}
+
+/* AUTO-ROTATE based on suffix in class name */
+.object.campfirebenchobject_bottom { transform: rotate(0deg); }
+.object.campfirebenchobject_right  { transform: rotate(90deg); }
+.object.campfirebenchobject_top    { transform: rotate(180deg); }
+.object.campfirebenchobject_left   { transform: rotate(270deg); }
+
 .object.candleobject { 
   font-size: 30px; 
   text-shadow: 0px 0px 10px white;
@@ -488,6 +529,33 @@ font-size: 60px;
         width: 40px;
     height: 40px;
 }
+.object.campfirestoneobject {
+  width: 25px;
+  height: 25px;
+  border-radius: 25px 10px 10px 15px;
+
+  /* Lighter, more natural stone gradient */
+  background-image: 
+    linear-gradient(to bottom right, #8c8c8c 0%, #5c5c5c 20%, #6b6b6b 50%, #777777 60%, #a0a0a0 100%),
+    radial-gradient(circle at 25% 25%, #b0b0b0 1px, #c0c0c0 1px),
+    radial-gradient(circle at 75% 75%, #999 1px, #ccc 1px);
+
+  background-size: cover;
+  position: relative;
+
+  /* Softer 3D tilt */
+  transform: translateX(-20px) translateY(-20px) perspective(100px) rotateX(12deg);
+
+  transition: all 0.3s ease;
+
+  /* Lighter, more subtle shadows */
+  box-shadow: 
+    8px 6px 10px rgba(0, 0, 0, 0.1),
+    3px 5px 5px rgba(0, 0, 0, 0.1),
+    2px 1px 2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
 /* .object.timberwoodupobject {
     background: linear-gradient(to right, 
         #8B4513 0%,  
@@ -722,8 +790,46 @@ font-size: 60px;
   height: 100%;
   display: block;
 }
+/* MONSTER */
 .object.cavespider {
   background: url('/ownemojis/spideroriginalnobg.webp') center/contain no-repeat;
   width: 300%;
   height: 300%;
+}
+/* ARMORS */
+.object.dark-armor {
+  background: url('/ownemojis/dark-armor.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+}
+.object.knights-armor {
+  background: url('/ownemojis/knights-armor.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+}
+.object.wing-armor {
+  background: url('/ownemojis/wing-armor.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+}
+/* NPCS */
+.object.half-elf-merchant {
+  background: url('/ownemojis/half-elf-merchant.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+}
+.object.human-merchant {
+  background: url('/ownemojis/human-merchant.webp') center/contain no-repeat;
+  width: 150%;
+  height: 150%;
+}
+.object.player-image {
+  background: url('/ownemojis/player-image.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+}
+.object.short-sword {
+  background: url('/ownemojis/short-sword.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
 }

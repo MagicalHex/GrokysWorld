@@ -63,6 +63,17 @@ useEffect(() => {
 //   useEffect(() => {
 //   console.trace('[PlayMode] rendered — why?');
 // }, []);
+
+// FAKE ADDING ITEMS (BUT IT DOESN'T RENDER ITEMS):
+// useEffect(() => {
+//     const starter = {
+//       ...globalInventory,
+//       'knights-armor': 1,          
+//       'wood': 1,
+//     };
+//     onInventoryChange(starter);
+//   }, []);
+
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
