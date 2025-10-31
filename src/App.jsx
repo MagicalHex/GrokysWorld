@@ -7,14 +7,42 @@ import LevelSelector from './components/LevelSelector';
 import './App.css';
 import { startGameLoop } from './utils/gameLoop';
 
+import { v4 as uuidv4 } from 'uuid'; // statistics
+// Add import
+import Stats from './components/Stats';
+
 function App() {
   const [mode, setMode] = useState('free');
   const [playMode, setPlayMode] = useState(false);
+  const [sessionId] = useState(uuidv4()); // statistics
 
-  // App.jsx
+  // Start game loop (monster movement, combatstyle)
 useEffect(() => {
   startGameLoop();
 }, []);
+
+// Add this useEffect to log connection when PLAY is clicked
+useEffect(() => {
+  if (playMode) {
+    const logConnection = async () => {
+      try {
+        await fetch('/api/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            userId: 'player', // or get from auth later
+            ip: null,
+            userAgent: navigator.userAgent
+          })
+        });
+      } catch (err) {
+        console.error('Failed to log connection', err);
+      }
+    };
+    logConnection();
+  }
+}, [playMode, sessionId]);
 
   const game = useGameState();
   const {
@@ -112,6 +140,9 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
           <span>Mode: {mode}</span>
         </div>
       </header>
+
+
+      {window.location.pathname === '/stats' && <Stats />}
 
       <EditWorld
         grid={currentLevelData.grid}
