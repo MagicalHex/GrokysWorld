@@ -21,11 +21,9 @@ jobs:
         run: |
           npm ci
           npm run build
-          # Move build/ contents to root for deployment
           cp -r build/* .
-          cp server.cjs .
-          cp web.config .
-          # Verify files are in root
+          [ ! -f server.cjs ] && cp server.cjs . || echo "server.cjs already in root"
+          [ ! -f web.config ] && cp web.config . || echo "web.config already in root"
           ls -la
 
       - name: Upload
@@ -59,3 +57,4 @@ jobs:
         with:
           app-name: grokysworld
           package: .
+
