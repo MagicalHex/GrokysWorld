@@ -74,7 +74,7 @@ app.get('/health', (req, res) => {
 });
 
 // === CATCH-ALL SPA ROUTE ===
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
   const indexPath = path.join(BUILD_PATH, 'index.html');
   require('fs').access(indexPath, err => {
     if (err) {
