@@ -1,4 +1,4 @@
-// server.cjs — FINAL WORKING VERSION
+// server.cjs — FINAL WORKING VERSION (only this file changed)
 const express = require('express');
 const path = require('path');
 const { MongoClient } = require('mongodb');
@@ -17,7 +17,7 @@ if (process.env.MONGODB_URI) {
       db = client.db('grokysworld');
       db.collection('connections').createIndex(
         { timestamp: 1 },
-        { expireAfterSeconds: 900 }
+        { expireAfterSeconds: 900 }   // 15 min TTL
       );
       console.log('MongoDB connected');
     })
@@ -44,7 +44,7 @@ app.get('/api/stats', async (req, res) => {
   if (!db) return res.json({ live: 0 });
   try {
     const live = await db.collection('connections').countDocuments({
-      timestamp: { $gt: new Date(Date.now() - 15*60*1000) }
+      timestamp: { $gt: new Date(Date.now() - 15 * 60 * 1000) }
     });
     res.json({ live });
   } catch (e) {
@@ -52,13 +52,20 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// === SERVE STATIC FILES ===
-app.use(express.static(path.join(__dirname, 'build')));
+// === SERVE STATIC FILES — fallback to index.html if file missing ===
+const buildPath = path.resolve(__dirname, 'build');   // <-- absolute path
+app.use(express.static(buildPath));
 
-// === CATCH-ALL ROUTE — MUST BE LAST! ===
+// Catch-all must be **after** static middleware
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  const indexFile = path.join(buildPath, 'index.html');
+  res.sendFile(indexFile, err => {
+    if (err) {
+      console.error('sendFile error:', err);
+      res.status(500).send('Server error');
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server on ${PORT}`));
+app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
