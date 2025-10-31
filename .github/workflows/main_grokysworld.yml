@@ -44,12 +44,13 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_... }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_... }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_... }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_363C179D755340EFB62CE989D32F6F16 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2B12514CE12B4507825D99BFEA283AD5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC967F4FFA89452199B0B251152DE82A }}
 
       - name: Deploy
         uses: azure/webapps-deploy@v3
         with:
           app-name: grokysworld
           package: build/
+
