@@ -1,35 +1,32 @@
-name: Build and deploy Node.js app to Azure Web App - grokysworld
+name: Deploy to Azure
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install & Build
         run: |
           npm ci
-          npm run build --if-present
+          npm run build
 
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: dist/
+          name: app
+          path: build/
 
   deploy:
     runs-on: ubuntu-latest
@@ -38,24 +35,21 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Download artifact
+      - name: Download
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-          path: dist/
+          name: app
+          path: build/
 
-      - name: Login to Azure
+      - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_363C179D755340EFB62CE989D32F6F16 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2B12514CE12B4507825D99BFEA283AD5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC967F4FFA89452199B0B251152DE82A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_... }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_... }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_... }}
 
-      - name: Deploy to Azure Web App
+      - name: Deploy
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: grokysworld
-          package: dist/
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          package: build/
