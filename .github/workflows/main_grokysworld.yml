@@ -26,16 +26,6 @@ jobs:
           npm ci
           npm run build --if-present
 
-      - name: DEBUG - List dist/ contents
-        run: |
-          echo "=== DIST FOLDER CONTENTS ==="
-          if [ -d "dist" ]; then
-            ls -R dist/ | head -50
-            echo "=== TOTAL FILES: $(find dist/ -type f | wc -l) ==="
-          else
-            echo "ERROR: dist/ folder not found!"
-          fi
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -55,11 +45,6 @@ jobs:
           name: node-app
           path: dist/
 
-      - name: DEBUG - Verify downloaded files
-        run: |
-          echo "=== DOWNLOADED DIST CONTENTS ==="
-          ls -R dist/ | head -50
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -74,3 +59,4 @@ jobs:
           app-name: grokysworld
           package: dist/
           # REMOVED: slot-name → now deploys to MAIN site
+
