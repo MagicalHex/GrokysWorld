@@ -25,6 +25,10 @@
   "20,2": "lightstoneobject",
   "20,5": "lightstoneobject",
   "4,6": "lightstoneobject",
+
+  "4,9": "spider",
+  "18,5": "spider",
+
   "3,3": "lightstoneobject",
   "7,8": "lightstoneobject",
   "12,2": "lightstoneobject",
@@ -36,6 +40,26 @@
   "1,7": "lightstoneobject",
   "21,9": "lightstoneobject",
   "10,14": "lightstoneobject",
-  "6,1": "lightstoneobject"
+  "6,1": "lightstoneobject",
+
+  "0,0": "stoneobjectcrooked",
+  
+  "2,2": "stoneobjectcrooked",
+  "4,4": "stoneobjectcrooked", 
+  "8,7": "stoneobjectcrooked", 
+  "11,1": "stoneobjectcrooked",
+  "19,11": "stoneobjectcrooked",   
+  "4,12": "stoneobjectcrooked",  
+  "15,7": "stoneobjectcrooked",   
+  "20,8": "stoneobjectcrooked",
+  "0,15": "stoneobjectcrookedlarge",
+
+ "6,3": "stoneobjectcrookedlarge",
+
+ "13,3": "stoneobjectcrookedlarge",
+
+"17,8": "stoneobjectcrookedlarge",
+
+ "21,6": "stoneobjectcrookedlarge"
 }
 }

@@ -7,7 +7,7 @@ export const TERRAINS = {
 
   soilbrown: '#7c3502',
   mudground: '#5d4037',
-    mudgroundtograss: '#5d4037',
+  mudgroundtograss: '#5d4037',
 
   // ENVIRONMENT
   sand: '#ffc107',
@@ -20,7 +20,9 @@ export const TERRAINS = {
   msc: 'green', // msc = mossy cave tile
   mscd: 'darkgreen',
   mscl: 'darkgreen', // void
+  msclside: 'darkgreen',
   mscsp: 'darkgreen',
+  
   
   // WALLS
   wall: '#343a40',

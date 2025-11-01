@@ -14,7 +14,7 @@ const PORTAL_ENTRY_POINTS = {
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
-  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none'
+  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl'
 ]);
 
 export const useGameState = () => {

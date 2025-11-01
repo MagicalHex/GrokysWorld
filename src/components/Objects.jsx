@@ -91,11 +91,16 @@ export const OBJECTS = {
   toolsobject: '🛠️',
 
   // CSS STYLED THINGS
-  darkstoneobject: '',        // Dark cobblestone
-  lightstoneobject: '',       // Light cobblestone  
+  darkstoneobject: '',
+  lightstoneobject: '',
   lightstonechoppedobject: '',
-  stoneobject: '',            // Medium stone
-  stoneobjecthalf: '',            // Medium stone
+  stoneobject: '',
+  stoneobjectcrooked: '',
+  stoneobjectcrookedlarge: '',
+  stoneobjecthalf: '',
+  stoneobjectstraighthalfup: '',
+  stoneobjectstraighthalfuplonger: '',
+  stoneobjectstraighthalfside: '',
   stonepillarobject: '',
   campfirestoneobject: '',
   // TIMBER

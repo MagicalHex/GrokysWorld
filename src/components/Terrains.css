@@ -419,6 +419,28 @@ background:
   from { transform: translateX(0); }
   to { transform: translateX(-16px); }
 } */
+ .tile.mscl {
+  background-image: linear-gradient(to left, 
+  #000000 0%, #3a3a3a 30%, #161616 60%, #161616 80%, #161616 100%),
+   radial-gradient(circle at 15% 30%, #000000 1px, #000000 1px),
+    radial-gradient(circle at 40% 60%, #000000 1px, #000000 1px);
+ }
+ /* Side Panel Gradient Tile */
+.tile.msclside {
+  background-image: 
+    linear-gradient(to top, 
+      #000000 0%, 
+      #3a3a3a 30%, 
+      #161616 60%, 
+      #161616 80%, 
+      #161616 100%
+    ),
+    radial-gradient(circle at 15% 30%, #000000 1px, transparent 1px),
+    radial-gradient(circle at 40% 60%, #000000 1px, transparent 1px);
+  
+  background-size: cover;
+  background-repeat: no-repeat;
+}
  .tile.mscsp {
   background: 
     linear-gradient(145deg, #4a4a4a 0%, #3a3a3a 50%, #555555 70%, #333333 100%),

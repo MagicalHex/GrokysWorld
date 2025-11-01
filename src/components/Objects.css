@@ -96,9 +96,10 @@
 .object.spider { 
   font-size: 50px;
   animation: spider-crawl 5s ease-in-out infinite;
-  filter: drop-shadow(0 0 3px #8B008B);
+  filter: drop-shadow(0 0 3px red);
   color: #383838;
   text-shadow: 0px 0px 1px black;
+  
 }
 /* === ITEMS === */
 .object.ball { 
@@ -463,6 +464,33 @@ font-size: 60px;
     4px 2px 2px rgba(0,0,0,0.2),
     inset 0 1px 0 rgba(255,255,255,0.2);
 }
+
+.object.stoneobjectcrooked{
+  width:40px;height:40px;
+  border-radius:6px;
+  background:linear-gradient(to bottom right,#646464,#343a40 20%,#495057 50%,#3e3e3e 60%,#696969),
+    radial-gradient(circle at 25% 25%,#6e6e6e 1px,#0000 2px),
+    radial-gradient(circle at 75% 75%,#5a5a5a 1px,#0000 1px);
+  background-size:cover;
+  position:relative;
+  transform:translate(-20px,-20px) perspective(100px) rotateX(15deg) rotateZ(-12deg) skewX(-4deg);
+  transition:.3s;
+  box-shadow:12px 8px 12px #22222266,4px 8px 6px #0000004d,4px 2px 2px #00000033,
+    inset 0 1px 0 #ffffff33,inset 6px 4px 8px #00000080;
+}
+.object.stoneobjectcrookedlarge{
+  width:64px;height:64px;
+  border-radius:8px;
+  background:linear-gradient(to bottom right,#707070,#3e444b 18%,#58606e 48%,#4a4a4a 62%,#787878),
+    radial-gradient(circle at 20% 30%,#7a7a7a 1px,#0000 2px),
+    radial-gradient(circle at 70% 70%,#666 1px,#0000 1px);
+  background-size:cover;
+  position:relative;
+  transform:translate(-28px,-28px) perspective(120px) rotateX(18deg) rotateZ(14deg) skewX(5deg);
+  transition:.3s;
+  box-shadow:16px 12px 16px #1a1a1a70,6px 10px 8px #00000055,4px 4px 4px #00000040,
+    inset 0 1px 0 #ffffff40,inset 8px 6px 10px #00000085;
+}
 .object.stoneobjecthalf {
   /* Half size: 40x20px (feels like half a stone) */
   width: 20px;
@@ -502,6 +530,88 @@ font-size: 60px;
     8px 8px 10px rgba(0, 0, 0, 0.4),       /* mid shadow */
     4px 4px 6px rgba(0, 0, 0, 0.3),        /* close edge */
     inset 0 1px 0 rgba(255, 255, 255, 0.15); /* subtle top highlight */
+}
+.object.stoneobjectstraighthalfup {
+    width: 20px;
+  height: 40px;
+
+    border-radius: 3px;
+
+  /* Gradient: darker on exposed side, lighter on "cut" */
+  background-image: 
+    linear-gradient(to bottom right, 
+      #5a5a5a 0%, 
+      #3a3a3a 30%, 
+      #555555 60%, 
+      #252525 80%, 
+      #1a1a1a 100%
+    ),
+    radial-gradient(circle at 15% 30%, #6e6e6e 1px, #7f7f7f 1px),
+    radial-gradient(circle at 40% 60%, #5a5a5a 1px, #7f7f7f 1px);
+
+  /* Shadow: strong right/down bias, darker, more spread */
+  box-shadow: 
+    16px 12px 16px rgba(0, 0, 0, 0.5),     /* main deep shadow */
+    8px 8px 10px rgba(0, 0, 0, 0.4),       /* mid shadow */
+    4px 4px 6px rgba(0, 0, 0, 0.3),        /* close edge */
+    inset 0 1px 0 rgba(255, 255, 255, 0.15); /* subtle top highlight */
+}
+.object.stoneobjectstraighthalfuplonger {
+    width: 20px;
+    height: 630px;
+    position: absolute;
+    bottom: 0;
+    opacity: 0.7;
+    pointer-events: none;
+
+    border-radius: 3px;
+
+  /* Gradient: darker on exposed side, lighter on "cut" */
+  background-image: 
+    linear-gradient(to bottom right, 
+      #5a5a5a 0%, 
+      #3a3a3a 30%, 
+      #555555 60%, 
+      #252525 80%, 
+      #1a1a1a 100%
+    ),
+    radial-gradient(circle at 15% 30%, #6e6e6e 1px, #7f7f7f 1px),
+    radial-gradient(circle at 40% 60%, #5a5a5a 1px, #7f7f7f 1px);
+
+  /* Shadow: strong right/down bias, darker, more spread */
+  box-shadow: 
+    16px 12px 16px rgba(0, 0, 0, 0.5),     /* main deep shadow */
+    8px 8px 10px rgba(0, 0, 0, 0.4),       /* mid shadow */
+    4px 4px 6px rgba(0, 0, 0, 0.3),        /* close edge */
+    inset 0 1px 0 rgba(255, 255, 255, 0.15); /* subtle top highlight */
+}
+.object.stoneobjectstraighthalfside {
+  width: 40px;   /* ← now matches visual width after rotation */
+  height: 20px;  /* ← now matches visual height */
+  margin-left: 0px;  /* ← pull back into tile (half of 20px overflow) */
+  margin-top: 0px;   /* ← pull down into tile */
+
+  border-radius: 3px;
+  
+  /* Optional: use flex centering in parent if possible */
+  /* Or rely on grid layout to center */
+
+  background-image: 
+    linear-gradient(to bottom left, 
+      #5a5a5a 0%, 
+      #3a3a3a 30%, 
+      #555555 60%, 
+      #252525 80%, 
+      #1a1a1a 100%
+    ),
+    radial-gradient(circle at 30% 15%, #6e6e6e 1px, #7f7f7f 1px),
+    radial-gradient(circle at 60% 40%, #5a5a5a 1px, #7f7f7f 1px);
+
+  box-shadow: 
+    12px -16px 16px rgba(0, 0, 0, 0.5),
+    8px -8px 10px rgba(0, 0, 0, 0.4),
+    4px -4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* LARGE ROCK */
@@ -795,22 +905,27 @@ font-size: 60px;
   background: url('/ownemojis/spideroriginalnobg.webp') center/contain no-repeat;
   width: 300%;
   height: 300%;
+  animation: skeleton-rattle 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
 }
 /* ARMORS */
 .object.dark-armor {
   background: url('/ownemojis/dark-armor.webp') center/contain no-repeat;
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 0 3px gold);
 }
 .object.knights-armor {
   background: url('/ownemojis/knights-armor.webp') center/contain no-repeat;
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 0 3px gold);
 }
 .object.wing-armor {
   background: url('/ownemojis/wing-armor.webp') center/contain no-repeat;
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 0 3px gold);
 }
 /* NPCS */
 .object.half-elf-merchant {

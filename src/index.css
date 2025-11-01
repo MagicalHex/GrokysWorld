@@ -23,13 +23,38 @@ a:hover {
 }
 
 body {
-  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  background: #111;
+}
+
+/* ===================================
+   2. DESKTOP & TABLET: CENTERED
+   =================================== */
+@media (min-width: 768px) {
+  body {
+    justify-content: center;
+    align-items: center;
+    place-items: center;
+      margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  }
 }
 
+/* ===================================
+   3. MOBILE: FULLSCREEN (no centering)
+   =================================== */
+@media (max-width: 767px) {
+  body {
+    /* Remove centering */
+    justify-content: stretch;
+    align-items: stretch;
+    place-items: stretch;
+  }
+}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

@@ -104,6 +104,11 @@
     "12,1": "timberwoodupobjectleft",
     "12,2": "timberwoodupobjectleft",
     "12,3": "timberwoodupobjectleft",
+    "13,0": "timberwoodsideobject",
+    "14,0": "timberwoodsideobject",
+    "15,0": "timberwoodsideobject",
+    "16,0": "timberwoodsideobject",
+    "17,0": "timberwoodsideobject",
 
     "12,4": "timberwoodsideobjecthalfleft",
     "18,4": "timberwoodsideobjecthalfright",
