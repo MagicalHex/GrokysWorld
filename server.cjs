@@ -1,4 +1,3 @@
-// server.cjs — CRASH-PROOF + LOGGING
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
@@ -14,9 +13,9 @@ const BUILD_PATH = path.resolve(__dirname, 'build');
 // === LOG STARTUP ===
 console.log('Starting server...');
 console.log('BUILD_PATH:', BUILD_PATH);
-console.log('Files in build/:', require('fs').readdirSync(BUILD_PATH).join(', '));
+console.log('Files in build/:', fs.readdirSync(BUILD_PATH).join(', '));
 
-// === CONNECT TO MONGODB (SAFE) ===
+// === MONGODB ===
 if (process.env.MONGODB_URI) {
   console.log('Connecting to MongoDB...');
   const client = new MongoClient(process.env.MONGODB_URI);
@@ -37,7 +36,7 @@ if (process.env.MONGODB_URI) {
   console.warn('MONGODB_URI not set — running without DB');
 }
 
-// === API ROUTES ===
+// === API ROUTES (FIRST) ===
 app.post('/api/connect', async (req, res) => {
   if (!db) return res.json({ ok: false, error: 'DB not ready' });
   try {
@@ -45,6 +44,7 @@ app.post('/api/connect', async (req, res) => {
       sessionId: req.body.sessionId || 'unknown',
       timestamp: new Date()
     });
+    console.log('Inserted connection:', req.body.sessionId); // ← ADD THIS
     res.json({ ok: true });
   } catch (e) {
     console.error('POST /api/connect error:', e);
@@ -65,30 +65,28 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// === SERVE STATIC FILES ===
-app.use('/assets', express.static(path.join(BUILD_PATH, 'assets')));
-app.use(express.static(BUILD_PATH));
-
-// === HEALTH CHECK ===
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// === CATCH-ALL SPA ROUTE ===
+// === STATIC FILES (AFTER API) ===
+app.use('/assets', express.static(path.join(BUILD_PATH, 'assets')));
+app.use(express.static(BUILD_PATH));
+
+// === SPA FALLBACK (LAST) ===
 app.get(/.*/, (req, res) => {
   const indexPath = path.join(BUILD_PATH, 'index.html');
-  require('fs').access(indexPath, err => {
+  fs.access(indexPath, err => {
     if (err) {
       console.error('index.html NOT FOUND at:', indexPath);
-      return res.status(500).send('Build folder missing or index.html not found');
+      return res.status(500).send('Build folder missing');
     }
     res.sendFile(indexPath);
   });
 });
 
-// === START SERVER ===
+// === START ===
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server RUNNING on port ${PORT}`);
-  console.log(`Open: http://localhost:${PORT}`);
 });
