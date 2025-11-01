@@ -4,8 +4,19 @@ const path = require('path');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-const app = express();
+const app = express();                    // ← MUST BE FIRST
 app.use(express.json());
+
+// === RATE LIMIT (after app) ===
+const rateLimit = require('express-rate-limit');
+const connectLimiter = rateLimit({
+  windowMs: 1000,
+  max: 1,
+  message: { error: 'Too many connections, try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/connect', connectLimiter);
 
 let db = null;
 const BUILD_PATH = path.resolve(__dirname, 'build');
@@ -53,15 +64,24 @@ app.post('/api/connect', async (req, res) => {
 });
 
 app.get('/api/stats', async (req, res) => {
-  if (!db) return res.json({ live: 0 });
+  if (!db) return res.json({ live: 0, today: 0 });
+
   try {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     const live = await db.collection('connections').countDocuments({
       timestamp: { $gt: new Date(Date.now() - 15 * 60 * 1000) }
     });
-    res.json({ live });
+
+    const today = await db.collection('connections').countDocuments({
+      timestamp: { $gte: startOfDay }
+    });
+
+    res.json({ live, today });
   } catch (e) {
     console.error('GET /api/stats error:', e);
-    res.json({ live: 0 });
+    res.json({ live: 0, today: 0 });
   }
 });
 
