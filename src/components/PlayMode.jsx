@@ -257,7 +257,7 @@ const removePickupPopup = useCallback((id) => {
             {obj && (
             <div className={`object ${monsterTypes[obj] || obj} ${droppedItems.has(key) ? 'dropped-item' : ''}`}>
               {OBJECTS[monsterTypes[obj] || obj]}
-              {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider' || monsterTypes[obj] === 'cavespider') && (
+              {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider' || monsterTypes[obj] === 'littlespider' || monsterTypes[obj] === 'cavespider') && (
                 <HealthBar
                   key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
                   health={globalMonsterHealths[obj] ?? 100}

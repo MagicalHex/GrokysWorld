@@ -253,6 +253,7 @@ const RESPAWN_DELAYS = {
   treeobject: 1500,
   lightstoneobject: 2000,
   spider: 2000,
+    littlespider: 2000,
   skeleton: 30000,
   cavespider: 50000,      
   default: 10000
@@ -472,7 +473,7 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
   if (newHealth > 0) return;
 
   const type = monsterTypes[monsterId];
-  if (!['spider', 'skeleton', 'cavespider'].includes(type)) return;
+  if (!['spider', 'littlespider', 'skeleton', 'cavespider'].includes(type)) return;
 
   // Uses per-type delay from RESPAWN_DELAYS (e.g. 30s for spider)
   scheduleRespawn(monsterId); // ← delay auto-determined by type
@@ -498,7 +499,7 @@ useEffect(() => {
       /* ---------- objects → monster IDs ---------- */
       const objects = { ...data.objects || {} };
       Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (['skeleton', 'spider', 'cavespider'].includes(type)) {
+        if (['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) {
           const [x, y] = key.split(',').map(Number);
           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
           objects[key] = monsterId;

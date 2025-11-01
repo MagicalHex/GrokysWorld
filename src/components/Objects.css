@@ -908,6 +908,23 @@ font-size: 60px;
   animation: skeleton-rattle 1.2s ease-in-out infinite;
   filter: drop-shadow(0 0 3px red);
 }
+.object.littlespider {
+  background: url('/ownemojis/littlespider.webp') center/contain no-repeat;
+  width: 220%;
+  height: 220%;
+  filter: drop-shadow(0 0 3px rgb(164, 0, 0));
+}
+.object.shaman {
+  background: url('/ownemojis/shaman.webp') center/contain no-repeat;
+  width: 220%;
+  height: 220%;
+  filter: drop-shadow(0 0 3px gold);
+}.object.shaman1 {
+  background: url('/ownemojis/shaman1.webp') center/contain no-repeat;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 3px gold);
+}
 /* ARMORS */
 .object.dark-armor {
   background: url('/ownemojis/dark-armor.webp') center/contain no-repeat;

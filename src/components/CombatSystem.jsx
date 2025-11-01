@@ -16,6 +16,7 @@ const WEAPON_DAMAGE_RANGES = {
 };
 
 const MONSTER_DAMAGE_RANGES = {
+  littlespider:     { min:  0, max: 10 },
   spider:     { min:  0, max: 15 },
   skeleton:   { min:  0, max: 20 },
   cavespider: { min:  0, max: 30 },
@@ -177,7 +178,7 @@ export default function CombatSystem({
 
       Object.entries(objects).forEach(([key, monsterId]) => {
         const type = monsterTypes[monsterId];
-        if (!['skeleton', 'spider', 'cavespider'].includes(type)) return;
+        if (!['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) return;
         if ((globalMonsterHealths[monsterId] ?? 100) <= 0) return;
 
         const [mx, my] = key.split(',').map(Number);

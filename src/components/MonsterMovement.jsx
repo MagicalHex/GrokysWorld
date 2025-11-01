@@ -130,7 +130,7 @@ const MonsterMovement = ({
     const monsters = [];
     Object.entries(objects).forEach(([key, monsterId]) => {
       const type = monsterTypes[monsterId];
-      if (['skeleton', 'spider', 'cavespider'].includes(type)) {
+      if (['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) {
         const [x, y] = key.split(',').map(Number);
         const health = globalMonsterHealths[monsterId] ?? 100;
         if (health > 0) {
@@ -155,7 +155,7 @@ const MonsterMovement = ({
 
       // === ALLOW SWAPPING WITH OTHER MONSTERS ===
       const occupant = newObjects[toKey];
-      if (occupant && monsterTypes[occupant] && ['skeleton', 'spider', 'cavespider'].includes(monsterTypes[occupant])) {
+      if (occupant && monsterTypes[occupant] && ['skeleton', 'spider', 'littlespider', 'cavespider'].includes(monsterTypes[occupant])) {
         // Swap positions!
         newObjects[key] = occupant;
         newObjects[toKey] = monsterId;

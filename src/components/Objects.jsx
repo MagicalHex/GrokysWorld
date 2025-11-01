@@ -122,6 +122,7 @@ export const OBJECTS = {
   fenceobject: '',
   // MONSTERS
   cavespider: '',
+    littlespider: '',
   // ITEMS - ARMORS
   'dark-armor': '',
   'knights-armor': '',
@@ -132,4 +133,6 @@ export const OBJECTS = {
   'half-elf-merchant': '',
   'human-merchant': '',
   'player-image': '',
+    shaman: '',
+      shaman1: '',
 };
