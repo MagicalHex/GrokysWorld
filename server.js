@@ -1,4 +1,5 @@
 // server.cjs — CRASH-PROOF + LOGGING
+const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const { MongoClient } = require('mongodb');
