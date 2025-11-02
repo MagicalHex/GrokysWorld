@@ -79,3 +79,36 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+/* Add to your global CSS */
+.object.has-quest-marker {
+  position: relative;
+}
+
+.object.has-quest-marker::before {
+  content: attr(data-marker);
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 12;
+  pointer-events: none;
+  animation: pulse 2s infinite;
+}
+
+.object.has-quest-marker[data-marker="?" ]::before {
+  color: #ff0; /* yellow */
+  text-shadow: 0 0 8px #ff0, 0 0 16px #ff0;
+}
+
+.object.has-quest-marker[data-marker="!" ]::before {
+  color: #ff9800; /* orange */
+  text-shadow: 0 0 8px #ff9800, 0 0 16px #ff4500;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.15); }
+}

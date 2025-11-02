@@ -8,7 +8,7 @@ import HealthRegenSystem from './HealthRegenSystem';
 import HealthBar from './HealthBar'; // Old
 import ActionBar from './ActionBar'; // new, holds both progress and health
 import InteractionSystem from './InteractionSystem/InteractionSystem';
-import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS } from './InteractionSystem/InteractionConstants';
+import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, getQuestMarker } from './InteractionSystem/InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
 import { PickupPopup } from './PickupPopup';
@@ -78,7 +78,9 @@ useEffect(() => {
 // States for healthbar:
 const [currentAction, setCurrentAction] = useState('health');
 const [choppingProgress, setChoppingProgress] = useState(0);
-
+// For quests:
+const [activeQuests, setActiveQuests] = useState({});
+// for Movement
 const [moveDirection, setMoveDirection] = useState(null);
 console.log('[PlayMode] current moveDirection →', moveDirection);
 
@@ -166,7 +168,7 @@ const removePickupPopup = useCallback((id) => {
   useEffect(() => {
     const newDropped = new Set();
     Object.keys(objects).forEach(k => {
-      if (objects[k] === 'woodobject' || objects[k] === 'rockobject') newDropped.add(k);
+      if (objects[k] === 'woodobject' || objects[k] === 'rockobject' || objects[k] === 'spiderweb') newDropped.add(k);
     });
     setDroppedItems(newDropped);
   }, [objects]);
@@ -244,6 +246,7 @@ const removePickupPopup = useCallback((id) => {
         interactionActive={interaction.active}
         inventory={globalInventory}
         onInventoryChange={onInventoryChange}
+        activeQuests={activeQuests}
       />
 
       {/* ---------- DEATH SCREEN ---------- */}
@@ -262,21 +265,31 @@ const removePickupPopup = useCallback((id) => {
         className="play-grid"
         style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}
       >
-        {grid.map((row, y) =>
-          row.map((terrain, x) => {
-            const key = `${x},${y}`;
-            const obj = objects[key];
+{grid.map((row, y) =>
+  row.map((terrain, x) => {
+    const key = `${x},${y}`;
+    const obj = objects[key];
 
-            return (
-              <div
-                key={key}
-                className={`tile ${terrain}`}
-                style={{ width: tileSize, height: tileSize, position: 'relative' }}
-              >
-                {/* OBJECTS */}
-            {obj && (
-            <div className={`object ${monsterTypes[obj] || obj} ${droppedItems.has(key) ? 'dropped-item' : ''}`}>
-              {OBJECTS[monsterTypes[obj] || obj]}
+    // Compute marker for campfireshaman
+    const isShaman = obj === 'campfireshaman';
+    const marker = isShaman ? getQuestMarker(activeQuests, globalInventory) : null;
+
+    return (
+      <div
+        key={key}
+        className={`tile ${terrain}`}
+        style={{ width: tileSize, height: tileSize, position: 'relative' }}
+      >
+        {obj && (
+          <div
+            className={`
+              object ${monsterTypes[obj] || obj}
+              ${droppedItems.has(key) ? 'dropped-item' : ''}
+              ${isShaman && marker ? 'has-quest-marker' : ''}
+            `.trim()}
+            data-marker={marker}  // ← CSS uses this
+          >
+            {OBJECTS[monsterTypes[obj] || obj]}
               {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider' || monsterTypes[obj] === 'littlespider' || monsterTypes[obj] === 'cavespider') && (
                 <HealthBar
                   key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
@@ -342,6 +355,9 @@ const removePickupPopup = useCallback((id) => {
   setCurrentAction={setCurrentAction}
   choppingProgress={choppingProgress}
   setChoppingProgress={setChoppingProgress}
+
+  activeQuests={activeQuests}
+  setActiveQuests={setActiveQuests}
       />
 
       <button onClick={onExit}>Edit Mode</button>

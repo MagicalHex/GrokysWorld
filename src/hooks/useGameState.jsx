@@ -375,7 +375,7 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
       console.log('→ Tile occupied by:', occupied);
 
       const canPlace = !occupied ||
-        ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject'].includes(occupied);
+        ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'].includes(occupied);
 
       if (!canPlace) {
         console.log('→ Cannot place → retry in 1s');

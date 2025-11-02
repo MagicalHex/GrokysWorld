@@ -199,12 +199,23 @@ export default function CombatSystem({
           onMonsterHealthChange(monsterId, newHealth);
           addPopup(mx, my, dmg);
 
-          if (newHealth <= 0) {
-            newObjects[key] = 'gold';
-            objectsChanged = true;
-          }
+if (newHealth <= 0) {
+    // === DROP LOGIC: 33% chance for spiderweb on specific spiders ===
+    const spiderTypes = ['spider', 'littlespider', 'cavespider'];
+    if (spiderTypes.includes(type)) {
+      const dropRoll = Math.random();
+      if (dropRoll < 0.33) {
+        newObjects[key] = 'spiderweb';
+      } else {
+        newObjects[key] = 'gold';
+      }
+    } else {
+      newObjects[key] = 'gold';
+    }
+    objectsChanged = true;
+  }
 
-          lastPlayerAttack = now;
+  lastPlayerAttack = now;
         }
 
         // === MONSTER ATTACK ===

@@ -11,7 +11,9 @@ import './InteractionSystem.css';
 import {
   CHOP_DURATION,
   CHOPPABLE_OBJECTS,
-  TALKABLE_OBJECTS
+  TALKABLE_OBJECTS,
+  QUESTS,           // ← ADD THIS
+  QUEST_DIALOGUE    // ← (optional, if you want to use it later)
 } from './InteractionConstants';
 
 const InteractionSystem = forwardRef(({
@@ -31,6 +33,9 @@ const InteractionSystem = forwardRef(({
   setCurrentAction,
   choppingProgress,
   setChoppingProgress,
+    activeQuests,
+  setActiveQuests
+  
 }, ref) => {
 
   // === QUEST POPUP ===
@@ -54,8 +59,24 @@ const { startChopping } = useChopping({
   setChoppingProgress      // ← PASS
 });
 
+const handleQuestAccept = (questId) => {
+  setActiveQuests(prev => ({
+    ...prev,
+    [questId]: { ...QUESTS[questId], status: 'active' }
+  }));
+};
+
+const handleQuestComplete = (questId) => {
+  setActiveQuests(prev => ({
+    ...prev,
+    [questId]: { ...prev[questId], status: 'completed' }
+  }));
+};
+
   const { startTalking, closeDialogue } = useTalking({
-    objects, interaction, setInteraction, inventory, onInventoryChange, onCancelInteraction
+    objects, interaction, setInteraction, inventory, onInventoryChange, onCancelInteraction, onQuestAccept: handleQuestAccept,
+  onQuestComplete: handleQuestComplete,
+  activeQuests
   });
 
   const { startOpening } = useQuesting({

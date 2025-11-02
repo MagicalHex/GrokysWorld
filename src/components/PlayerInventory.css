@@ -1,8 +1,8 @@
 /* INVENTORY  */
 .inventory-popup {
   position: fixed;
-  top: 25%;
-  left: 12%;
+  top: 35%;
+  left: 20%;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;

@@ -1034,17 +1034,6 @@ font-size: 60px;
   z-index: 1000;
 }
 
-.object.campfireshaman::before {
-  content: '🔮';
-  position: absolute;
-  top: -10px; left: 50%;
-  transform: translateX(-50%);
-  font-size: 28px;
-  filter: drop-shadow(0 0 8px #9b59b6) drop-shadow(0 0 16px #8e44ad);
-  animation: float 3s infinite ease-in-out;
-  z-index: 11;
-}
-
 .object.campfireshaman::after {
   content: '';
   position: absolute;
@@ -1055,4 +1044,33 @@ font-size: 60px;
   transform: translateX(-50%) rotate(20deg);
   box-shadow: 0 0 6px #ff4500;
   animation: spark 1.8s infinite;
+}
+.object.campfireshaman::before {
+  content: '🔮!';
+  position: absolute;
+  top: -38px;           /* Above the crystal ball */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: bold;
+  color: #ff0;          /* Bright yellow */
+  text-shadow: 
+    0 0 8px #ff0,
+    0 0 16px #ff0,
+    0 0 24px #ff0;
+  animation: questPulse 2s infinite;
+  z-index: 12;
+  pointer-events: none;
+}
+
+/* Optional: subtle pulse animation */
+@keyframes questPulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.15);
+    opacity: 0.9;
+  }
 }
