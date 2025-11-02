@@ -1,20 +1,20 @@
 /* src/components/ProgressBar.css */
-.progress-bar-container {
-  position: absolute;
-  bottom: -170%;
-  left: 90%;
-  /* right: 4px; */
-  height: 8px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
-  overflow: hidden;
-  z-index: 10;
-  box-shadow: 0 0 6px rgba(33, 150, 243, 0.4);
-  border: 1px solid rgba(33, 150, 243, 0.2);
-  width: 3rem;
+.action-bar {
+    position: absolute;
+    bottom: 100%;
+    left: 0%;
+    /* right: 4px; */
+    height: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 10;
+    box-shadow: 0px 0px 6px 2px rgb(33 150 243 / 74%);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+    width: 3rem;
 }
 
-.progress-bar-fill {
+.action-bar-fill {
   height: 100%;
   width: 0;
   border-radius: 4px;
@@ -34,7 +34,7 @@
 }
 
 /* Subtle inner glow that pulses */
-.progress-bar-fill::before {
+.action-bar-fill::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;

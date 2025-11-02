@@ -965,3 +965,40 @@ font-size: 60px;
   width: 100%;
   height: 100%;
 }
+
+.object.campfireshaman {
+  position: relative;
+  width: 40px; height: 40px;
+  background: radial-gradient(circle at 50% 40%, #ff6b35 20%, #f7931e 40%, #ff9f1c 60%, transparent 70%);
+  border-radius: 50% 50% 40% 40%;
+  box-shadow: 
+    0 0 20px #ff4500,
+    0 0 40px #ff8c00,
+    inset 0 -8px 12px rgba(0,0,0,0.4);
+  animation: flicker 2.5s infinite alternate;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.object.campfireshaman::before {
+  content: '🔮';
+  position: absolute;
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px #9b59b6) drop-shadow(0 0 16px #8e44ad);
+  animation: float 3s infinite ease-in-out;
+  z-index: 11;
+}
+
+.object.campfireshaman::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 50%;
+  width: 4px; height: 12px;
+  background: linear-gradient(to bottom, #ff4500, #ff8c00);
+  border-radius: 50%;
+  transform: translateX(-50%) rotate(20deg);
+  box-shadow: 0 0 6px #ff4500;
+  animation: spark 1.8s infinite;
+}

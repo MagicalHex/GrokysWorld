@@ -26,7 +26,11 @@ const InteractionSystem = forwardRef(({
   tileSize,
   onQueueRespawn,
   spawnMonster,
-  onInventoryChange
+  onInventoryChange,
+  currentAction,
+  setCurrentAction,
+  choppingProgress,
+  setChoppingProgress,
 }, ref) => {
 
   // === QUEST POPUP ===
@@ -37,10 +41,18 @@ const InteractionSystem = forwardRef(({
   };
 
   // === SYSTEMS ===
-  const { startChopping } = useChopping({
-    objects, onObjectsChange, interaction, setInteraction,
-    rows, columns, onQueueRespawn, CHOP_DURATION
-  });
+const { startChopping } = useChopping({
+  objects,
+  onObjectsChange,
+  interaction,
+  setInteraction,
+  rows,
+  columns,
+  onQueueRespawn,
+  CHOP_DURATION,
+  setCurrentAction,        // ← PASS
+  setChoppingProgress      // ← PASS
+});
 
   const { startTalking, closeDialogue } = useTalking({
     objects, interaction, setInteraction, inventory, onInventoryChange, onCancelInteraction
@@ -56,11 +68,15 @@ const InteractionSystem = forwardRef(({
     startChopping(targetKey) || startTalking(targetKey) || startOpening(targetKey);
   };
 
-  const cancelInteraction = () => {
-    if (interaction.timer) clearTimeout(interaction.timer);
-    setInteraction({ type: null, active: false, key: null, timer: null });
-    onCancelInteraction?.();
-  };
+const cancelInteraction = () => {
+  if (interaction.timer) {
+    clearInterval(interaction.timer);  // ← stops progress
+  }
+  setCurrentAction('health');          // ← FORCE RESET
+  setChoppingProgress(0);
+  setInteraction({ type: null, active: false, key: null, timer: null });
+  onCancelInteraction?.();
+};
 
   useImperativeHandle(ref, () => ({
     handleStartInteraction,
@@ -97,7 +113,7 @@ const InteractionSystem = forwardRef(({
         <TalkingUI message={interaction.message} choices={interaction.choices} />
       )}
 
-      <ChoppingUI x={chopX} y={chopY} tileSize={tileSize} />
+      {/* <ChoppingUI x={chopX} y={chopY} tileSize={tileSize} /> */}
 
       <QuestingUI questPopup={questPopup} tileSize={tileSize} onClose={() => setQuestPopup(null)} />
     </>

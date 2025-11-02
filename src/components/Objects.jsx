@@ -112,9 +112,10 @@ export const OBJECTS = {
   timberwoodrightcornerobject: '',
 
   campfirebenchobject_bottom: '',
-  campfirebenchobject_right:  '',
-  campfirebenchobject_top:    '',
-  campfirebenchobject_left:   '',
+  campfirebenchobject_right: '',
+  campfirebenchobject_top: '',
+  campfirebenchobject_left: '',
+  campfireshaman: '',
   
   // TIMBER CHOPPED
   timberwoodchoppedobject: '',

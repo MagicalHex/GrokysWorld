@@ -5,7 +5,8 @@ import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
 import HealthRegenSystem from './HealthRegenSystem';
-import HealthBar from './HealthBar';
+import HealthBar from './HealthBar'; // Old
+import ActionBar from './ActionBar'; // new, holds both progress and health
 import InteractionSystem from './InteractionSystem/InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS } from './InteractionSystem/InteractionConstants';
 import PlayerInventory from './PlayerInventory';
@@ -74,6 +75,9 @@ useEffect(() => {
 //     onInventoryChange(starter);
 //   }, []);
 
+// States for healthbar:
+const [currentAction, setCurrentAction] = useState('health');
+const [choppingProgress, setChoppingProgress] = useState(0);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -269,9 +273,10 @@ const removePickupPopup = useCallback((id) => {
           {playerPos?.x === x && playerPos?.y === y && (
             <div className="player" style={{ fontSize: '38px' }}>
               🧙
-              <HealthBar
-                health={globalPlayerHealth}
-                color={globalPlayerHealth > 50 ? '#4CAF50' : '#f44336'}
+          <ActionBar
+                type={currentAction} // 'health' | 'chop' | 'mine'
+                value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
+                color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
               />
             </div>
           )}
@@ -308,6 +313,11 @@ const removePickupPopup = useCallback((id) => {
         originalSpawns={originalSpawns}
         spawnMonster={spawnMonster}
         level={level}
+        
+        currentAction={currentAction}
+  setCurrentAction={setCurrentAction}
+  choppingProgress={choppingProgress}
+  setChoppingProgress={setChoppingProgress}
       />
 
       <button onClick={onExit}>Edit Mode</button>
