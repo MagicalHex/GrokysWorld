@@ -95,7 +95,7 @@
   font-weight: bold;
   z-index: 12;
   pointer-events: none;
-  animation: pulse 2s infinite;
+  animation: bigPulse 2s infinite;
 }
 
 .object.has-quest-marker[data-marker="?" ]::before {
@@ -108,7 +108,7 @@
   text-shadow: 0 0 8px #ff9800, 0 0 16px #ff4500;
 }
 
-@keyframes pulse {
+@keyframes bigPulse {
   0%, 100% { transform: translateX(-50%) scale(1); }
   50% { transform: translateX(-50%) scale(1.15); }
 }

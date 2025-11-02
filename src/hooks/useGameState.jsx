@@ -374,18 +374,51 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
       const occupied = level.objects[key];
       console.log('→ Tile occupied by:', occupied);
 
-      const canPlace = !occupied ||
-        ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'].includes(occupied);
+// === FIND NEARBY AVAILABLE TILE ===
+const [origX, origY] = key.split(',').map(Number);
+const lootTiles = ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'];
 
-      if (!canPlace) {
-        console.log('→ Cannot place → retry in 1s');
-        if (isMonster) {
-          scheduleRespawn(monsterId, 1000);
-        } else {
-          scheduleRespawn(levelId, key, type, 1000);
-        }
-        return prevLevels;
+let placed = false;
+let newKey = key;
+
+for (let radius = 1; radius <= 5 && !placed; radius++) {
+  const candidates = [];
+
+  for (let dx = -radius; dx <= radius; dx++) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      if (Math.abs(dx) + Math.abs(dy) > radius) continue; // Manhattan
+
+      const nx = origX + dx;
+      const ny = origY + dy;
+      const nKey = `${nx},${ny}`;
+
+      if (nKey === key) continue; // skip original (we already know it's blocked)
+
+      const occupant = level.objects[nKey];
+      if (!occupant || lootTiles.includes(occupant)) {
+        candidates.push({ key: nKey, dist: Math.abs(dx) + Math.abs(dy) });
       }
+    }
+  }
+
+  if (candidates.length > 0) {
+    // Sort by distance, pick closest
+    candidates.sort((a, b) => a.dist - b.dist);
+    newKey = candidates[0].key;
+    placed = true;
+    console.log(`→ SPAWNING NEARBY at ${newKey} (dist: ${candidates[0].dist})`);
+  }
+}
+
+if (!placed) {
+  console.log('→ No nearby tile → retry in 1s');
+  if (isMonster) {
+    scheduleRespawn(monsterId, 1000);
+  } else {
+    scheduleRespawn(levelId, key, type, 1000);
+  }
+  return prevLevels;
+}
 
       console.log('→ PLACING:', isMonster ? 'MONSTER' : 'STATIC');
 
