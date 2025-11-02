@@ -54,7 +54,12 @@ export default function CombatSystem({
   onHealPopupFinish,
   setLastDamageTime
 }) {
-  const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+  // const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+  const distance = (p1, p2) => {
+  const dx = Math.abs(p1.x - p2.x);
+  const dy = Math.abs(p1.y - p2.y);
+  return Math.max(dx, dy); // CHEBYSHEV DISTANCE!
+};
 
   // === REFS TO HOLD LATEST VALUES ===
   const refs = useRef({
@@ -182,7 +187,8 @@ export default function CombatSystem({
         if ((globalMonsterHealths[monsterId] ?? 100) <= 0) return;
 
         const [mx, my] = key.split(',').map(Number);
-        const isAdjacent = distance({ x: mx, y: my }, playerPos) === 1;
+        // const isAdjacent = distance({ x: mx, y: my }, playerPos) === 1;
+        const isAdjacent = distance({ x: mx, y: my }, playerPos) <= 1;
 
         // === PLAYER ATTACK ===
         if (
@@ -241,17 +247,6 @@ onPlayerHealthChange(prev => {
 
   return newHealth;
 });
-  // onPlayerHealthChange(prev => {
-  //   const newHealth = Math.max(0, prev - dmg);
-  //   if (newHealth <= 0 && !isDead) setIsDead(true);
-    
-  //   // TELL REGEN SYSTEM: "PLAYER GOT HIT!"
-  //   // if (newHealth < prev && onDamageTaken) {
-  //   //   onDamageTaken();
-  //   // }
-
-  //   return newHealth;
-  // });
 
   lastMonsterAttack[monsterId] = now;
 }

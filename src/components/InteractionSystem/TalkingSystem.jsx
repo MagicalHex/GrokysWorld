@@ -1,11 +1,10 @@
 // Talking/TalkingSystem.js
-
 import { 
   TALKABLE_OBJECTS, 
   NPC_DIALOGUE, 
-  QUEST_DIALOGUE,     // ← NEW
+  QUEST_DIALOGUE,
   SHOP_DATA,
-  QUESTS               // ← NEW
+  QUESTS 
 } from './InteractionConstants';
 
 export const useTalking = ({
@@ -15,8 +14,8 @@ export const useTalking = ({
   inventory,
   onInventoryChange,
   onCancelInteraction,
-onQuestAccept,
-  onQuestComplete,     // ← NEW
+  onQuestAccept,
+  onQuestComplete,
   activeQuests = {}
 }) => {
 
@@ -27,16 +26,22 @@ onQuestAccept,
     const questGiver = QUEST_DIALOGUE[obj];
     const npc = NPC_DIALOGUE[obj];
 
-    let dlg;
+    let dlg = null;
+
+    // 1. QUEST GIVER (dynamic)
     if (questGiver && questGiver.getDialogue) {
       dlg = questGiver.getDialogue(activeQuests, inventory);
-    } else if (npc) {
+    }
+    // 2. FALLBACK: Static NPC dialogue
+    else if (npc) {
       dlg = npc;
-    } else return;
+    }
+    if (!dlg) return;
 
+    // Map choices with proper action + payload
     const choices = (dlg.choices || []).map(c => ({
       ...c,
-      action: () => handleChoiceAction(c.action, c)
+      action: () => handleChoiceAction(c.action, c.questId || c.type || c.message, c)
     }));
 
     setInteraction({
@@ -50,13 +55,15 @@ onQuestAccept,
     });
   };
 
-  const handleChoiceAction = (action, choice) => {
-    if (action === 'acceptQuest') acceptQuest(choice.questId);
-    else if (action === 'turnInQuest') turnInQuest(choice.questId);
-    else if (action === 'say') say(choice.message);
+  const handleChoiceAction = (action, payload, fullChoice) => {
+    if (action === 'acceptQuest') acceptQuest(payload);
+    else if (action === 'turnInQuest') turnInQuest(payload);
+    else if (action === 'openShop') openShop(payload);        // ← RESTORED!
+    else if (action === 'say') say(payload);
     else if (action === 'close') closeDialogue();
   };
 
+  // === QUESTS ===
   const acceptQuest = (questId) => {
     onQuestAccept?.(questId);
     say(`Quest accepted: **${QUESTS[questId].title}**`);
@@ -73,27 +80,25 @@ onQuestAccept,
       return;
     }
 
-    // Deduct items
     const newInv = { ...inventory };
     quest.objectives.forEach(obj => {
       newInv[obj.item] -= obj.required;
       if (newInv[obj.item] <= 0) delete newInv[obj.item];
     });
 
-    // Give reward
     if (quest.reward.gold) {
       newInv.gold = (newInv.gold || 0) + quest.reward.gold;
     }
 
     onInventoryChange(newInv);
     onQuestComplete?.(questId);
-
     say(`Quest completed! +${quest.reward.gold} gold.`);
   };
 
+  // === SHOPS (RESTORED & WORKING!) ===
   const openShop = (type) => {
     const items = SHOP_DATA[type];
-    if (!items) {
+    if (!items || items.length === 0) {
       say("Sorry, I don't have anything right now.");
       return;
     }
@@ -102,17 +107,23 @@ onQuestAccept,
       `**${it.name}** – ${Object.entries(it.cost).map(([k, v]) => `${v} ${k}`).join(', ')}`
     );
 
-    const choices = items.map((it, i) => ({
+    const choices = items.map((it) => ({
       text: `Buy ${it.name}`,
       action: () => buyItem(it),
       item: it
     }));
 
-    setInteraction(prev => ({ ...prev, message: lines.join('\n'), choices }));
+    setInteraction(prev => ({
+      ...prev,
+      message: lines.join('\n'),
+      choices
+    }));
   };
 
   const buyItem = (item) => {
-    const hasEnough = Object.entries(item.cost).every(([res, amt]) => (inventory[res] ?? 0) >= amt);
+    const hasEnough = Object.entries(item.cost).every(([res, amt]) =>
+      (inventory[res] ?? 0) >= amt
+    );
     if (!hasEnough) {
       say("You don't have enough materials!");
       return;
