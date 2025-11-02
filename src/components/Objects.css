@@ -11,26 +11,80 @@
 }
 
 /* === HEROES === */
-/* THIS IS THE SHIELD PLAYER */
-.object.player { 
-  font-size: 40px; 
+/* THIS IS THE OBJECT PLAYER */
+/* ---- 1. Base player (inside the tile) ---- */
+/* .object.player {
+  position: relative; 
+  font-size: 38px;
+  line-height: 1;      
+  text-align: center;
   filter: drop-shadow(0 0 4px #4CAF50);
   z-index: 20;
+
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+} */
+
+/* 1. Base pop-in removed from .object.player */
+/* Base: default pop-in from left */
+/* .object.player {
+  animation: playerPop 0.12s ease-out forwards;
 }
-/* THIS IS THE SORCERER PLAYER */
+
+@keyframes playerPop {
+  from { opacity: 0; transform: translateX(0px); }
+  to   { opacity: 1; transform: translateX(0); }
+} */
+
+/* .object.player.present {
+  opacity: 1;
+  transform: scale(1);
+} */
+/* .object.player {
+  animation: playerPop 0.12s ease-out forwards;
+  transform: translateX(0);
+  opacity: 1;
+} */
+
+/* @keyframes playerPop {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+} */
+/* Directional overrides */
+/* Base player */
 .player {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
   pointer-events: none;
-  z-index: 10;
-  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
-  animation: float 3s ease-in-out infinite;
   z-index: 20;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
   text-shadow: 1px 1px 6px black;
+animation: playerFadeIn 0.1s ease-out forwards;
+  transform: translateX(0);
+  opacity: 0;
+  will-change: transform, opacity;
 }
+
+.player.enter-from-left   { transform: translateX( 2px) scale(0.9); }
+.player.enter-from-right  { transform: translateX( 2px) scale(0.9); }
+.player.enter-from-up     { transform: translateY( -2px) scale(0.9); }
+.player.enter-from-down   { transform: translateY( 2px) scale(0.9); }
+
+@keyframes playerFadeIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
 .object.knight { 
   font-size: 32px; 
   animation: metallic-shine 1.5s ease-in-out infinite;
@@ -977,7 +1031,7 @@ font-size: 60px;
     inset 0 -8px 12px rgba(0,0,0,0.4);
   animation: flicker 2.5s infinite alternate;
   cursor: pointer;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .object.campfireshaman::before {

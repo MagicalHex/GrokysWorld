@@ -9,10 +9,12 @@ export const OBJECTS = {
   // WEAPONS
   sword: '',
   doublesword: '⚔️',
-  axe: '🪓',
   dagger: '🗡️',
   bow: '🏹',
   staff: '🔮',
+  // EQUIPMENT
+  saw: '🪚',
+  axe: '🪓',
   // ARMOR
   armor: '🛡️',
   helmet: '⛑️',

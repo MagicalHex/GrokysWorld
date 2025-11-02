@@ -78,6 +78,21 @@ useEffect(() => {
 // States for healthbar:
 const [currentAction, setCurrentAction] = useState('health');
 const [choppingProgress, setChoppingProgress] = useState(0);
+
+const [moveDirection, setMoveDirection] = useState(null);
+console.log('[PlayMode] current moveDirection →', moveDirection);
+
+  // clear after animation
+  useEffect(() => {
+    if (moveDirection) {
+      console.log('[PlayMode] will clear direction in 120 ms');
+      const t = setTimeout(() => {
+        console.log('[PlayMode] clearing direction');
+        setMoveDirection(null);
+      }, 120);
+      return () => clearTimeout(t);
+    }
+  }, [moveDirection]);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -180,6 +195,7 @@ const removePickupPopup = useCallback((id) => {
         TALKABLE_OBJECTS={TALKABLE_OBJECTS}
         OPENABLE_OBJECTS={OPENABLE_OBJECTS}
         isDead={isDead}
+        setMoveDirection={setMoveDirection}
       />
 
       {/* ---------- AI / COMBAT ---------- */}
@@ -270,16 +286,24 @@ const removePickupPopup = useCallback((id) => {
               )}
             </div>
           )}
-          {playerPos?.x === x && playerPos?.y === y && (
-            <div className="player" style={{ fontSize: '38px' }}>
-              🧙
-          <ActionBar
-                type={currentAction} // 'health' | 'chop' | 'mine'
-                value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
-                color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
-              />
-            </div>
-          )}
+          
+{playerPos?.x === x && playerPos?.y === y && (
+  <div
+    key={`player-${playerPos.x}-${playerPos.y}`}
+    className={`object player ${
+      moveDirection ? `enter-from-${moveDirection}` : ''
+    }`}
+    onAnimationStart={() => console.log('[ANIM] Starting:', moveDirection)}
+    onAnimationEnd={() => console.log('[ANIM] Ended:', moveDirection)}
+  >
+    🧙
+    <ActionBar
+      type={currentAction}
+      value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
+      color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
+    />
+  </div>
+)}
               </div>
             );
           })

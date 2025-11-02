@@ -21,7 +21,8 @@ const PlayerMovement = ({
   CHOPPABLE_OBJECTS,
   TALKABLE_OBJECTS,
   OPENABLE_OBJECTS,
-  isDead
+  isDead,
+  setMoveDirection
 }) => {
   const [canMove, setCanMove] = useState(true);
   const moveDelay = 300;
@@ -48,13 +49,15 @@ const PlayerMovement = ({
       // ---- TRY TO MOVE → cancel any pending interaction first ----
       if (onCancelInteraction) onCancelInteraction();
 
-      let newPos = { ...playerPos };
-      if (e.key === 'ArrowUp'    && playerPos.y > 0)          newPos.y -= 1;
-      else if (e.key === 'ArrowDown'  && playerPos.y < rows-1) newPos.y += 1;
-      else if (e.key === 'ArrowLeft'  && playerPos.x > 0)       newPos.x -= 1;
-      else if (e.key === 'ArrowRight' && playerPos.x < columns-1) newPos.x += 1;
-      else if (e.key === ' ') { e.preventDefault(); onExit(); return; }
-      else return;
+let newPos = { ...playerPos };
+let direction = null;  // ← track direction, pass it to PlayMode to render movement smoothly
+
+if (e.key === 'ArrowUp'    && playerPos.y > 0)          { newPos.y -= 1; direction = 'up'; }
+else if (e.key === 'ArrowDown'  && playerPos.y < rows-1) { newPos.y += 1; direction = 'down'; }
+else if (e.key === 'ArrowLeft'  && playerPos.x > 0)       { newPos.x -= 1; direction = 'left'; }
+else if (e.key === 'ArrowRight' && playerPos.x < columns-1) { newPos.x += 1; direction = 'right'; }
+else if (e.key === ' ') { e.preventDefault(); onExit(); return; }
+else return;
 
       const targetKey = `${newPos.x},${newPos.y}`;
       const targetObj = objects[targetKey];
@@ -81,6 +84,11 @@ const PlayerMovement = ({
 
       setCanMove(false);
       onPlayerMove(newPos);
+
+if (direction) {
+  console.log('SETTING DIRECTION:', direction);  // ← ADD THIS
+  setMoveDirection(direction);
+}
 
       // === TELEPORT LOGIC ===
       if (teleportMatch || isLegacyRope || isLegacyHole) {
@@ -122,7 +130,7 @@ const PlayerMovement = ({
   }, [
     playerPos, onPlayerMove, onExit, objects, restrictedTiles,
     rows, columns, level, onLevelChange, onStartInteraction,
-    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS
+    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, setMoveDirection
   ]);
 
   return null;

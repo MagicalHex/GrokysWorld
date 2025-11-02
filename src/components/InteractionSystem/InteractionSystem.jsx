@@ -3,7 +3,7 @@ import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'rea
 import { useChopping } from './ChoppingSystem';
 import { useTalking } from './TalkingSystem';
 import { useQuesting } from './QuestingSystem';
-import { ChoppingUI } from './ChoppingUI';
+// import { ChoppingUI } from './ChoppingUI';
 import { TalkingUI } from './TalkingUI';
 import { QuestingUI } from './QuestingUI';
 import './InteractionSystem.css';
@@ -104,16 +104,19 @@ const cancelInteraction = () => {
   // === RENDER ===
   if (!interaction.active && !questPopup) return null;
 
-  const chopX = interaction.type === 'chop' && interaction.key ? Number(interaction.key.split(',')[0]) : null;
-  const chopY = interaction.type === 'chop' && interaction.key ? Number(interaction.key.split(',')[1]) : null;
+  // const chopX = interaction.type === 'chop' && interaction.key ? Number(interaction.key.split(',')[0]) : null;
+  // const chopY = interaction.type === 'chop' && interaction.key ? Number(interaction.key.split(',')[1]) : null;
+  {/* <ChoppingUI x={chopX} y={chopY} tileSize={tileSize} /> Move this into the return if needed. */}
 
   return (
     <>
       {interaction.type === 'talk' && (
-        <TalkingUI message={interaction.message} choices={interaction.choices} />
+        <TalkingUI 
+        message={interaction.message} 
+        choices={interaction.choices} 
+        icon={interaction.icon} 
+      />
       )}
-
-      {/* <ChoppingUI x={chopX} y={chopY} tileSize={tileSize} /> */}
 
       <QuestingUI questPopup={questPopup} tileSize={tileSize} onClose={() => setQuestPopup(null)} />
     </>

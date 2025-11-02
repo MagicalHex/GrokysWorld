@@ -186,7 +186,7 @@ const onHealPopupFinish = useCallback(() => {
   updateLevel(levelId, {
     objects: newObjs,
     playerPos: newPos,
-    pendingPickup: pickupItem          // <-- NEW flag
+    pendingPickup: pickupItem
   });
   
 }, [

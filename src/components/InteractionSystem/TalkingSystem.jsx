@@ -27,6 +27,7 @@ export const useTalking = ({
       key: targetKey,
       message: dlg.greeting,
       npc: obj,
+      icon: dlg.icon,
       choices
     });
   };
@@ -45,13 +46,13 @@ export const useTalking = ({
     }
 
     const lines = items.map(it =>
-      `${it.emoji} **${it.name}** – ${Object.entries(it.cost).map(([k, v]) => `${v} ${k}`).join(', ')}`
+      `**${it.name}** – ${Object.entries(it.cost).map(([k, v]) => `${v} ${k}`).join(', ')}`
     );
 
     const choices = items.map((it, i) => ({
-      key: ['left', 'up', 'right'][i],
       text: `Buy ${it.name}`,
-      action: () => buyItem(it)
+      action: () => buyItem(it),
+      item: it
     }));
 
     setInteraction(prev => ({ ...prev, message: lines.join('\n'), choices }));
@@ -79,7 +80,7 @@ export const useTalking = ({
     setInteraction(prev => ({
       ...prev,
       message: txt,
-      choices: [{ key: 'up', text: 'Thanks!', action: closeDialogue }]
+      choices: [{ text: 'Thanks!', action: closeDialogue }]
     }));
   };
 
@@ -89,5 +90,5 @@ export const useTalking = ({
     onCancelInteraction?.();
   };
 
-  return { startTalking, handleChoiceAction, closeDialogue };
+  return { startTalking, closeDialogue };
 };
