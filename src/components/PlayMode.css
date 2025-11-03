@@ -3,6 +3,51 @@
       display: grid;
       padding: 3rem;
 }
+.level-label {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 
+    0 1px 0 #0c0,
+    0 2px 4px rgba(0, 255, 94, 0.4),
+    0 0 8px rgba(0, 255, 94, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px); /* Safari */
+  white-space: nowrap;
+  animation: fadeInLevelLabel 0.4s ease-out;
+  text-align: center;
+opacity: 0;
+  animation: fadeInMystical 1.2s ease-out forwards;
+}
+
+/* Pure opacity fade-in with a soft "breathing" glow */
+@keyframes fadeInMystical {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 
+      0 1px 0 #0c0,
+      0 2px 4px rgba(0, 255, 94, 0.6),
+      0 0 16px rgba(0, 255, 94, 0.9),
+      0 0 30px rgba(0, 255, 94, 0.5);
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 
+      0 1px 0 #0c0,
+      0 2px 4px rgba(0, 255, 94, 0.5),
+      0 0 12px rgba(0, 255, 94, 0.7),
+      0 0 20px rgba(0, 255, 94, 0.4);
+  }
+}
 
 .play-grid {
   position: relative;
@@ -26,9 +71,6 @@
     linear-gradient(to left, rgba(0, 0, 0, 0.7), transparent 5%),
     linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent 5%);
 }
-
-
-
 
 .play-grid .tile {
   width: var(--tile-size);

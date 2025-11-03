@@ -16,6 +16,7 @@ import { PickupPopup } from './PickupPopup';
 const PlayMode = ({
   grid,
   objects,
+  levelName,
   playerPos,
   onExit,
   tileSize,
@@ -24,7 +25,7 @@ const PlayMode = ({
   onPlayerMoveAttempt,
   onObjectsChange,
   restrictedTiles,
-  level,
+  level, // e.g. "3"
   onLevelChange,
   onQueueRespawn,
   originalSpawns,
@@ -83,6 +84,8 @@ const [activeQuests, setActiveQuests] = useState({});
 // for Movement
 const [moveDirection, setMoveDirection] = useState(null);
 console.log('[PlayMode] current moveDirection →', moveDirection);
+// For level name display:
+const displayName = levelName || 'Unknown Level';
 
   // clear after animation
   // useEffect(() => {
@@ -178,6 +181,11 @@ const removePickupPopup = useCallback((id) => {
      -------------------------------------------------------------- */
   return (
     <div className="play-mode">
+
+      <div className="level-label">
+        {displayName}
+      </div>
+
       {/* ---------- INPUT ---------- */}
       <PlayerMovement
         playerPos={playerPos}

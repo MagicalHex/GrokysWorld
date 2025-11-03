@@ -93,6 +93,7 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
 <PlayMode
         grid={currentLevelData.grid}
         objects={currentLevelData.objects}
+        levelName={currentLevelData.name || `Level ${currentLevel}`}
         playerPos={currentLevelData.playerPos}
         onExit={() => setPlayMode(false)}
         tileSize={40}

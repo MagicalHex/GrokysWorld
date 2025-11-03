@@ -14,9 +14,9 @@
     ["lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "mudground", "mudground", "mudground", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"],
     ["lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "mudground", "mudground", "mudground", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"],
     ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "mudground", "mudground", "mudground", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"],
-    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mgtgbl", "mudground", "mudground", "mudground", "mgtgbr", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"],
-    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"],
-    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass"]
+    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mgtgbl", "mudground", "mudground", "mudground", "mgtgbr", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "lightgrass"],
+    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "mudground", "mudground"],
+    ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground"]
   ],
   "objects": {
     "0,0": "treeobject",
@@ -35,7 +35,6 @@
     "0,10": "treeobject",
     "23,0": "treeobject",
     "19,10": "treeobject",
-    "20,12": "treeobject",
 
     "15,13": "campfireshaman",
 
@@ -121,15 +120,16 @@
     "4,15": "stoneobjecthalf",
 
     "23,11": "stoneobjecthalf",
-    "23,12": "stoneobject",
-    "23,13": "stoneobject",
+    "23,12": "stoneobjectcrookedlarge",
+    "23,13": "stoneobjectcrookedlarge",
     "23,15": "stoneobject",
     "23,14": "stoneobject",
     "22,15": "stoneobject",
-    "21,15": "stoneobject",
+    "21,15": "stoneobjectcrookedlarge",
     "20,14": "stoneobject",
     "20,15": "stoneobjecthalf",
-    "20,13": "stoneobject",
+    "20,13": "stoneobjectcrookedlarge",
+    "20,12": "stoneobject",
 
     "22,13": "hole-to-5"
   }
