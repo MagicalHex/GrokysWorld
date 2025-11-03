@@ -85,16 +85,16 @@ const [moveDirection, setMoveDirection] = useState(null);
 console.log('[PlayMode] current moveDirection →', moveDirection);
 
   // clear after animation
-  useEffect(() => {
-    if (moveDirection) {
-      console.log('[PlayMode] will clear direction in 120 ms');
-      const t = setTimeout(() => {
-        console.log('[PlayMode] clearing direction');
-        setMoveDirection(null);
-      }, 120);
-      return () => clearTimeout(t);
-    }
-  }, [moveDirection]);
+  // useEffect(() => {
+  //   if (moveDirection) {
+  //     console.log('[PlayMode] will clear direction in 120 ms');
+  //     const t = setTimeout(() => {
+  //       console.log('[PlayMode] clearing direction');
+  //       setMoveDirection(null);
+  //     }, 1200);
+  //     return () => clearTimeout(t);
+  //   }
+  // }, [moveDirection]);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */

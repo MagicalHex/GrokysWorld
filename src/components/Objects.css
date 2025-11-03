@@ -60,6 +60,98 @@
 /* Directional overrides */
 /* Base player */
 .player {
+  /* position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center; */
+  font-size: 38px;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  text-shadow: 1px 1px 6px black;
+  /* pointer-events: none;
+  z-index: 20;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+  text-shadow: 1px 1px 6px black;
+  animation: playerFadeIn 0.1s ease-out forwards;
+  transform: translateX(0);
+  opacity: 0;
+  will-change: transform, opacity; */
+  /* transform: translate(calc(-50% + 20px), -50%);
+animation: animatePlayer 0.5s ease-out forwards; */
+opacity: 0;
+/* animation: animatePlayer 1s ease-out forwards; */
+}
+/* @keyframes animatePlayer {
+  to {
+    opacity: 1;
+  }
+} */
+/* === DIRECTIONAL ENTRY CLASSES === */
+.player.enter-from-left {
+  transform: translate(calc(-50% + 20px), -50%);
+  animation: enterFromLeft 0.28s ease-out forwards;
+}
+
+.player.enter-from-right {
+  transform: translate(calc(-50% - 20px), -50%);
+  animation: enterFromRight 0.28s ease-out forwards;
+}
+
+.player.enter-from-down {
+  transform: translate(-50%, calc(-50% - 20px));
+  animation: enterFromTop 0.28s ease-out forwards;
+}
+
+.player.enter-from-up {
+  transform: translate(-50%, calc(-50% + 20px));
+  animation: enterFromBottom 0.28s ease-out forwards;
+}
+
+/* === KEYFRAMES — ALL DIRECTIONS (with opacity!) === */
+@keyframes enterFromLeft {
+  from {
+    opacity: 0.8;
+    transform: translate(calc(-50% + 40px), -50%) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromRight {
+  from {
+    opacity: 0.8;
+    transform: translate(calc(-50% - 40px), -50%) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromTop {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, calc(-50% - 40px)) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromBottom {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, calc(-50% + 40px)) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+/* .player.enter-from-left   { 
   position: absolute;
   inset: 0;
   display: flex;
@@ -70,20 +162,23 @@
   z-index: 20;
   filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
   text-shadow: 1px 1px 6px black;
-animation: playerFadeIn 0.1s ease-out forwards;
-  transform: translateX(0);
-  opacity: 0;
+transform: translateX(10px) scale(1.0);
+  opacity: 1;
   will-change: transform, opacity;
-}
+animation: slideInFromRight 0.5s ease-out forwards;
+} */
 
-.player.enter-from-left   { transform: translateX( 2px) scale(0.9); }
+/* -------------------------------------------------
+   Keyframes – right → centre
+   ------------------------------------------------- */
+/* @keyframes slideInFromRight {
+  to {
+    opacity: 1;
+  }
+}
 .player.enter-from-right  { transform: translateX( 2px) scale(0.9); }
 .player.enter-from-up     { transform: translateY( -2px) scale(0.9); }
-.player.enter-from-down   { transform: translateY( 2px) scale(0.9); }
-
-@keyframes playerFadeIn {
-  to { opacity: 1; transform: scale(1); }
-}
+.player.enter-from-down   { transform: translateY( 2px) scale(0.9); } */
 
 .object.knight { 
   font-size: 32px; 
