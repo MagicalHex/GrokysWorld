@@ -120,11 +120,11 @@ const handleCommand = (cmd) => {
                     {OBJECTS[obj]}
                   </div>
                 )}
-                {playerPos && playerPos.x === x && playerPos.y === y && !obj && (
-                  <div className="player">
-                    🔴
-                  </div>
-                )}
+{playerPos && playerPos.x === x && playerPos.y === y && (
+  <div className="object player standing">
+   🧙
+  </div>
+)}
               </div>
             );
           })

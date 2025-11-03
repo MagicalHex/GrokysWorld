@@ -81,6 +81,10 @@ animation: animatePlayer 0.5s ease-out forwards; */
 opacity: 0;
 /* animation: animatePlayer 1s ease-out forwards; */
 }
+/* STANDING – centered + visible (NEW!) */
+.player.standing {
+  opacity: 1;
+}
 /* @keyframes animatePlayer {
   to {
     opacity: 1;

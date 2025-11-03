@@ -12,6 +12,7 @@ import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, getQuestMarker }
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
 import { PickupPopup } from './PickupPopup';
+import { DamagePopup } from './DamagePopup';
 
 const PlayMode = ({
   grid,
@@ -76,16 +77,18 @@ useEffect(() => {
 //     onInventoryChange(starter);
 //   }, []);
 
+// For level name display:
+const displayName = levelName || 'Unknown Level';
 // States for healthbar:
 const [currentAction, setCurrentAction] = useState('health');
 const [choppingProgress, setChoppingProgress] = useState(0);
+// For combat popups:
+  const [popups, setPopups] = useState([]);
 // For quests:
 const [activeQuests, setActiveQuests] = useState({});
 // for Movement
 const [moveDirection, setMoveDirection] = useState(null);
 console.log('[PlayMode] current moveDirection →', moveDirection);
-// For level name display:
-const displayName = levelName || 'Unknown Level';
 
   // clear after animation
   // useEffect(() => {
@@ -238,6 +241,8 @@ const removePickupPopup = useCallback((id) => {
         healPopup={healPopup}
         onHealPopupFinish={onHealPopupFinish}
         setLastDamageTime={setLastDamageTime}
+        popups={popups}
+        setPopups={setPopups}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -269,10 +274,13 @@ const removePickupPopup = useCallback((id) => {
       )}
 
       {/* ---------- GRID ---------- */}
-      <div
-        className="play-grid"
-        style={{ gridTemplateColumns: `repeat(${columns}, ${tileSize}px)` }}
-      >
+<div
+  className="play-grid"
+  style={{
+    gridTemplateColumns: `repeat(${columns}, ${tileSize}px)`,
+    '--tile-size': `${tileSize}px`,   // ← 03-11-2025 Remove this if problems
+  }}
+>
 {grid.map((row, y) =>
   row.map((terrain, x) => {
     const key = `${x},${y}`;
@@ -286,7 +294,7 @@ const removePickupPopup = useCallback((id) => {
       <div
         key={key}
         className={`tile ${terrain}`}
-        style={{ width: tileSize, height: tileSize, position: 'relative' }}
+        // style={{ width: tileSize, height: tileSize, position: 'relative' }} 03-11-2025 Add this again if problems
       >
         {obj && (
           <div
@@ -312,7 +320,9 @@ const removePickupPopup = useCallback((id) => {
   <div
     key={`player-${playerPos.x}-${playerPos.y}`}
     className={`object player ${
-      moveDirection ? `enter-from-${moveDirection}` : ''
+      moveDirection 
+        ? `enter-from-${moveDirection}`      // moving
+        : 'standing'                         // standing (NEW!)
     }`}
     onAnimationStart={() => console.log('[ANIM] Starting:', moveDirection)}
     onAnimationEnd={() => console.log('[ANIM] Ended:', moveDirection)}
@@ -325,11 +335,26 @@ const removePickupPopup = useCallback((id) => {
     />
   </div>
 )}
+
               </div>
             );
           })
         )}
       </div>
+      
+      {/* Battle popups (CombatSystem) */}
+{popups.map(p => (
+  <DamagePopup
+  tileSize={tileSize}
+    key={p.id}
+    x={p.x}
+    y={p.y}
+    damage={p.dmg}
+    isPlayer={p.isPlayer}
+    isHeal={p.isHeal}
+    onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+  />
+))}
       {/* ---------- PICKUP POPUPS (float above everything) ---------- */}
       {pickupPopups.map(p => (
         <PickupPopup

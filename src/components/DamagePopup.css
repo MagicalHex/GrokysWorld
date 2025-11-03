@@ -1,6 +1,8 @@
 .damage-popup {
   position: absolute;
-transform: translate(-50%, -50%) translate(10px, 10x);
+  top: 50%;
+  left: 50%;
+transform: translate(-50%, -50%);
   font-family: 'Arial', sans-serif;
   font-weight: bold;
   font-size: 1.8rem;

@@ -1,6 +1,6 @@
 // src/components/CombatSystem.jsx
 import React, { useEffect, useRef, useState } from 'react';
-import { DamagePopup } from './DamagePopup';
+// import { DamagePopup } from './DamagePopup';
 import { subscribe } from '../utils/gameLoop';
 
 // Random integer in [min, max] inclusive
@@ -52,7 +52,9 @@ export default function CombatSystem({
   inventory,
   healPopup,
   onHealPopupFinish,
-  setLastDamageTime
+  setLastDamageTime,
+  popups,
+  setPopups
 }) {
   // const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const distance = (p1, p2) => {
@@ -104,11 +106,13 @@ export default function CombatSystem({
     onObjectsChange,
     isDead,
     setIsDead,
-    inventory
+    inventory,
+    setPopups,
+    popups
   ]);
 
   // === DAMAGE POPUPS ===
-  const [popups, setPopups] = useState([]);
+  // const [popups, setPopups] = useState([]);
 
   const addPopup = (x, y, dmg, isPlayer = false, isHeal = false) => {
     const id = `${Date.now()}-${Math.random()}`;
@@ -274,19 +278,19 @@ onPlayerHealthChange(prev => {
   }, [playerHealth, isDead]);
 
   // === RENDER POPUPS ===
-  return (
-    <>
-      {popups.map(p => (
-        <DamagePopup
-          key={p.id}
-          x={p.x}
-          y={p.y}
-          damage={p.dmg}
-          isPlayer={p.isPlayer}
-          isHeal={p.isHeal}
-          onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
-        />
-      ))}
-    </>
-  );
+  // return (
+  //   <>
+  //     {popups.map(p => (
+  //       <DamagePopup
+  //         key={p.id}
+  //         x={p.x}
+  //         y={p.y}
+  //         damage={p.dmg}
+  //         isPlayer={p.isPlayer}
+  //         isHeal={p.isHeal}
+  //         onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+  //       />
+  //     ))}
+  //   </>
+  // );
 }

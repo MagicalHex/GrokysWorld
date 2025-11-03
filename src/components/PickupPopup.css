@@ -1,7 +1,9 @@
 /* src/components/PickupPopup.css */
 .pickup-popup {
   position: absolute;
-  transform: translate(-50%, -50%);
+  top: 50%;                     /* start at the centre of the tile */
+  left: 50%;
+  transform: translate(-50%, -100%);   /* lift it just above the sprite */
   font-family: 'Arial', sans-serif;
   font-weight: bold;
   font-size: 1.6rem;
@@ -12,19 +14,11 @@
   pointer-events: none;
   animation: floatPickup 1s ease-out forwards;
   z-index: 99;
+  white-space: nowrap;
 }
 
 @keyframes floatPickup {
-  0% {
-    transform: translate(-50%, -50%) scale(0.7);
-    opacity: 1;
-  }
-  60% {
-    transform: translate(-50%, -100%) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -140%) scale(1);
-    opacity: 0;
-  }
+  0%   { transform: translate(-50%, -100%) scale(0.7); opacity: 1; }
+  60%  { transform: translate(-50%, -150%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -190%) scale(1);   opacity: 0; }
 }

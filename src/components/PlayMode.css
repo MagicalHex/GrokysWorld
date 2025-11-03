@@ -55,6 +55,7 @@ opacity: 0;
   gap: 0;
   background: black;
   transition: all 0.3s ease;
+  box-sizing: border-box;
   /* overflow: hidden; */
 }
 
@@ -76,6 +77,7 @@ opacity: 0;
   width: var(--tile-size);
   height: var(--tile-size);
   position: relative;
+  box-sizing: border-box;   /* ← critical */
 }
 
 /* Monster-specific override */

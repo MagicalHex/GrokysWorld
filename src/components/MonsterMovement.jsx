@@ -86,9 +86,11 @@ const MonsterMovement = ({
       const targetKey = `${dir.x},${dir.y}`;
       const targetObj = objects[targetKey];
 
+      // THIS CODE DOESN'T SEEM TO WORK
       const isWalkable =
         !targetObj ||
-        targetObj === 'spiderweb';
+        targetObj === 'spiderweb'
+        || targetObj === 'gold';
 
       if (
         dir.x >= 0 && dir.x < columns &&
