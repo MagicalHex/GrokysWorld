@@ -336,6 +336,30 @@ const removePickupPopup = useCallback((id) => {
   </div>
 )}
 
+{/* PICKUP POPUP — NOW INSIDE TILE */}
+  {pickupPopups
+    .filter(p => p.x === x && p.y === y)
+    .map(p => (
+      <PickupPopup
+        key={p.id}
+        item={p.item}
+        onFinish={() => removePickupPopup(p.id)}
+      />
+    ))}
+
+    {/* DAMAGE POPUPS — NOW INSIDE TILE */}
+  {popups
+    .filter(p => p.x === x && p.y === y)
+    .map(p => (
+      <DamagePopup
+        key={p.id}
+        damage={p.dmg}
+        isPlayer={p.isPlayer}
+        isHeal={p.isHeal}
+        onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+      />
+    ))}
+
               </div>
             );
           })
@@ -343,7 +367,7 @@ const removePickupPopup = useCallback((id) => {
       </div>
       
       {/* Battle popups (CombatSystem) */}
-{popups.map(p => (
+{/* {popups.map(p => (
   <DamagePopup
   tileSize={tileSize}
     key={p.id}
@@ -354,9 +378,9 @@ const removePickupPopup = useCallback((id) => {
     isHeal={p.isHeal}
     onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
   />
-))}
+))} */}
       {/* ---------- PICKUP POPUPS (float above everything) ---------- */}
-      {pickupPopups.map(p => (
+      {/* {pickupPopups.map(p => (
         <PickupPopup
           key={p.id}
           x={p.x}
@@ -364,7 +388,7 @@ const removePickupPopup = useCallback((id) => {
           item={p.item}
           onFinish={() => removePickupPopup(p.id)}
         />
-      ))}
+      ))} */}
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem
