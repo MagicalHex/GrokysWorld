@@ -13,7 +13,7 @@ const WEAPON_DAMAGE_RANGES = {
   fist:   { min:  40, max: 50 },
   dagger: { min: 12, max: 20 },
   sword:  { min: 18, max: 25 },
-  crossbow: { min:  5, max:  5 },   // fixed 5 dmg – weak but safe
+  crossbow: { min:  5, max:  70 }, // Auto-use this when in range
 };
 
 const MONSTER_DAMAGE_RANGES = {

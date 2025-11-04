@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './CooldownBar.css';
 
-const DURATION = { melee: 1500, ranged: 5000 };
-
-const CooldownBar = ({ signal, setCooldownSignal }) => {
+const CooldownBar = ({ signal, setCooldownSignal, cooldowns }) => {
   const { active, type } = signal || {};
   const fillRef = useRef(null);
   const rafRef = useRef(0);
@@ -21,7 +19,13 @@ const CooldownBar = ({ signal, setCooldownSignal }) => {
       return;
     }
 
-    const duration = DURATION[type] || 1500;
+    // USE PROP: cooldowns.MELEE or cooldowns.RANGED
+    const duration = type === 'melee' 
+      ? cooldowns.MELEE 
+      : type === 'ranged' 
+        ? cooldowns.RANGED 
+        : 1500;
+
     let cycleStart = performance.now();
 
     const tick = () => {
@@ -49,9 +53,8 @@ const CooldownBar = ({ signal, setCooldownSignal }) => {
         rafRef.current = 0;
       }
     };
-  }, [active, type]);
+  }, [active, type, cooldowns]); // ← ADD cooldowns to deps
 
-  // === ALWAYS RENDER — just hide when inactive ===
   return (
     <div className={`cooldown-container ${active ? 'active' : 'inactive'}`}>
       <div className="cooldown-bar">

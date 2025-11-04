@@ -16,7 +16,7 @@ import { PickupPopup } from './PickupPopup';
 import { DamagePopup } from './DamagePopup';
 
 // For cool downs (CombatSystem and CooldownBar)
-const COOLDOWNS = { MELEE: 1500, RANGED: 5000, MONSTER: 3000 };
+const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
 
 const PlayMode = ({
   grid,
@@ -408,6 +408,7 @@ const removePickupPopup = useCallback((id) => {
 <CooldownBar 
 signal={cooldownSignal} 
 setCooldownSignal={setCooldownSignal}
+cooldowns={COOLDOWNS}
 />
 
       <button onClick={onExit}>Edit Mode</button>

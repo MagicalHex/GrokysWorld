@@ -464,7 +464,6 @@ const onQueueRespawn = useCallback((levelId, { key, type }) => {
 // ──────────────────────────────────────────────────────────────
 //  SPAWN
 // ──────────────────────────────────────────────────────────────
-// useGameState.jsx
 const spawnMonster = useCallback(
   (key, type, delay = 0) => {
     console.log('[useGameState] spawnMonster', { levelId: currentLevel, key, type, delay });
@@ -477,6 +476,31 @@ const spawnMonster = useCallback(
   },
   [currentLevel, scheduleRespawn]
 );
+// ──────────────────────────────────────────────────────────────
+//  A HELP-SWEEPER TO SPAWN EVERY 30 SECONDS. HELPS TO AVOID STALE MONSTERS
+// ──────────────────────────────────────────────────────────────
+useEffect(() => {
+  const interval = setInterval(() => {
+    const level = levels[currentLevel];
+    if (!level?.objects) return;
+
+    // Scan current monsters in objects
+    Object.entries(level.objects).forEach(([key, objId]) => {
+      if (typeof objId !== 'string' || !objId.includes('_')) return;
+      
+      const type = objId.split('_')[0];
+      if (!['spider', 'littlespider', 'skeleton', 'cavespider'].includes(type)) return;
+
+      // If tile is empty or wrong → respawn
+      if (!level.objects[key] || level.objects[key] !== objId) {
+        console.log(`[SWEEP] Respawn ${type} at ${key}`);
+        scheduleRespawn(currentLevel, key, type, 0);
+      }
+    });
+  }, 30_000);
+
+  return () => clearInterval(interval);
+}, [levels, currentLevel, scheduleRespawn]);
 
 // ------------------------
 // GRID CHANGES
@@ -498,18 +522,62 @@ const spawnMonster = useCallback(
 const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
   console.log('[useGameState] onMonsterHealthChange:', { monsterId, newHealth });
 
-  setGlobalMonsterHealths(prev => ({
-    ...prev,
-    [monsterId]: newHealth
-  }));
+  if (newHealth > 0) {
+    setGlobalMonsterHealths(prev => ({
+      ...prev,
+      [monsterId]: newHealth
+    }));
+    return;
+  }
 
-  if (newHealth > 0) return;
-
+  // === MONSTER IS DEAD ===
   const type = monsterTypes[monsterId];
   if (!['spider', 'littlespider', 'skeleton', 'cavespider'].includes(type)) return;
 
-  // Uses per-type delay from RESPAWN_DELAYS (e.g. 30s for spider)
-  scheduleRespawn(monsterId); // ← delay auto-determined by type
+  // 1. DROP LOOT (in objects)
+  const parts = monsterId.split('_');
+  const x = parts[2], y = parts[3];
+  const key = `${x},${y}`;
+  const levelId = Number(parts[1]);
+
+  // Loot handled in CombatSystem
+  // const loot = ['spider', 'littlespider', 'cavespider'].includes(type) && Math.random() < 0.33
+  //   ? 'spiderweb'
+  //   : 'gold';
+
+  // 2. FULL CLEANUP
+  setGlobalMonsterHealths(prev => {
+    const copy = { ...prev };
+    delete copy[monsterId];
+    return copy;
+  });
+
+  setMonsterTypes(prev => {
+    const copy = { ...prev };
+    delete copy[monsterId];
+    return copy;
+  });
+
+  // 3. REPLACE IN objects WITH LOOT
+  setLevels(prevLevels => {
+    const level = prevLevels[levelId];
+    if (!level) return prevLevels;
+
+    return {
+      ...prevLevels,
+      [levelId]: {
+        ...level,
+        objects: {
+          ...level.objects
+          // [key]: loot  // ← loot replaces monster
+        }
+      }
+    };
+  });
+
+  // 4. SCHEDULE RESPAWN (safe now — old ID is GONE)
+  scheduleRespawn(monsterId, RESPAWN_DELAYS[type] || 3000);
+
 }, [monsterTypes, scheduleRespawn]);
   /* --------------------------------------------------------------
      8. Load maps + initialise monster health
