@@ -417,6 +417,17 @@ font-size: 60px;
   animation: potion-bubble 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
+.object.hole-to-1,
+.object.hole-to-2,
+.object.hole-to-3,
+.object.hole-to-4,
+.object.hole-to-5,
+.object.hole-to-6,
+.object.hole-to-7 { 
+  font-size: 50px; 
+  filter: drop-shadow(0 0 4px #000000);
+  text-shadow: 0px 0px 10px rgb(146, 146, 146);
+}
 .object.ropeobject {
       text-shadow: 0px 0px 6px green;
     filter: brightness(1);
@@ -643,6 +654,7 @@ font-size: 60px;
   transition:.3s;
   box-shadow:16px 12px 16px #1a1a1a70,6px 10px 8px #00000055,4px 4px 4px #00000040,
     inset 0 1px 0 #ffffff40,inset 8px 6px 10px #00000085;
+    z-index: 20;
 }
 .object.stoneobjecthalf {
   /* Half size: 40x20px (feels like half a stone) */

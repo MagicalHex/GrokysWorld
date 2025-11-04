@@ -9,8 +9,9 @@ const PORTAL_ENTRY_POINTS = {
   2: { x: 1, y: 2 }, // Wilderness
   3: { x: 1, y: 2 }, // Slimecave
   4: { x: 4, y: 4 }, // StoneCave
-  5: { x: 1, y: 2 }, // Dungeon
-  6: { x: 1, y: 2 }, }; // Slimecave 1
+  5: { x: 1, y: 2 }, // Town Mines level 1
+  6: { x: 1, y: 2 },  // Slimecave 1
+  7: { x: 21, y: 3 }, }; // Town Mines level 2
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
@@ -173,7 +174,7 @@ const onHealPopupFinish = useCallback(() => {
   } else {
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','hole-to-5','rope-to-1', 'rope-to-2',
+      'bridge','ladder','hole-to-5', 'hole-to-6', 'hole-to-7', 'rope-to-1', 'rope-to-2',
       'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);

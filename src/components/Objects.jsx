@@ -75,10 +75,13 @@ export const OBJECTS = {
   'rope-to-1': '🪢',
   'rope-to-2': '🪢',
   'rope-to-3': '🪢',
+    'rope-to-4': '🪢',
+      'rope-to-5': '🪢', // Town Mines Level 1
   'hole-to-3': '🕳️',
   'hole-to-4': '🕳️',
   'hole-to-5': '🕳️',
   'hole-to-6': '🕳️',
+  'hole-to-7': '🕳️',
   ladder: '🪜',
   castle: '🏰',
   // QUEST ITEMS
