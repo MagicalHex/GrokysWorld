@@ -272,7 +272,11 @@ animation: slideInFromRight 0.5s ease-out forwards;
   font-size: 18px; 
   animation: coin-spin 2s linear infinite;
 }
-
+.object.spiderwebnopickup {
+  font-size: 100px;
+  filter: brightness(0.2);
+  filter: drop-shadow(0 0 4px #ffffff2a);
+}
 /* === NPCs === */
 .object.agent { 
   font-size: 24px; 

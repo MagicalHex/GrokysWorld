@@ -25,6 +25,9 @@
     "20,2": "lightstoneobject",
     "20,5": "lightstoneobject",
     "4,6": "lightstoneobject",
+        "9,3": "spiderwebnopickup",
+    "4,11": "spiderwebnopickup",
+    "15,11": "spiderwebnopickup",
 
     "4,9": "littlespider",
     "18,9": "littlespider",

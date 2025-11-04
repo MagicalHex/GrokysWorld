@@ -45,6 +45,7 @@ export const OBJECTS = {
   diamond: '💎',
   // OBSTACLES
   spiderweb: '🕸️',
+  spiderwebnopickup: '🕸️',
   fireobject: '🔥',
   campfireobject: '🔥',
   woodobject: '🪵',
