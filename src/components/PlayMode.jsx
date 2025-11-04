@@ -7,12 +7,16 @@ import CombatSystem from './CombatSystem';
 import HealthRegenSystem from './HealthRegenSystem';
 import HealthBar from './HealthBar'; // Old
 import ActionBar from './ActionBar'; // new, holds both progress and health
+import CooldownBar from './CooldownBar';
 import InteractionSystem from './InteractionSystem/InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, getQuestMarker } from './InteractionSystem/InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
 import { PickupPopup } from './PickupPopup';
 import { DamagePopup } from './DamagePopup';
+
+// For cool downs (CombatSystem and CooldownBar)
+const COOLDOWNS = { MELEE: 1500, RANGED: 5000, MONSTER: 3000 };
 
 const PlayMode = ({
   grid,
@@ -26,7 +30,7 @@ const PlayMode = ({
   onPlayerMoveAttempt,
   onObjectsChange,
   restrictedTiles,
-  level, // e.g. "3"
+  currentLevel, // e.g. "3"
   onLevelChange,
   onQueueRespawn,
   originalSpawns,
@@ -54,53 +58,54 @@ const PlayMode = ({
      DEBUG AREA
      -------------------------------------------------------------- */
 useEffect(() => {
-  console.log('[PlayMode] monsterHealths updated:', level);
+  console.log('[PlayMode] monsterHealths updated:', currentLevel);
 }, [monsterHealths]);
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
-  // useEffect(() => {
-  // console.log('[PlayMode] lastDamageTime prop:', lastDamageTime, typeof lastDamageTime);
-  // }, [lastDamageTime]);
 
-//   useEffect(() => {
-//   console.trace('[PlayMode] rendered — why?');
-// }, []);
+  // ── Display Name ─────────────────────────────────────────────────────
+  // e.g. "Town Mines level 2"
+  const displayName = levelName || 'Unknown Level';
+  // ── Health & Progressbar ─────────────────────────────────────────────────────
+  // Switch been health and progressbar depending on what Player is doing
+  const [currentAction, setCurrentAction] = useState('health');
+  const [choppingProgress, setChoppingProgress] = useState(0);
+  // ── Combat Popups ─────────────────────────────────────────────────────
+  // Set popup to display e.g. damagePopup (holds healing popup as well)
+    const [popups, setPopups] = useState([]);
+  // ── Quests ─────────────────────────────────────────────────────
+  // Tell .player class which direction class to render 
+  const [activeQuests, setActiveQuests] = useState({});
+  // ── Movement ─────────────────────────────────────────────────────
+  // Tell .player class which direction class to render 
+  const [moveDirection, setMoveDirection] = useState(null);
+  // console.log('[PlayMode] current moveDirection →', moveDirection);
+  // ── Battle System ─────────────────────────────────────────────────────
+  // Stand still in same area as monsters to start loading range combat
+const [cooldownSignal, setCooldownSignal] = useState({ active: false, type: null });
 
-// FAKE ADDING ITEMS (BUT IT DOESN'T RENDER ITEMS):
-// useEffect(() => {
-//     const starter = {
-//       ...globalInventory,
-//       'knights-armor': 1,          
-//       'wood': 1,
-//     };
-//     onInventoryChange(starter);
-//   }, []);
+useEffect(() => {
+  console.log('[STATE] cooldownSignal changed:', cooldownSignal);
+}, [cooldownSignal]);
 
-// For level name display:
-const displayName = levelName || 'Unknown Level';
-// States for healthbar:
-const [currentAction, setCurrentAction] = useState('health');
-const [choppingProgress, setChoppingProgress] = useState(0);
-// For combat popups:
-  const [popups, setPopups] = useState([]);
-// For quests:
-const [activeQuests, setActiveQuests] = useState({});
-// for Movement
-const [moveDirection, setMoveDirection] = useState(null);
-console.log('[PlayMode] current moveDirection →', moveDirection);
+// === TIMER: Auto-reset. Helper for CooldownBar to reset. ===
+useEffect(() => {
+  if (!cooldownSignal.active || !cooldownSignal.type) return;
 
-  // clear after animation
-  // useEffect(() => {
-  //   if (moveDirection) {
-  //     console.log('[PlayMode] will clear direction in 120 ms');
-  //     const t = setTimeout(() => {
-  //       console.log('[PlayMode] clearing direction');
-  //       setMoveDirection(null);
-  //     }, 1200);
-  //     return () => clearTimeout(t);
-  //   }
-  // }, [moveDirection]);
+  const duration = cooldownSignal.type === 'ranged' 
+    ? COOLDOWNS.RANGED 
+    : COOLDOWNS.MELEE;
+
+  console.log(`[TIMER] Set timeout ${duration}ms for ${cooldownSignal.type}`);
+
+  const timer = setTimeout(() => {
+    console.log(`[TIMER] Reset ${cooldownSignal.type} cooldown`);
+    setCooldownSignal({ active: false, type: null });
+  }, duration);
+
+  return () => clearTimeout(timer);
+}, [cooldownSignal]);
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -198,7 +203,7 @@ const removePickupPopup = useCallback((id) => {
         restrictedTiles={restrictedTiles}
         rows={rows}
         columns={columns}
-        level={level}
+        level={currentLevel}
         onLevelChange={onLevelChange}
         onStartInteraction={key => interactionRef.current?.handleStartInteraction(key)}
         onCancelInteraction={() => interactionRef.current?.cancelInteraction()}
@@ -238,11 +243,16 @@ const removePickupPopup = useCallback((id) => {
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
         inventory={globalInventory}
+        // Popups
         healPopup={healPopup}
         onHealPopupFinish={onHealPopupFinish}
         setLastDamageTime={setLastDamageTime}
         popups={popups}
         setPopups={setPopups}
+        // Attacks cooldown
+        setCooldownSignal={setCooldownSignal}
+        currentLevel={currentLevel}
+        cooldowns={COOLDOWNS}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -333,6 +343,7 @@ const removePickupPopup = useCallback((id) => {
       value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
       color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
     />
+
   </div>
 )}
 
@@ -365,30 +376,6 @@ const removePickupPopup = useCallback((id) => {
           })
         )}
       </div>
-      
-      {/* Battle popups (CombatSystem) */}
-{/* {popups.map(p => (
-  <DamagePopup
-  tileSize={tileSize}
-    key={p.id}
-    x={p.x}
-    y={p.y}
-    damage={p.dmg}
-    isPlayer={p.isPlayer}
-    isHeal={p.isHeal}
-    onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
-  />
-))} */}
-      {/* ---------- PICKUP POPUPS (float above everything) ---------- */}
-      {/* {pickupPopups.map(p => (
-        <PickupPopup
-          key={p.id}
-          x={p.x}
-          y={p.y}
-          item={p.item}
-          onFinish={() => removePickupPopup(p.id)}
-        />
-      ))} */}
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem
@@ -406,7 +393,7 @@ const removePickupPopup = useCallback((id) => {
         onQueueRespawn={onQueueRespawn}
         originalSpawns={originalSpawns}
         spawnMonster={spawnMonster}
-        level={level}
+        level={currentLevel}
         
         currentAction={currentAction}
   setCurrentAction={setCurrentAction}
@@ -416,6 +403,12 @@ const removePickupPopup = useCallback((id) => {
   activeQuests={activeQuests}
   setActiveQuests={setActiveQuests}
       />
+
+    {/* COOLDOWN / CHARGE BAR */}
+<CooldownBar 
+signal={cooldownSignal} 
+setCooldownSignal={setCooldownSignal}
+/>
 
       <button onClick={onExit}>Edit Mode</button>
     </div>

@@ -101,7 +101,7 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
         columns={columns}
         onObjectsChange={onObjectsChange}
         restrictedTiles={restrictedTiles}
-        level={currentLevel}
+        currentLevel={currentLevel}
         onLevelChange={onLevelChange}
         onQueueRespawn={onQueueRespawn}
         originalSpawns={getOriginalSpawns()}

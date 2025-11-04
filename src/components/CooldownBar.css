@@ -1,0 +1,26 @@
+.cooldown-container {
+  /* position: fixed;
+  top: 20px;
+  left: 20px; */
+  z-index: 9999;
+  pointer-events: none;
+  margin: auto;
+}
+
+.cooldown-bar {
+  width: 50vw;
+  height: 12px;
+  background: #1a1a1a;
+  border: 2px solid #00749a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 116, 154, 0.7);
+}
+
+.cooldown-fill {
+  height: 100%;
+  background: #ff9800;
+  border-radius: 6px;
+  width: 0;
+  /* No transition — RAF handles it */
+}
