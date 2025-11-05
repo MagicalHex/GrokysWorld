@@ -604,14 +604,12 @@ font-size: 60px;
 
 /* LIGHT STONE */
 .object.lightstoneobject {
-  background-color: #adb5bd;
-  background-image: 
-    linear-gradient(to bottom, #dee2e6 0%, #adb5bd 20%, #ced4da 50%, #6c757d 60%, #adb5bd 100%),
-    radial-gradient(circle at 25% 25%, #6c757d 1px, #495057 1px),
-    radial-gradient(circle at 75% 75%, #495057 1px, transparent 1px);
-  border-radius: 8px;
-      width: 40px;
-    height: 40px;
+    background-color: #adb5bd;
+    background-image: linear-gradient(to bottom right, #dee2e6, #adb5bd 20%, #ced4da 50%, #6c757d 60%, #adb5bd), radial-gradient(circle at 25% 25%, #6c757d 1px, #495057 1px), radial-gradient(circle at 75% 75%, #495057 1px, transparent 1px);
+    box-shadow: 0px 0px 4px white;
+    border-radius: 6px 2px 6px 2px;
+    width: 35px;
+    height: 35px;
 }
 .object.lightstonechoppedobject {
     background-image: linear-gradient(to bottom right,
