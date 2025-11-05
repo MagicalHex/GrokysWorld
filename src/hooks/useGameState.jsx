@@ -27,7 +27,7 @@ const RESTRICTED_TERRAIN = new Set([
 const MONSTER_BASE_DATA = {
   skeleton:     { hp: 200,  name: "SKELETON" },
   spider:       { hp: 200,  name: "SPIDER" },
-  littlespider: { hp: 300,  name: "LITTLE SPIDER" },
+  littlespider: { hp: 300,  name: "ARACHNID" },
   cavespider:   { hp: 500,  name: "CAVE SPIDER" },
   demonspider:  { hp: 600,  name: "DEMON SPIDER" },
   deadshriek:   { hp: 1000, name: "DEAD SHRIEK" },
