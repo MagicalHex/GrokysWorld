@@ -187,10 +187,11 @@ const onHealPopupFinish = useCallback(() => {
     pickupItem = targetObj;               // <-- tell UI to animate
     // **Do NOT delete the item yet** – UI will delete after animation
   } else {
+    // OBJECTS MUST BE ADDED HERE, OTHERWISE THEY WILL VANISH IN PRODUCTION
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','hole-to-5', 'hole-to-6', 'hole-to-7', 'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5', 'rope-to-6',
-      'rope-to-7', 'rope-to-8',
+      'bridge','ladder','hole-to-4', 'hole-to-5', 'hole-to-6', 'hole-to-7', 'hole-to-8', 'hole-to-9',
+      'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5', 'rope-to-6', 'rope-to-7', 'rope-to-8',
       'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);
