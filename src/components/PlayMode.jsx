@@ -336,17 +336,17 @@ const removePickupPopup = useCallback((id) => {
       />
     )}
 
-    {/* NEW: NPC Name Label */}
-{NPC_NAMES[obj] && (
-  <div className="npc-name-label">
-    {obj === 'farmer001' && 'Farmer '}
-    {NPC_NAMES[obj]}
-    {obj === 'mechanic001' && ' the Blacksmith'}
-    {obj === 'oldandwise' && ' the Wise'}
-  </div>
-)}
-  </div>
-)}
+    {/* NPC Name Label (const NPC_NAMES) */}
+    {NPC_NAMES[obj] && (
+      <div className="npc-name-label">
+        {obj === 'farmer001' && 'Farmer '}
+        {NPC_NAMES[obj]}
+        {obj === 'mechanic001' && ' the Blacksmith'}
+        {obj === 'oldandwise' && ' the Wise'}
+      </div>
+    )}
+      </div>
+    )}
           
 {playerPos?.x === x && playerPos?.y === y && (
   <div

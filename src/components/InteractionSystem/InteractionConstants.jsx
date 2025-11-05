@@ -30,8 +30,7 @@ export const NPC_DIALOGUE = {
     choices: [
       { key: 'up',   text: "Show me your weapons!", action: 'openShop', type: 'weapons' },
       { key: 'left', text: "Tell me about the village.", action: 'say', message: "It's called Sunny Town." },
-      { key: 'right',text: "Any armors laying around?",               action: 'openShop', type: 'armors' },
-      { key: 'down',text: "Goodbye.",               action: 'close' }
+      { key: 'right',text: "Any armors laying around?",               action: 'openShop', type: 'armors' }
     ]
   }
 };
