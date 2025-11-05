@@ -80,6 +80,16 @@
 animation: animatePlayer 0.5s ease-out forwards; */
 opacity: 0;
 /* animation: animatePlayer 1s ease-out forwards; */
+  font-size: 35px; 
+  animation: npc-bob 2.5s ease-in-out infinite;
+  background: url('/ownemojis/player-image.webp') center/contain no-repeat;
+  width: 180%;
+  height: 180%;
+  filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
+    position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 /* STANDING – centered + visible (NEW!) */
 .player.standing {
@@ -291,9 +301,16 @@ animation: slideInFromRight 0.5s ease-out forwards;
 .object.mechanic001 { 
   font-size: 35px; 
   animation: npc-bob 2.5s ease-in-out infinite;
-  text-shadow: 1px 1px 4px green;
+  background: url('/ownemojis/merchant1.webp') center/contain no-repeat;
+  width: 180%;
+  height: 180%;
+  filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
+      position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-.object.merchantobject { 
+.object.oldandwise { 
   font-size: 35px; 
   animation: merchant-wave 4s ease-in-out infinite;
   text-shadow: 1px 1px 4px black;
@@ -808,7 +825,33 @@ font-size: 60px;
         width: 40px;
     height: 40px;
 }
-.object.campfirestoneobject {
+.object.campfirestoneobjectlarge {
+  width: 25px;
+  height: 25px;
+  border-radius: 25px 10px 10px 15px;
+
+  /* Lighter, more natural stone gradient */
+  background-image: 
+    linear-gradient(to bottom right, #8c8c8c 0%, #5c5c5c 20%, #6b6b6b 50%, #777777 60%, #a0a0a0 100%),
+    radial-gradient(circle at 25% 25%, #b0b0b0 1px, #c0c0c0 1px),
+    radial-gradient(circle at 75% 75%, #999 1px, #ccc 1px);
+
+  background-size: cover;
+  position: relative;
+
+  /* Softer 3D tilt */
+  transform: translateX(-20px) translateY(-20px) perspective(100px) rotateX(12deg);
+
+  transition: all 0.3s ease;
+
+  /* Lighter, more subtle shadows */
+  box-shadow: 
+    8px 6px 10px rgba(0, 0, 0, 0.1),
+    3px 5px 5px rgba(0, 0, 0, 0.1),
+    2px 1px 2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.object.campfirestoneobjectsmall {
   width: 25px;
   height: 25px;
   border-radius: 25px 10px 10px 15px;
@@ -1134,6 +1177,30 @@ font-size: 60px;
   width: 100%;
   height: 100%;
 }
+.object.magicoak {
+  background: url('/ownemojis/magicoak.webp') center/contain no-repeat;
+  width: 400%;
+  height: 400%;
+  filter: drop-shadow(4px 4px 4px black);
+}
+.object.oaktree {
+  background: url('/ownemojis/oaktree.webp') center/contain no-repeat;
+  width: 400%;
+  height: 400%;
+  filter: drop-shadow(4px 4px 4px black);
+}
+.object.blacksmith {
+  background: url('/ownemojis/merchant.webp') center/contain no-repeat;
+  width: 150%;
+  height: 150%;
+  filter: drop-shadow(0px 0px 4px white);
+}
+.object.blacksmith1 {
+  background: url('/ownemojis/merchant1.webp') center/contain no-repeat;
+  width: 180%;
+  height: 180%;
+  filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
+}
 
 .object.campfireshaman {
   position: relative;
@@ -1161,7 +1228,7 @@ font-size: 60px;
   animation: spark 1.8s infinite;
 }
 .object.campfireshaman::before {
-  content: '🔮!';
+  content: '!';
   position: absolute;
   top: -38px;           /* Above the crystal ball */
   left: 50%;

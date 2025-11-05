@@ -1,0 +1,86 @@
+/* Talking/TalkingUI.css */
+.chat-bubble {
+  font-family: 'Courier New', monospace;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 400px;
+  border: 2px solid #444;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.chat-bubble__icon {
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.chat-bubble__message {
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.chat-bubble__choices {
+  margin: 16px 0;
+}
+
+.chat-bubble__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.chat-bubble__choice:last-child {
+  margin-bottom: 0;
+}
+
+.chat-bubble__choice-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-bubble__description {
+  margin-left: 28px;
+  font-size: 0.9em;
+  color: gold;
+  font-weight: 600;
+  text-shadow: 0 0 2px #000000, 0 0 4px #cc9900;
+  white-space: nowrap;
+  margin-top: 2px;
+  font-size: 16px;
+}
+
+.chat-bubble__cost {
+  margin-left: 28px;
+  font-size: 0.9em;
+  color: #888;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.chat-bubble__hint {
+  margin-top: 16px;
+  font-size: 0.8em;
+  color: #aaa;
+  text-align: center;
+}
+
+/* Item Image */
+.chat-bubble__item-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: -webkit-optimize-contrast;
+  flex-shrink: 0;
+}
+
+.chat-bubble__item-fallback {
+  font-size: 36px;
+  min-width: 48px;
+  text-align: center;
+  display: inline-block;
+}

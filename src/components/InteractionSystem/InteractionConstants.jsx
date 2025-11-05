@@ -16,7 +16,7 @@ export const CHOP_DROPS = {
 
 export const NPC_DIALOGUE = {
   farmer001: {
-    icon: 'Farmer',
+    icon: '⚒️',
     greeting: "Howdy, partner! Need any crops?",
     choices: [
       { key: 'up',   text: "Show me your wares!", action: 'openShop', type: 'equipment' },
@@ -25,25 +25,72 @@ export const NPC_DIALOGUE = {
     ]
   },
   mechanic001: {
-    icon: 'Mechanic',
+    icon: '🛡️',
     greeting: "Hello, partner! Need anything?",
     choices: [
-      { key: 'up',   text: "Show me your wares!", action: 'openShop', type: 'weapons' },
-      { key: 'left', text: "Tell me about the village.", action: 'say', message: "It's peaceful here." },
-      { key: 'right',text: "Goodbye.",               action: 'close' }
+      { key: 'up',   text: "Show me your weapons!", action: 'openShop', type: 'weapons' },
+      { key: 'left', text: "Tell me about the village.", action: 'say', message: "It's called Sunny Town." },
+      { key: 'right',text: "Any armors laying around?",               action: 'openShop', type: 'armors' },
+      { key: 'down',text: "Goodbye.",               action: 'close' }
     ]
   }
 };
 
 export const SHOP_DATA = {
   equipment: [
-    { image: 'ownemojis/saw.webp',        name: 'Saw',          fallback: 'Saw',   cost: { woodobject: 1, rockobject: 1 }, addsToInventory: 'saw' },
-    { image: 'ownemojis/axe.webp',        name: 'Axe',          fallback: 'Axe',   cost: { woodobject: 3, rockobject: 3 }, addsToInventory: 'axe' }
+    { 
+      image: 'ownemojis/saw.webp',        
+      name: 'Saw',          
+      fallback: 'Saw',   
+      cost: { woodobject: 1, rockobject: 1 }, 
+      addsToInventory: 'saw',
+      description: '20% faster wood cutting'
+    },
+    { 
+      image: 'ownemojis/axe.webp',        
+      name: 'Axe',          
+      fallback: 'Axe',   
+      cost: { woodobject: 3, rockobject: 3 }, 
+      addsToInventory: 'axe',
+      description: '50% faster wood cutting'
+    }
   ],
   weapons: [
-    { image: 'ownemojis/dagger.webp',     name: 'Dagger',       fallback: 'Dagger',cost: { woodobject: 2, rockobject: 1 }, addsToInventory: 'dagger' },
-    { image: 'ownemojis/short-sword.webp',name: 'Short Sword',  fallback: 'Short Sword',cost: { woodobject: 4, rockobject: 2 }, addsToInventory: 'shortsword' }
-  ]
+    { 
+      image: 'ownemojis/dagger.webp',     
+      name: 'Dagger',       
+      fallback: 'Dagger',
+      cost: { woodobject: 2, rockobject: 1 }, 
+      addsToInventory: 'dagger',
+      description: '5 attack damage'
+    },
+    { 
+      image: 'ownemojis/short-sword.webp',
+      name: 'Short Sword',  
+      fallback: 'Short Sword',
+      cost: { woodobject: 4, rockobject: 2 }, 
+      addsToInventory: 'shortsword',
+      description: '10 attack damage'
+    }
+  ],
+    armors: [
+    { 
+      image: 'ownemojis/dark-armor.webp',
+      name: 'Dark Armor',  
+      fallback: 'Dark Armor',
+      cost: { woodobject: 10, rockobject: 10, gold: 5 }, 
+      addsToInventory: 'darkarmor',
+      description: '5 armor'
+    },
+    { 
+      image: 'ownemojis/knights-armor.webp',
+      name: 'Knights Armor',  
+      fallback: 'Knights Armor',
+      cost: { woodobject: 12, rockobject: 12, gold: 20 }, 
+      addsToInventory: 'knightsarmor',
+      description: '10 armor'
+    }
+  ],
 };
 
 // InteractionConstants.js

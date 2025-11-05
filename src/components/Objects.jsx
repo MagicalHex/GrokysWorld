@@ -38,9 +38,9 @@ export const OBJECTS = {
   agent: '🟣',
   npc: '🔵',
   prince: '🤴',
-  merchantobject: '🧙‍♂️',
+  oldandwise: '🧙‍♂️',
   farmer001: '🧑‍🌾',
-  mechanic001: '👨‍🔧',
+  mechanic001: '',
   // JEWELRY
   diamond: '💎',
   // OBSTACLES
@@ -109,6 +109,8 @@ export const OBJECTS = {
   stoneobjectstraighthalfside: '',
   stonepillarobject: '',
   campfirestoneobject: '',
+  campfirestoneobjectlarge: '',
+  campfirestoneobjectsmall: '',
   // TIMBER
   timberwoodupobject: '',
   timberwoodsideobject: '',
@@ -121,7 +123,7 @@ export const OBJECTS = {
   campfirebenchobject_right: '',
   campfirebenchobject_top: '',
   campfirebenchobject_left: '',
-  campfireshaman: '',
+  campfireshaman: '🔮',
   
   // TIMBER CHOPPED
   timberwoodchoppedobject: '',
@@ -140,6 +142,13 @@ export const OBJECTS = {
   'half-elf-merchant': '',
   'human-merchant': '',
   'player-image': '',
-    shaman: '',
-      shaman1: '',
+  shaman: '',
+  shaman1: '',
+
+  // IMAGE OBJECTS
+  'magicoak': '',
+  'oaktree': '',
+  // IMAGE NPC
+  'blacksmith': '',
+    'blacksmith1': ''
 };

@@ -23,6 +23,9 @@ export const TERRAINS = {
   msclside: 'darkgreen',
   mscsp: 'darkgreen',
   
+  // Mud ground
+  mgtgt: 'brown',
+  burntground: 'brown',
   
   // WALLS
   wall: '#343a40',

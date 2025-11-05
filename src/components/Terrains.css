@@ -33,20 +33,12 @@ background: linear-gradient(to right, #026802 0%, #006400 50%, #006800 100%);
 }
 
 .tile.soilbrown {
-background: linear-gradient(to bottom,
- green 0%, 
- #542606 10%,
-  #a94700 20%, 
-  #542606 30%, 
-  #a94700 40%, 
-  #542606 50%,
-   #a94700 60%, 
-   #542606 70%,
-    #a94700 80%, 
-    #542606 90%, 
-    #a94700 100%);
+    background: linear-gradient(to bottom,
+     #a94700  0%, #542606 10%,
+      #a94700 20%, #542606 50%,
+       #a94700 60%, #542606 70%,
+        #a94700 100%);
     box-shadow: 0px 0px 0px black;
-    /* border: 1px solid brown; */
 }
 
 /* 🏜️ SAND - Warm desert glow */
@@ -82,10 +74,40 @@ background: linear-gradient(to bottom,
   background: linear-gradient(135deg, #28a745 0%, #198754 100%);
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
-.tile.mudground {
-background: linear-gradient(to bottom right, #5d4037 0%, #5d4037 100%);
-}
 
+.tile.burntground {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Perfect circle */
+
+  background: radial-gradient(
+    circle at center,
+    #1a120b 0%,     /* Deep black char */
+    #2b1f16 20%,    /* Dark ash */
+    #3d2a1c 35%,    /* Charred brown */
+    #845838 50%,    /* Your original dark brown */
+    #A0522D 75%,    /* Sienna mid-burn */
+    #8B5A2B 100%    /* Tan outer edge */
+  );
+
+  /* Optional: subtle texture + depression */
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  filter: contrast(1.2) brightness(0.85);
+
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+/* .tile.mudground {
+background: linear-gradient(to bottom right, #5d4037 0%, #5d4037 100%);
+} */
+.tile.mudground {
+      background: linear-gradient(to right, #845838 0%,
+     #A0522D 50%,
+      #8B5A2B 100%);
+}
+/* Mud ground to grass */
 .tile.mgtgtr {
   background: linear-gradient(to top right, #5d4037 0%, #5d4037 30%, #009400aa 60%, #009f01 100%);
   border-top:    1px solid #009f01;   /* GREEN */

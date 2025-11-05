@@ -1,13 +1,14 @@
 // Talking/TalkingUI.jsx
 import React, { useState } from 'react';
 import { OBJECTS } from '../Objects';
+import './TalkingUI.css'; // Import CSS
 
 export const TalkingUI = ({ message, choices, icon = 'Hammer' }) => {
   return (
     <div className="chat-bubble">
       <div style={{ fontSize: '40px' }}>{icon}</div>
 
-      {/* Only show greeting / say messages */}
+      {/* Greeting / Message */}
       {message && !choices?.[0]?.item && (
         <div className="chat-bubble__message">
           {message.split('\n').map((line, i) => {
@@ -27,13 +28,13 @@ export const TalkingUI = ({ message, choices, icon = 'Hammer' }) => {
         </div>
       )}
 
+      {/* Choices */}
       {choices && (
         <div className="chat-bubble__choices">
           {choices.slice(0, 3).map((c, i) => {
             const icons = ['Up', 'Left', 'Right'];
             const item = c.item;
 
-            // Build cost string
             const costText = item
               ? Object.entries(item.cost)
                   .map(([res, amt]) => `${amt} ${res}`)
@@ -41,17 +42,8 @@ export const TalkingUI = ({ message, choices, icon = 'Hammer' }) => {
               : '';
 
             return (
-              <div
-                key={i}
-                className="chat-bubble__choice"
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px',
-                  lineHeight: '1.4',
-                }}
-              >
-                {/* Image / Emoji */}
+              <div key={i} className="chat-bubble__choice">
+                {/* Item Image */}
                 {item && (
                   <ItemImage
                     src={`/${item.image}`}
@@ -60,25 +52,23 @@ export const TalkingUI = ({ message, choices, icon = 'Hammer' }) => {
                   />
                 )}
 
-                {/* Arrow + Text Block */}
+                {/* Text Block */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div className="chat-bubble__choice-text">
                     <span className="chat-bubble__icon">[{icons[i]}]</span>
-                    <span>
-                      {item ? `Buy ${item.name}` : c.text}
-                    </span>
+                    <span>{item ? `Buy ${item.name}` : c.text}</span>
                   </div>
 
-                  {/* Cost on second line, indented */}
+                  {/* Description */}
+                  {item && item.description && (
+                    <div className="chat-bubble__description">
+                      {item.description}
+                    </div>
+                  )}
+
+                  {/* Cost */}
                   {item && costText && (
-                    <div
-                      style={{
-                        marginLeft: '28px', // align with text above
-                        fontSize: '0.9em',
-                        color: '#888',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
+                    <div className="chat-bubble__cost">
                       {costText}
                     </div>
                   )}
@@ -105,12 +95,7 @@ const ItemImage = ({ src, alt, item }) => {
   if (failed) {
     return (
       <span
-        style={{
-          fontSize: '36px',
-          minWidth: '48px',
-          textAlign: 'center',
-          display: 'inline-block',
-        }}
+        className="chat-bubble__item-fallback"
         title={item.name}
       >
         {fallbackEmoji}
@@ -122,13 +107,7 @@ const ItemImage = ({ src, alt, item }) => {
     <img
       src={src}
       alt={alt}
-      style={{
-        width: '48px',
-        height: '48px',
-        objectFit: 'contain',
-        borderRadius: '4px',
-        imageRendering: '-webkit-optimize-contrast',
-      }}
+      className="chat-bubble__item-image"
       onError={() => setFailed(true)}
     />
   );

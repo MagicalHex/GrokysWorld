@@ -17,6 +17,13 @@ import { DamagePopup } from './DamagePopup';
 
 // For cool downs (CombatSystem and CooldownBar)
 const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
+// Add this near your other constants (e.g. in Objects.js or a new file)
+const NPC_NAMES = {
+  farmer001: 'Sam',
+  mechanic001: 'Gomli',
+  oldandwise: 'Mandal',
+  // Add more later...
+};
 
 const PlayMode = ({
   grid,
@@ -306,25 +313,40 @@ const removePickupPopup = useCallback((id) => {
         className={`tile ${terrain}`}
         // style={{ width: tileSize, height: tileSize, position: 'relative' }} 03-11-2025 Add this again if problems
       >
-        {obj && (
-          <div
-            className={`
-              object ${monsterTypes[obj] || obj}
-              ${droppedItems.has(key) ? 'dropped-item' : ''}
-              ${isShaman && marker ? 'has-quest-marker' : ''}
-            `.trim()}
-            data-marker={marker}  // ← CSS uses this
-          >
-            {OBJECTS[monsterTypes[obj] || obj]}
-              {(monsterTypes[obj] === 'skeleton' || monsterTypes[obj] === 'spider' || monsterTypes[obj] === 'littlespider' || monsterTypes[obj] === 'cavespider') && (
-                <HealthBar
-                  key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
-                  health={globalMonsterHealths[obj] ?? 100}
-                  color="#FF9800"
-                />
-              )}
-            </div>
-          )}
+{obj && (
+  <div
+    className={`
+      object ${monsterTypes[obj] || obj}
+      ${droppedItems.has(key) ? 'dropped-item' : ''}
+      ${isShaman && marker ? 'has-quest-marker' : ''}
+    `.trim()}
+    data-marker={marker}
+  >
+    {OBJECTS[monsterTypes[obj] || obj]}
+
+    {/* Health Bar for monsters */}
+    {(monsterTypes[obj] === 'skeleton' || 
+      monsterTypes[obj] === 'spider' || 
+      monsterTypes[obj] === 'littlespider' || 
+      monsterTypes[obj] === 'cavespider') && (
+      <HealthBar
+        key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
+        health={globalMonsterHealths[obj] ?? 100}
+        color="#FF9800"
+      />
+    )}
+
+    {/* NEW: NPC Name Label */}
+{NPC_NAMES[obj] && (
+  <div className="npc-name-label">
+    {obj === 'farmer001' && 'Farmer '}
+    {NPC_NAMES[obj]}
+    {obj === 'mechanic001' && ' the Blacksmith'}
+    {obj === 'oldandwise' && ' the Wise'}
+  </div>
+)}
+  </div>
+)}
           
 {playerPos?.x === x && playerPos?.y === y && (
   <div
@@ -337,7 +359,7 @@ const removePickupPopup = useCallback((id) => {
     onAnimationStart={() => console.log('[ANIM] Starting:', moveDirection)}
     onAnimationEnd={() => console.log('[ANIM] Ended:', moveDirection)}
   >
-    🧙
+    
     <ActionBar
       type={currentAction}
       value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
