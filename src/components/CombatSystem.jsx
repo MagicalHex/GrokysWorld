@@ -21,6 +21,8 @@ const MONSTER_DAMAGE_RANGES = {
   spider:     { min:  0, max: 15 },
   skeleton:   { min:  0, max: 20 },
   cavespider: { min:  0, max: 30 },
+  demonspider: { min:  0, max: 70 },
+  deadshriek: { min:  0, max: 70 },
 };
 
 const getEquippedWeapon = (inventory) => {
@@ -234,7 +236,7 @@ let attackCooldownType = null;
 
       // Skip non-monsters, dead, or wrong level
       const type = monsterTypes[objId];
-      if (!type || !['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) continue;
+      if (!type || !['skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) continue;
       if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
       // if (mLevel !== currentLevel) continue; This breaks it
 
@@ -267,7 +269,7 @@ now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
     addPopup(mPos.x, mPos.y, dmg);
 
     if (newHealth <= 0) {
-      const spiderTypes = ['spider', 'littlespider', 'cavespider'];
+      const spiderTypes = ['spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'];
       newObjects[key] = spiderTypes.includes(type) && Math.random() < 0.33 ? 'spiderweb' : 'gold';
       objectsChanged = true;
     }

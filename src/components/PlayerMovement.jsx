@@ -105,6 +105,7 @@ if (direction) {
             'rope-2':   { x: 7, y: 13 },
             'rope-3':   { x: 22, y: 15 },
             'rope-5':   { x: 21, y: 4 },
+            'rope-7':   { x: 7, y: 5 },
           };
 
           const key = `${type}-${level}`;

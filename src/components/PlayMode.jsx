@@ -44,7 +44,7 @@ const PlayMode = ({
   spawnMonster,
   globalPlayerHealth,
   onPlayerHealthChange,
-  monsterHealths,
+  monsterData,
   globalMonsterHealths,
   onMonsterHealthChange,
   globalInventory,
@@ -65,8 +65,8 @@ const PlayMode = ({
      DEBUG AREA
      -------------------------------------------------------------- */
 useEffect(() => {
-  console.log('[PlayMode] monsterHealths updated:', currentLevel);
-}, [monsterHealths]);
+  console.log('[PlayMode] current level updated:', currentLevel);
+}, [currentLevel]);
 useEffect(() => {
     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
   }, [globalMonsterHealths]);
@@ -231,7 +231,7 @@ const removePickupPopup = useCallback((id) => {
         restrictedTiles={restrictedTiles}
         rows={rows}
         columns={columns}
-        monsterHealths={monsterHealths}
+        // monsterHealths={monsterHealths}
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
       />
@@ -240,7 +240,7 @@ const removePickupPopup = useCallback((id) => {
         playerHealth={globalPlayerHealth}
         onPlayerHealthChange={onPlayerHealthChange}
         objects={objects}
-        monsterHealths={monsterHealths}
+        // monsterHealths={monsterHealths}
         onMonsterHealthChange={onMonsterHealthChange}
         onObjectsChange={onObjectsChange}
         onQueueRespawn={onQueueRespawn}
@@ -325,16 +325,20 @@ const removePickupPopup = useCallback((id) => {
     {OBJECTS[monsterTypes[obj] || obj]}
 
     {/* Health Bar for monsters */}
-    {(monsterTypes[obj] === 'skeleton' || 
-      monsterTypes[obj] === 'spider' || 
-      monsterTypes[obj] === 'littlespider' || 
-      monsterTypes[obj] === 'cavespider') && (
-      <HealthBar
-        key={`${key}-${globalMonsterHealths[obj] ?? 100}`}
-        health={globalMonsterHealths[obj] ?? 100}
-        color="#FF9800"
-      />
-    )}
+{/* Health Bar for monsters */}
+{['skeleton', 'spider', 'littlespider', 'demonspider', 'deadshriek', 'cavespider'].includes(monsterTypes[obj]) && (
+  <div className="monster-health-container">
+    <div className="monster-name">
+      {monsterData[monsterTypes[obj]]?.name}
+    </div>
+    <HealthBar
+      key={`${key}-${globalMonsterHealths[obj]}`}
+      health={globalMonsterHealths[obj] ?? 0}
+      max={monsterData[monsterTypes[obj]]?.hp}
+      color="#FF9800"
+    />
+  </div>
+)}
 
     {/* NPC Name Label (const NPC_NAMES) */}
     {NPC_NAMES[obj] && (

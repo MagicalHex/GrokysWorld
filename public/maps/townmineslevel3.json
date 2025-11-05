@@ -1,5 +1,5 @@
 {
-  "name": "Town Mines Level 2",
+  "name": "Town Mines Level 3",
   "grid": [
     ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
     ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
@@ -19,7 +19,7 @@
     ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"]
   ],
   "objects": {
-    "21,2": "rope-to-5",
+    "7,4": "rope-to-7",
     "3,2": "lightstoneobject",
     "19,3": "lightstoneobject",
     "7,13": "lightstoneobject",
@@ -31,10 +31,8 @@
     "4,12": "spiderwebnopickup",
     "22,11": "spiderwebnopickup",
 
-    "9,4": "littlespider",
-    "15,11": "littlespider",
-    "22,7": "littlespider",
-    "4,9": "littlespider",
+    "9,4": "cavespider",
+    "15,11": "cavespider",
 
     "2,7": "lightstoneobject",
     "5,1": "lightstoneobject",
@@ -66,6 +64,6 @@
     "18,5": "stoneobjectcrookedlarge",
     "21,11": "stoneobjectcrookedlarge",
 
-    "7,4": "hole-to-8"
+    "21,13": "hole-to-9"
   }
 }

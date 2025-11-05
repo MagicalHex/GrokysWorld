@@ -1,0 +1,41 @@
+{
+  "name": "Dead Shriek's Lair",
+  "grid": [
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"],
+    ["darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone","darkstone"]
+  ],
+  "objects": {
+    "21,13": "rope-to-7",
+
+    "5,5": "deadshriek",
+    "3,13": "stoneobjectjaggedsmall",
+    "20,3": "stoneobjectjaggedsmall",
+    "7,1": "stoneobjectjaggedsmall",
+    "16,14": "stoneobjectjaggedsmall",
+    "11,5": "stoneobjectjaggedsmall",
+    "2,10": "stoneobjectjagged",
+    "19,7": "stoneobjectjagged",
+    "6,12": "stoneobjectjagged",
+    "13,2": "stoneobjectjagged",
+    "22,11": "stoneobjectjagged",
+    "4,8": "fireobject",
+    "17,4": "fireobject",
+    "10,13": "fireobject",
+    "1,6": "fireobject",
+    "15,10": "fireobject"
+  }
+}

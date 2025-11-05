@@ -86,7 +86,7 @@ const MonsterMovement = ({
       const targetKey = `${dir.x},${dir.y}`;
       const targetObj = objects[targetKey];
 
-      // THIS CODE DOESN'T SEEM TO WORK
+      // WALKABLES NEEDS TO BE ADDED FURTHER DOWN IN (ELSE IF STATEMENT) AS WELL
       const isWalkable =
         !targetObj ||
         targetObj === 'spiderweb'
@@ -132,7 +132,7 @@ const MonsterMovement = ({
     const monsters = [];
     Object.entries(objects).forEach(([key, monsterId]) => {
       const type = monsterTypes[monsterId];
-      if (['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) {
+      if (['skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
         const [x, y] = key.split(',').map(Number);
         const health = globalMonsterHealths[monsterId] ?? 100;
         if (health > 0) {
@@ -157,7 +157,9 @@ const MonsterMovement = ({
 
       // === ALLOW SWAPPING WITH OTHER MONSTERS ===
       const occupant = newObjects[toKey];
-      if (occupant && monsterTypes[occupant] && ['skeleton', 'spider', 'littlespider', 'cavespider'].includes(monsterTypes[occupant])) {
+      if (occupant && monsterTypes[occupant] && [
+        'skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'
+      ].includes(monsterTypes[occupant])) {
         // Swap positions!
         newObjects[key] = occupant;
         newObjects[toKey] = monsterId;
@@ -169,7 +171,7 @@ const MonsterMovement = ({
         toY >= 0 && toY < rows &&
         !restrictedTiles.has(toKey) &&
         !(toX === playerPos.x && toY === playerPos.y) &&
-        (!newObjects[toKey] || newObjects[toKey] === 'spiderweb' || newObjects[toKey].startsWith('portal-to-'))
+        (!newObjects[toKey] || newObjects[toKey] === 'spiderweb' || newObjects[toKey] === 'gold' || newObjects[toKey].startsWith('portal-to-'))
       ) {
         delete newObjects[key];
         newObjects[toKey] = monsterId;

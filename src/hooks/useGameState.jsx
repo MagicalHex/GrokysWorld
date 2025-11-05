@@ -11,12 +11,27 @@ const PORTAL_ENTRY_POINTS = {
   4: { x: 4, y: 4 }, // StoneCave
   5: { x: 1, y: 2 }, // Town Mines level 1
   6: { x: 1, y: 2 },  // Slimecave 1
-  7: { x: 21, y: 3 }, }; // Town Mines level 2
+  7: { x: 21, y: 3 }, // Town Mines level 2
+  8: { x: 6, y: 4 }, // Town Mines level 3
+  9: { x: 21, y: 14 }, }; // Deadshriek's lair
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
   'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl'
 ]);
+
+// ──────────────────────────────────────────────────────
+//  Monster base health – change only here
+// ──────────────────────────────────────────────────────
+// useGameState.js
+const MONSTER_BASE_DATA = {
+  skeleton:     { hp: 200,  name: "SKELETON" },
+  spider:       { hp: 200,  name: "SPIDER" },
+  littlespider: { hp: 300,  name: "LITTLE SPIDER" },
+  cavespider:   { hp: 500,  name: "CAVE SPIDER" },
+  demonspider:  { hp: 600,  name: "DEMON SPIDER" },
+  deadshriek:   { hp: 1000, name: "DEAD SHRIEK" },
+};
 
 export const useGameState = () => {
   /* --------------------------------------------------------------
@@ -174,7 +189,8 @@ const onHealPopupFinish = useCallback(() => {
   } else {
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','hole-to-5', 'hole-to-6', 'hole-to-7', 'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5',
+      'bridge','ladder','hole-to-5', 'hole-to-6', 'hole-to-7', 'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5', 'rope-to-6',
+      'rope-to-7', 'rope-to-8',
       'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
     ]);
     const isPersist = targetObj && PERSIST.has(targetObj);
@@ -254,9 +270,10 @@ const RESPAWN_DELAYS = {
   treeobject: 1500,
   lightstoneobject: 2000,
   spider: 2000,
-    littlespider: 2000,
+  littlespider: 2000,
   skeleton: 30000,
   cavespider: 50000,      
+  deadshriek: 50000,    
   default: 10000
 };
 
@@ -427,7 +444,11 @@ if (!placed) {
         const [x, y] = key.split(',').map(Number);
         const newMonsterId = `${type}_${levelId}_${x}_${y}`;
         console.log('→ Spawning new monster:', newMonsterId, 'at', key);
-        setGlobalMonsterHealths(p => ({ ...p, [newMonsterId]: 100 }));
+       // ── use base health from monsterData  ──
+setGlobalMonsterHealths(p => ({
+  ...p,
+  [newMonsterId]: MONSTER_BASE_DATA[type]?.hp ?? 100
+}));
         setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
 
         return {
@@ -490,7 +511,7 @@ useEffect(() => {
       if (typeof objId !== 'string' || !objId.includes('_')) return;
       
       const type = objId.split('_')[0];
-      if (!['spider', 'littlespider', 'skeleton', 'cavespider'].includes(type)) return;
+      if (!['spider', 'littlespider', 'skeleton', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
 
       // If tile is empty or wrong → respawn
       if (!level.objects[key] || level.objects[key] !== objId) {
@@ -533,7 +554,7 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
 
   // === MONSTER IS DEAD ===
   const type = monsterTypes[monsterId];
-  if (!['spider', 'littlespider', 'skeleton', 'cavespider'].includes(type)) return;
+  if (!['spider', 'littlespider', 'skeleton', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
 
   // 1. DROP LOOT (in objects)
   const parts = monsterId.split('_');
@@ -601,13 +622,17 @@ useEffect(() => {
       /* ---------- objects → monster IDs ---------- */
       const objects = { ...data.objects || {} };
       Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (['skeleton', 'spider', 'littlespider', 'cavespider'].includes(type)) {
+        if (['skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
           const [x, y] = key.split(',').map(Number);
           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
           objects[key] = monsterId;
 
           setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
-          setGlobalMonsterHealths(prev => ({ ...prev, [monsterId]: 100 }));
+          // ── use base health from monsterData ──
+          setGlobalMonsterHealths(prev => ({
+            ...prev,
+            [monsterId]: MONSTER_BASE_DATA[type]?.hp ?? 100
+          }));
         }
       });
 
@@ -663,6 +688,8 @@ useEffect(() => {
     onHealPopupFinish,
     // lastDamageTime, NOTE THAT THIS IS COMMENTED OUT. It works at this level but blocks HealthRegen component for some reason
     setLastDamageTime,
+
+    monsterData: MONSTER_BASE_DATA, // For setting different healths on different monsters
 
     setCurrentLevel,
     onLevelChange,

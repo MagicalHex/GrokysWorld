@@ -10,6 +10,8 @@ const FALLBACKS = {
   5: () => createFallbackGrid(16, 24, 'darkstone'), // Town Mines Level 1
   6: () => createFallbackGrid(16, 24, 'darkstone'), // Slime Cave 1
   7: () => createFallbackGrid(16, 24, 'darkstone'), // Town Mines Level 2
+  8: () => createFallbackGrid(16, 24, 'darkstone'), // Town Mines Level 3
+  9: () => createFallbackGrid(16, 24, 'darkstone'), // Demon spider lair
 };
 
 export const loadMaps = async () => {
@@ -22,6 +24,8 @@ export const loadMaps = async () => {
       fetch('/maps/dungeon.json').then(r => r.json()),
       fetch('/maps/slimecave1.json').then(r => r.json()),
       fetch('/maps/townmineslevel2.json').then(r => r.json()),
+      fetch('/maps/townmineslevel3.json').then(r => r.json()),
+      fetch('/maps/demonspiderlair.json').then(r => r.json()),
     ]);
 
     return maps.reduce((acc, map, i) => {

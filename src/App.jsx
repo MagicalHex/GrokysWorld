@@ -61,7 +61,7 @@ useEffect(() => {
     currentLevel,
     globalPlayerHealth,
     onPlayerHealthChange, 
-    monsterHealths,
+    monsterData,
     globalMonsterHealths,
     onMonsterHealthChange,
     globalInventory,
@@ -108,7 +108,7 @@ console.log('[App] globalMonsterHealths passed to PlayMode:', globalMonsterHealt
         spawnMonster={spawnMonster}
         globalPlayerHealth={globalPlayerHealth}
         onPlayerHealthChange={onPlayerHealthChange}
-        monsterHealths={monsterHealths}
+        monsterData={monsterData}
         globalMonsterHealths={globalMonsterHealths} // Updated
         onMonsterHealthChange={onMonsterHealthChange}
         globalInventory={globalInventory}

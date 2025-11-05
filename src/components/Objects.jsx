@@ -76,13 +76,17 @@ export const OBJECTS = {
   'rope-to-1': '🪢',
   'rope-to-2': '🪢',
   'rope-to-3': '🪢',
-    'rope-to-4': '🪢',
-      'rope-to-5': '🪢', // Town Mines Level 1
+  'rope-to-4': '🪢',
+  'rope-to-5': '🪢', // Town Mines Level 1
+  'rope-to-7': '🪢', // Town Mines Level 2
+  'rope-to-8': '🪢', // Town Mines Level 3
   'hole-to-3': '🕳️',
   'hole-to-4': '🕳️',
   'hole-to-5': '🕳️',
   'hole-to-6': '🕳️',
-  'hole-to-7': '🕳️',
+  'hole-to-7': '🕳️', // Town Mines Level 2
+  'hole-to-8': '🕳️', // Town Mines level 3
+  'hole-to-9': '🕳️', // Dead Shriek's lair
   ladder: '🪜',
   castle: '🏰',
   // QUEST ITEMS
@@ -107,6 +111,10 @@ export const OBJECTS = {
   stoneobjectstraighthalfup: '',
   stoneobjectstraighthalfuplonger: '',
   stoneobjectstraighthalfside: '',
+
+  stoneobjectjagged: '',
+  stoneobjectjaggedsmall: '',
+
   stonepillarobject: '',
   campfirestoneobject: '',
   campfirestoneobjectlarge: '',
@@ -131,7 +139,10 @@ export const OBJECTS = {
   fenceobject: '',
   // MONSTERS
   cavespider: '',
-    littlespider: '',
+  littlespider: '',
+  demonspider: '',
+  demonspider1: '',
+  deadshriek: '',
   // ITEMS - ARMORS
   'dark-armor': '',
   'knights-armor': '',
