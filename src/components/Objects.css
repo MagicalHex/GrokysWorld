@@ -1205,7 +1205,7 @@ font-size: 60px;
   background: url('/ownemojis/deadshriek.webp') center/contain no-repeat;
   width: 300%;
   height: 300%;
-  animation: skeleton-rattle 1.2s ease-in-out infinite;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
   filter: drop-shadow(0 0 3px red);
 }
 .object.littlespider {

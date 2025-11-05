@@ -12,6 +12,7 @@ export const TERRAINS = {
   // ENVIRONMENT
   sand: '#ffc107',
   water: '#17a2b8',
+  lava: '#ffc107',
   mountain: '#6c757d',
   forest: '#155724',
   field: '#28a745',
