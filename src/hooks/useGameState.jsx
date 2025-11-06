@@ -1,7 +1,7 @@
 // src/hooks/useGameState.js
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadMaps } from '../data/loadMaps';
-import MONSTER_DATA from '../components/data/monsters.json';
+import MONSTER_DATA from '../../public/data/monsters.json';
 
 const ROWS = 16;
 const COLS = 24;
