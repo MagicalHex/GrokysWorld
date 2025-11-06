@@ -1,35 +1,52 @@
-// ItemIcon.jsx
+// src/ItemIcon.jsx
 import React, { useState } from 'react';
 import { OBJECTS } from './Objects';
 import { ITEMS } from './ITEMS';
+import './ItemIcon.css';
 
-const ItemIcon = ({ itemId, alt, className = "inventory-item-icon" }) => {
-  const [failed, setFailed] = useState(false);
-  const itemData = ITEMS[itemId];
-  const objectEmoji = OBJECTS[itemId];
+export const RARITY_COLOR = {
+  common:   '#bbbbbb',
+  uncommon: '#1eff00',
+  rare:     '#0070dd',
+  epic:     '#a335ee',
+};
 
-  // 1. Try image from ITEMS
-  if (itemData?.image) {
-    if (failed) {
-      return <span className={className}>{itemData.fallback}</span>;
-    }
+const ItemIcon = ({
+  itemId,
+  showName = false,      // set true in shop / tool-tips
+  className = 'item-icon',
+}) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const data = ITEMS[itemId] || {};
+  const objEmoji = OBJECTS[itemId];
+
+  // 1. Image
+  if (data.image && !imgFailed) {
     return (
       <img
-        src={itemData.image}
-        alt={alt}
+        src={data.image}
+        alt={data.name}
         className={className}
-        onError={() => setFailed(true)}
+        onError={() => setImgFailed(true)}
       />
     );
   }
 
-  // 2. Try emoji from OBJECTS (wood, gold, etc.)
-  if (typeof objectEmoji === 'string' && objectEmoji && !objectEmoji.startsWith('/')) {
-    return <span className={className}>{objectEmoji}</span>;
+  // 2. Emoji (from ITEMS or from global OBJECTS)
+  const emoji = data.emoji ?? (typeof objEmoji === 'string' ? objEmoji : null);
+  if (emoji) {
+    return <span className={className}>{emoji}</span>;
   }
 
-  // 3. Fallback
-  return <span className={className}>question</span>;
+  // 3. Name (final fallback)
+  const name = data.name ?? itemId;
+  const color = data.rarity ? RARITY_COLOR[data.rarity] : '#fff';
+
+  return (
+    <span className={className} style={{ color }}>
+      {showName ? name : '?'}
+    </span>
+  );
 };
 
 export default ItemIcon;

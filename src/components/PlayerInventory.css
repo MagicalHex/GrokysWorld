@@ -1,8 +1,8 @@
 /* INVENTORY  */
 .inventory-popup {
   position: fixed;
-  top: 35%;
-  left: 20%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
@@ -49,4 +49,70 @@
   height: 48px;
   width: 48px;
   box-shadow: 0px 0px 6px goldenrod;
+}
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.inventory-item {
+  margin-bottom: 0.8rem;
+  padding: 0.4rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.inventory-item__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inventory-item__name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.quantity {
+  color: #aaa;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.inventory-item__desc {
+  color: #ff9500;           /* nice orange */
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.inventory-item__sell {
+  color: #ffd700;
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+.inventory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.inventory-column {
+  background: rgba(20, 20, 30, 0.9);
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-column h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  text-align: center;
 }
