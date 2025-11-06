@@ -1,7 +1,7 @@
 // src/ItemIcon.jsx
 import React, { useState } from 'react';
 import { OBJECTS } from './Objects';
-import { ITEMS } from './ITEMS';
+import { ITEMS } from './Items';
 import './ItemIcon.css';
 
 export const RARITY_COLOR = {

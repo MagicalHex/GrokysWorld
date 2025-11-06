@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './PlayerInventory.css';
 import { OBJECTS } from './Objects';
 import ItemIcon, { RARITY_COLOR } from './ItemIcon';
-import { ITEMS } from './ITEMS';
+import { ITEMS } from './Items';
 
 // ---------------------------------------------------------------------
 // 1. Equipment categories
