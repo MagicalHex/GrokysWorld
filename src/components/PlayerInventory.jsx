@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './PlayerInventory.css';
 import { OBJECTS } from './Objects';
+import ItemIcon from './ItemIcon';
 
 const EQUIPMENT_SET = new Set(['dagger', 'sword', 'axe', 'knights-armor', 'short-sword', 'dark-armor', 'wing-armor']);
 
@@ -15,14 +16,14 @@ const InventoryPopup = ({ items, activeQuests = {}, onClose }) => {
   // Separate equipment & inventory
   const equipmentItems = {};
   const inventoryItems = {};
-  Object.entries(items).forEach(([item, quantity]) => {
-    const baseName = item.replace(/object$/i, '');
-    if (EQUIPMENT_SET.has(baseName)) {
-      equipmentItems[item] = quantity;
-    } else {
-      inventoryItems[item] = quantity;
-    }
-  });
+Object.entries(items).forEach(([item, quantity]) => {
+  const baseName = item.replace(/object$/i, '').toLowerCase(); // ← normalize
+  if (EQUIPMENT_SET.has(baseName)) {
+    equipmentItems[item] = quantity;
+  } else {
+    inventoryItems[item] = quantity;
+  }
+});
 
   // Get active quests
   const activeQuestList = Object.values(activeQuests).filter(q => q.status === 'active');
@@ -34,17 +35,15 @@ const InventoryPopup = ({ items, activeQuests = {}, onClose }) => {
         <h2>Equipment</h2>
         {Object.keys(equipmentItems).length > 0 ? (
           <ul>
-            {Object.entries(equipmentItems).map(([item, quantity], index) => (
-              <li key={index}>
-                {OBJECTS[item] && (
-                  <span style={{ fontSize: '1.4rem', marginRight: '0.5rem' }}>
-                    {OBJECTS[item]}
-                  </span>
-                )}
-                {formatItemName(item, quantity)} x{quantity}
-              </li>
-            ))}
-          </ul>
+{Object.entries(equipmentItems).map(([item, quantity]) => {
+  const displayName = formatItemName(item, quantity);
+  return (
+    <li key={item}>
+      <ItemIcon itemId={item} alt={displayName} />
+      {' '}{displayName} x{quantity}
+    </li>
+  );
+})}  </ul>
         ) : (
           <p>No equipment.</p>
         )}
@@ -53,16 +52,15 @@ const InventoryPopup = ({ items, activeQuests = {}, onClose }) => {
         <h2>Inventory</h2>
         {Object.keys(inventoryItems).length > 0 ? (
           <ul>
-            {Object.entries(inventoryItems).map(([item, quantity], index) => (
-              <li key={index}>
-                {OBJECTS[item] && (
-                  <span style={{ fontSize: '1.4rem', marginRight: '0.5rem' }}>
-                    {OBJECTS[item]}
-                  </span>
-                )}
-                {formatItemName(item, quantity)} x{quantity}
-              </li>
-            ))}
+{Object.entries(inventoryItems).map(([item, quantity]) => {
+  const displayName = formatItemName(item, quantity);
+  return (
+    <li key={item}>
+      <ItemIcon itemId={item} alt={displayName} />
+      {' '}{displayName} x{quantity}
+    </li>
+  );
+})}
           </ul>
         ) : (
           <p>Inventory is empty.</p>

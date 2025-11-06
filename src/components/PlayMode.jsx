@@ -80,7 +80,13 @@ useEffect(() => {
   const [choppingProgress, setChoppingProgress] = useState(0);
   // ── Combat Popups ─────────────────────────────────────────────────────
   // Set popup to display e.g. damagePopup (holds healing popup as well)
-    const [popups, setPopups] = useState([]);
+  const [popups, setPopups] = useState([]);
+
+  // Create universal addPopup
+  const addPopup = useCallback((popup) => {
+    const id = `popup_${Date.now()}_${Math.random()}`;
+    setPopups(prev => [...prev, { ...popup, id }]);
+  }, []);
   // ── Quests ─────────────────────────────────────────────────────
   // Tell .player class which direction class to render 
   const [activeQuests, setActiveQuests] = useState({});
@@ -251,6 +257,7 @@ const removePickupPopup = useCallback((id) => {
         monsterTypes={monsterTypes}
         inventory={globalInventory}
         // Popups
+        addPopup={addPopup} 
         healPopup={healPopup}
         onHealPopupFinish={onHealPopupFinish}
         setLastDamageTime={setLastDamageTime}
@@ -260,6 +267,9 @@ const removePickupPopup = useCallback((id) => {
         setCooldownSignal={setCooldownSignal}
         currentLevel={currentLevel}
         cooldowns={COOLDOWNS}
+        monsterData={monsterData}
+        // playerXp={player.xp}
+        // setPlayerXp={setPlayerXp}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -373,29 +383,30 @@ const removePickupPopup = useCallback((id) => {
   </div>
 )}
 
-{/* PICKUP POPUP — NOW INSIDE TILE */}
-  {pickupPopups
-    .filter(p => p.x === x && p.y === y)
-    .map(p => (
-      <PickupPopup
-        key={p.id}
-        item={p.item}
-        onFinish={() => removePickupPopup(p.id)}
-      />
-    ))}
+              {/* PICKUP POPUP — NOW INSIDE TILE */}
+                {pickupPopups
+                  .filter(p => p.x === x && p.y === y)
+                  .map(p => (
+                    <PickupPopup
+                      key={p.id}
+                      item={p.item}
+                      onFinish={() => removePickupPopup(p.id)}
+                    />
+                  ))}
 
-    {/* DAMAGE POPUPS — NOW INSIDE TILE */}
-  {popups
-    .filter(p => p.x === x && p.y === y)
-    .map(p => (
-      <DamagePopup
-        key={p.id}
-        damage={p.dmg}
-        isPlayer={p.isPlayer}
-        isHeal={p.isHeal}
-        onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
-      />
-    ))}
+                  {/* DAMAGE POPUPS — NOW INSIDE TILE */}
+                {popups
+                  .filter(p => p.x === x && p.y === y)
+                  .map(p => (
+                    <DamagePopup
+                      key={p.id}
+                      damage={p.dmg}
+                      isPlayer={p.isPlayer}
+                      isHeal={p.isHeal}
+                      isXP={p.isXP}
+                      onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
+                    />
+                  ))}
 
               </div>
             );

@@ -6,13 +6,11 @@ transform: translate(-50%, -50%);
   font-family: 'Arial', sans-serif;
   font-weight: bold;
   font-size: 1.8rem;
-  color: var(--dmg-color, #ffb84d);
-  text-shadow:
-    0 0 4px rgba(0,0,0,0.6),
-    0 0 8px rgba(0,0,0,0.4);
   pointer-events: none;
   animation: floatUp 1.2s ease-out forwards;
   z-index: 100;
+  color: var(--dmg-color, #ffb84d);
+  text-shadow: var(--text-shadow);
 }
 
 /* Floating + fade out */

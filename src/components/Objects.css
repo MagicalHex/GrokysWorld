@@ -1262,8 +1262,8 @@ font-size: 60px;
 }
 .object.short-sword {
   background: url('/ownemojis/short-sword.webp') center/contain no-repeat;
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 80%;
 }
 .object.magicoak {
   background: url('/ownemojis/magicoak.webp') center/contain no-repeat;

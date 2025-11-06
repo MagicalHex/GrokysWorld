@@ -57,12 +57,16 @@ export default function CombatSystem({
   healPopup,
   onHealPopupFinish,
   setLastDamageTime,
+  addPopup,
   popups,
   setPopups,
   cooldownSignal,
   setCooldownSignal,
   currentLevel,
-  cooldowns
+  cooldowns,
+  monsterData,
+  playerXp,
+  setPlayerXp
 }) {
   // const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const distance = (p1, p2) => {
@@ -144,10 +148,10 @@ export default function CombatSystem({
     }
   }, [playerHealth, isDead]);
 
-  const addPopup = (x, y, dmg, isPlayer = false, isHeal = false) => {
-    const id = `${Date.now()}-${Math.random()}`;
-    setPopups(prev => [...prev, { id, x, y, dmg, isPlayer, isHeal }]);
-  };
+  // const addPopup = (x, y, dmg, isPlayer = false, isHeal = false) => {
+  //   const id = `${Date.now()}-${Math.random()}`;
+  //   setPopups(prev => [...prev, { id, x, y, dmg, isPlayer, isHeal }]);
+  // };
 
   // Assign addPopup to refs
   refs.current.addPopup = addPopup;
@@ -157,34 +161,33 @@ export default function CombatSystem({
   useEffect(() => {
     if (playerHealth < prevHealthRef.current && playerHealth > 0) {
       const dmg = prevHealthRef.current - playerHealth;
-      addPopup(playerPos.x, playerPos.y, dmg, true);
+      addPopup({
+  x: playerPos.x,
+  y: playerPos.y,
+  dmg,
+  isPlayer: true
+});
     }
     prevHealthRef.current = playerHealth;
   }, [playerHealth, playerPos]);
 
   // === HEAL POPUP FROM PARENT ===
-  useEffect(() => {
-    if (!healPopup) return;
+useEffect(() => {
+  if (!healPopup) return;
 
-    const id = `heal-${Date.now()}-${Math.random()}`;
-    const popup = {
-      id,
-      x: healPopup.x,
-      y: healPopup.y,
-      dmg: healPopup.damage,
-      isPlayer: false,
-      isHeal: true,
-    };
+  addPopup({
+    x: healPopup.x,
+    y: healPopup.y,
+    dmg: healPopup.damage,
+    isHeal: true
+  });
 
-    setPopups(prev => [...prev, popup]);
+  const timer = setTimeout(() => {
+    onHealPopupFinish?.();
+  }, 1500);
 
-    const timer = setTimeout(() => {
-      setPopups(prev => prev.filter(p => p.id !== id));
-      onHealPopupFinish?.();
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [healPopup, onHealPopupFinish]);
+  return () => clearTimeout(timer);
+}, [healPopup, onHealPopupFinish, addPopup]);
 
   // === MAIN COMBAT LOOP (via gameLoop) ===
 useEffect(() => {
@@ -266,13 +269,58 @@ now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
     const newHealth = Math.max(0, curHealth - dmg);
 
     onMonsterHealthChange(objId, newHealth);
-    addPopup(mPos.x, mPos.y, dmg);
+    addPopup({
+      x: mPos.x,
+      y: mPos.y,
+      dmg
+    });
 
-    if (newHealth <= 0) {
-      const spiderTypes = ['spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'];
-      newObjects[key] = spiderTypes.includes(type) && Math.random() < 0.33 ? 'spiderweb' : 'gold';
-      objectsChanged = true;
+if (newHealth <= 0) {
+  const monster = monsterData[type];
+  if (!monster) {
+    console.warn(`No monster data for type: ${type}`);
+    newObjects[key] = 'gold';
+    objectsChanged = true;
+    continue;
+  }
+
+  // 1. Handle XP
+  const xpRange = monster.xp || [0, 0];
+  const xpGained = Math.floor(Math.random() * (xpRange[1] - xpRange[0] + 1)) + xpRange[0];
+  if (xpGained > 0) {
+    addPopup({
+      x: playerPos.x,
+      y: playerPos.y,
+      dmg: xpGained,
+      isXP: true
+    });
+    // Optionally: player.xp += xpGained; (if tracking player XP)
+  }
+
+  // 2. Handle loot drops
+  const drops = [];
+  (monster.loot || []).forEach(item => {
+    if (Math.random() < (item.chance || 1.0)) {
+      const amount = item.min !== undefined && item.max !== undefined
+        ? Math.floor(Math.random() * (item.max - item.min + 1)) + item.min
+        : 1;
+      for (let i = 0; i < amount; i++) {
+        drops.push(item.id);
+      }
     }
+  });
+
+  // 3. Special case: spider web drop
+  // const isSpider = ['spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type);
+  // if (isSpider && Math.random() < 0.33) {
+  //   drops.push('spiderweb');
+  // }
+
+  // 4. Pick one drop (or default to gold)
+  const droppedItem = drops.length > 0 ? drops[Math.floor(Math.random() * drops.length)] : 'gold';
+  newObjects[key] = droppedItem;
+  objectsChanged = true;
+}
 
     // === ONE-SHOT: ATTACK DONE ===
     lastPlayerAttack = now;

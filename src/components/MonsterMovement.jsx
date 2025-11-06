@@ -86,7 +86,7 @@ const MonsterMovement = ({
       const targetKey = `${dir.x},${dir.y}`;
       const targetObj = objects[targetKey];
 
-      // WALKABLES NEEDS TO BE ADDED FURTHER DOWN IN (ELSE IF STATEMENT) AS WELL
+      // WALKABLES NEEDS TO BE ADDED FURTHER DOWN (IN ELSE IF STATEMENT) AS WELL
       const isWalkable =
         !targetObj ||
         targetObj === 'spiderweb'

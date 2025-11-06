@@ -1,6 +1,7 @@
 // src/hooks/useGameState.js
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadMaps } from '../data/loadMaps';
+import MONSTER_DATA from '../components/data/monsters.json';
 
 const ROWS = 16;
 const COLS = 24;
@@ -19,19 +20,6 @@ const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
   'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl', 'lava'
 ]);
-
-// ──────────────────────────────────────────────────────
-//  Monster base health – change only here
-// ──────────────────────────────────────────────────────
-// useGameState.js
-const MONSTER_BASE_DATA = {
-  skeleton:     { hp: 200,  name: "SKELETON" },
-  spider:       { hp: 200,  name: "SPIDER" },
-  littlespider: { hp: 300,  name: "ARACHNID" },
-  cavespider:   { hp: 500,  name: "CAVE SPIDER" },
-  demonspider:  { hp: 600,  name: "DEMON SPIDER" },
-  deadshriek:   { hp: 1000, name: "DEAD SHRIEK" },
-};
 
 export const useGameState = () => {
   /* --------------------------------------------------------------
@@ -180,7 +168,7 @@ const onHealPopupFinish = useCallback(() => {
   if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
   // ---- 3. PICK-UP -------------------------------------------------
-  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject','rockobject']);
+  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject','rockobject', 'dark-armor', 'knights-armor', 'short-sword']);
   let pickupItem = null;
 
   if (targetObj && PICKUP.has(targetObj)) {
@@ -446,10 +434,10 @@ if (!placed) {
         const newMonsterId = `${type}_${levelId}_${x}_${y}`;
         console.log('→ Spawning new monster:', newMonsterId, 'at', key);
        // ── use base health from monsterData  ──
-setGlobalMonsterHealths(p => ({
-  ...p,
-  [newMonsterId]: MONSTER_BASE_DATA[type]?.hp ?? 100
-}));
+        setGlobalMonsterHealths(p => ({
+          ...p,
+          [newMonsterId]: MONSTER_DATA[type]?.hp ?? 100
+        }));
         setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
 
         return {
@@ -630,10 +618,11 @@ useEffect(() => {
 
           setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
           // ── use base health from monsterData ──
-          setGlobalMonsterHealths(prev => ({
-            ...prev,
-            [monsterId]: MONSTER_BASE_DATA[type]?.hp ?? 100
-          }));
+setGlobalMonsterHealths(prev => ({
+  ...prev,
+  [monsterId]: MONSTER_DATA[type]?.hp ?? 100
+}));
+
         }
       });
 
@@ -690,7 +679,7 @@ useEffect(() => {
     // lastDamageTime, NOTE THAT THIS IS COMMENTED OUT. It works at this level but blocks HealthRegen component for some reason
     setLastDamageTime,
 
-    monsterData: MONSTER_BASE_DATA, // For setting different healths on different monsters
+    monsterData: MONSTER_DATA, // For setting different healths on different monsters
 
     setCurrentLevel,
     onLevelChange,
