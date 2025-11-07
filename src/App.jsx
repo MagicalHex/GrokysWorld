@@ -221,7 +221,15 @@ useEffect(() => {
           <button onClick={() => setMode('rpg')}>RPG</button>
           <button onClick={() => setMode('sports')}>Sports</button>
           <button onClick={() => setMode('shooter')}>Shooter</button>
-          {/* PLAY button is now inside the overlay in prod */}
+          <button 
+            className="play-button" 
+            onClick={() => {
+              setPlayMode(true);
+              setHasSeenIntro(true);
+            }}
+          >
+            PLAY
+          </button>
           {isDev && (
             <button onClick={() => setPlayMode(true)}>PLAY 🎮</button>
           )}
