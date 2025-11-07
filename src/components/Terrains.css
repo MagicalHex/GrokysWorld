@@ -558,7 +558,8 @@ background: linear-gradient(to bottom right, #5d4037 0%, #5d4037 100%);
 
 /* CAVE FLOORS */
 .tile.msc {
-    background: linear-gradient(145deg, #1f361f 0%, #1a331a 50%, #243324 70%, #163416 100%), #173e17;
+    /* background: linear-gradient(145deg, #1f361f 0%, #1a331a 50%, #243324 70%, #163416 100%), #173e17; */
+        background: linear-gradient(145deg, #182718 0%, #1a331a 50%, #143414 70%, #0d430d 100%), #193e19;
     box-shadow: inset 0 0px 1px #00800059;
 }
 .tile.mscd {

@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { subscribe } from '../utils/gameLoop';
 import { ITEMS } from './Items';
 
+import { isMonster } from '../utils/monsterRegistry';
+
 import {
   getWeaponStats,
   getArmorDefense
@@ -238,7 +240,7 @@ let attackCooldownType = null;
 
       // Skip non-monsters, dead, or wrong level
       const type = monsterTypes[objId];
-      if (!type || !['skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) continue;
+      if (!type || !isMonster(type)) continue;
       if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
       // if (mLevel !== currentLevel) continue; This breaks it
 
@@ -260,22 +262,29 @@ if (isInWeaponRange) {
 if (!attackedThisTick && 
     isInWeaponRange && 
     now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
-  
-  // === DO THE ATTACK ===
-  const { min: dmgMin, max: dmgMax } = weaponStats.damage;
-  const dmg = randInt(dmgMin, dmgMax);
+  // 1 in 8 chance to crit (12.5%)
+  const isCrit = Math.random() < 1/8;   // ← 1/8 = 0.125
 
-  console.log(`⚔️  Player (${dmgMin}-${dmgMax}) → ${dmg} dmg to ${type}`);
+  const { min: dmgMin, max: dmgMax } = weaponStats.damage;
+  const dmg = isCrit
+    ? dmgMax * 2                     // Crit: double max
+    : randInt(dmgMin, dmgMax);       // Normal: random in range
+
+  console.log(`Player ${isCrit ? 'CRITICAL!' : ''} → ${dmg} dmg`);
 
   const curHealth = globalMonsterHealths[objId] ?? 100;
   const newHealth = Math.max(0, curHealth - dmg);
 
-  onMonsterHealthChange(objId, newHealth);
+  // 1. Damage popup (immediate)
   addPopup({
     x: mPos.x,
     y: mPos.y,
-    dmg
+    dmg,
+    isCrit,
   });
+
+  // 2. Apply damage
+  onMonsterHealthChange(objId, newHealth);
 
 if (newHealth <= 0) {
   const monster = monsterData[type];
@@ -287,6 +296,7 @@ if (newHealth <= 0) {
   }
 
   // 1. Handle XP
+  setTimeout(() => {
   const xpRange = monster.xp || [0, 0];
   const xpGained = Math.floor(Math.random() * (xpRange[1] - xpRange[0] + 1)) + xpRange[0];
   if (xpGained > 0) {
@@ -295,9 +305,11 @@ if (newHealth <= 0) {
       y: playerPos.y,
       dmg: xpGained,
       isXP: true
-    });
-    // Optionally: player.xp += xpGained; (if tracking player XP)
-  }
+      });
+      // Add to give player XP here
+    }
+  }, 300);      // <-- 300 ms delay (tweak as you like)
+
 
   // 2. Handle loot drops
   const drops = [];

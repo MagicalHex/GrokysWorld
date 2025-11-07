@@ -20,7 +20,8 @@
   ],
   "objects": {
     "1,1": "rope-to-2",
-    "22,14": "hole-to-6",
+    "22,14": "hole-to-10",
+
     "0,2": "stonemossy",
     "0,7": "stonemossy",
     "1,11": "mossystone",

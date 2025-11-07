@@ -1,5 +1,5 @@
 {
-  "name": "Mossy Slime Cave 2",
+  "name": "Mossly Slime Cave 2",
   "grid": [
     ["msc", "mscd", "msc", "msc", "mscd", "mscd", "mscd", "mscd", "msc", "msc", "mscd", "msc", "msc", "msc", "msc", "mscd", "msc", "msc", "slime", "slime", "slime", "msc", "msc", "msc"],
     ["mscd", "msc", "mscd", "msc", "mscd", "msc", "mscd", "msc", "mscd", "mscd", "msc", "mscd", "mscd", "mscd", "mscd", "msc", "msc", "mscd", "msc", "slime", "msc", "mscd", "msc", "mscd"],
@@ -19,45 +19,24 @@
     ["msc", "msc", "msc", "mscd", "mscd", "mscd", "msc", "mscd", "msc", "mscd", "msc", "msc", "mscd", "mscd", "msc", "mscd", "mscd", "mscd", "mscd", "msc", "msc", "msc", "mscd", "mscd"]
   ],
   "objects": {
-    "1,1": "rope-to-3",
-    "22,14": "hole-to-6",
-
     "12,13": "mossystone",
     "12,15": "stonemossy",
     "12,3": "swamptroll",
-    "14,12": "stonemossy",
-    "14,11": "stonemossy",
+    "13,12": "stonemossy",
+    "14,10": "stonemossy",
     "14,6": "stonemossy",
     "15,5": "mossystone",
     "16,15": "mossystone",
     "17,10": "stonemossy",
-    "16,13": "stonemossy",
+    "17,11": "stonemossylarge",
+    "17,13": "stonemossy",
     "23,0": "mossystone",
     "23,12": "stonemossy",
-    "4,5": "stonemossy",
+    "3,2": "stonemossylarge",
+    "4,4": "stonemossy",
     "4,7": "mossystone",
     "5,11": "mossystone",
-    "8,6": "stonemossy",
-
-"3,2": "mossystonelarge",
-  "3,3": "none",
-  "4,2": "none",
-  "4,3": "none",
-
-  "17,11": "mossystonelarge",
-  "17,12": "none",
-  "18,11": "none",
-  "18,12": "none",
-
-  "2,12": "mossystonelarge",
-  "2,13": "none",
-  "3,12": "none",
-  "3,13": "none",
-
-  "0,8": "mossystonelarge",
-  "0,9": "none",
-  "1,8": "none",
-  "1,9": "none"
+    "8,6": "stonemossy"
 
   }
 }

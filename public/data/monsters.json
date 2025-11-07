@@ -59,6 +59,60 @@
       { "id": "short-sword", "chance": 0.6 }
     ]
   },
+  "swamptroll": {
+    "hp": 650,
+    "name": "SWAMP TROLL",
+    "xp": [220, 320],
+    "damage": { "min": 25, "max": 55 },
+    "range": 1,
+    "loot": [
+      { "id": "gold", "chance": 1.0, "min": 20, "max": 35 },
+      { "id": "knights-armor", "chance": 0.85 },
+      { "id": "short-sword", "chance": 0.7 },
+      { "id": "bow", "chance": 0.4 }
+    ]
+  },
+  "swamptroll1": {
+    "hp": 800,
+    "name": "SWAMP TROLL CHIEFTAIN",
+    "xp": [350, 500],
+    "damage": { "min": 40, "max": 75 },
+    "range": 1,
+    "loot": [
+      { "id": "gold", "chance": 1.0, "min": 30, "max": 50 },
+      { "id": "knights-armor", "chance": 0.9 },
+      { "id": "short-sword", "chance": 0.8 },
+      { "id": "bow", "chance": 0.6 },
+      { "id": "magic-ring", "chance": 0.2 }
+    ]
+  },
+  "swampgolem": {
+    "hp": 1200,
+    "name": "SWAMP OGRE",
+    "xp": [600, 850],
+    "damage": { "min": 50, "max": 90 },
+    "range": 2,
+    "loot": [
+      { "id": "gold", "chance": 1.0, "min": 40, "max": 70 },
+      { "id": "knights-armor", "chance": 0.95 },
+      { "id": "short-sword", "chance": 0.85 },
+      { "id": "magic-ring", "chance": 0.4 }
+    ]
+  },
+  "swampgolem1": {
+    "hp": 1600,
+    "name": "SWAMP OGRE LORD",
+    "xp": [900, 1300],
+    "damage": { "min": 70, "max": 120 },
+    "range": 3,
+    "loot": [
+      { "id": "gold", "chance": 1.0, "min": 60, "max": 100 },
+      { "id": "knights-armor", "chance": 1.0 },
+      { "id": "short-sword", "chance": 0.95 },
+      { "id": "magic-ring", "chance": 0.7 },
+      { "id": "legendary-sword", "chance": 0.15 }
+    ]
+  },
   "demonspider": { 
     "hp": 600, 
     "name": "DEMON SPIDER",

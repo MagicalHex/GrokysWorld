@@ -12,10 +12,10 @@ import InteractionSystem from './InteractionSystem/InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, getQuestMarker } from './InteractionSystem/InteractionConstants';
 import PlayerInventory from './PlayerInventory';
 import './PlayMode.css';
-import { PickupPopup } from './PickupPopup';
-import { DamagePopup } from './DamagePopup';
-
-import { useEquipment } from './hooks/useEquipment';
+import { PickupPopup } from './PickupPopup'; // Pickup popup  on player (when moving on item tile)
+import { DamagePopup } from './DamagePopup'; // Damage popups on monster or player
+import { useEquipment } from './hooks/useEquipment'; // For using equipment
+import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
 
 // For cool downs (CombatSystem and CooldownBar)
 const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
@@ -85,10 +85,10 @@ useEffect(() => {
   const [popups, setPopups] = useState([]);
 
   // Create universal addPopup
-  const addPopup = useCallback((popup) => {
-    const id = `popup_${Date.now()}_${Math.random()}`;
-    setPopups(prev => [...prev, { ...popup, id }]);
-  }, []);
+const addPopup = useCallback((popup) => {
+  const id = `popup_${Date.now()}_${Math.random()}`;
+  setPopups(prev => [...prev, { ...popup, id, isCrit: popup.isCrit ?? false }]);
+}, []);
   // ── Quests ─────────────────────────────────────────────────────
   // Tell .player class which direction class to render 
   const [activeQuests, setActiveQuests] = useState({});
@@ -348,17 +348,16 @@ const removePickupPopup = useCallback((id) => {
   >
     {OBJECTS[monsterTypes[obj] || obj]}
 
-    {/* Health Bar for monsters */}
 {/* Health Bar for monsters */}
-{['skeleton1', 'spider', 'littlespider', 'demonspider', 'deadshriek', 'cavespider'].includes(monsterTypes[obj]) && (
+{isMonster(monsterTypes[obj]) && (
   <div className="monster-health-container">
     <div className="monster-name">
-      {monsterData[monsterTypes[obj]]?.name}
+      {getMonsterData(monsterTypes[obj])?.name}
     </div>
     <HealthBar
       key={`${key}-${globalMonsterHealths[obj]}`}
       health={globalMonsterHealths[obj] ?? 0}
-      max={monsterData[monsterTypes[obj]]?.hp}
+      max={getMonsterData(monsterTypes[obj])?.hp}
       color="#FF9800"
     />
   </div>
@@ -418,6 +417,7 @@ const removePickupPopup = useCallback((id) => {
                       isPlayer={p.isPlayer}
                       isHeal={p.isHeal}
                       isXP={p.isXP}
+                      isCrit={p.isCrit}
                       onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
                     />
                   ))}

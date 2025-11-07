@@ -80,13 +80,16 @@ export const OBJECTS = {
   'rope-to-5': '🪢', // Town Mines Level 1
   'rope-to-7': '🪢', // Town Mines Level 2
   'rope-to-8': '🪢', // Town Mines Level 3
+  'rope-to-9': '🪢', 
+  'rope-to-10': '🪢', // Slime Cave 1
   'hole-to-3': '🕳️',
   'hole-to-4': '🕳️',
   'hole-to-5': '🕳️',
-  'hole-to-6': '🕳️',
+  'hole-to-6': '🕳️', // Slime Cave 2
   'hole-to-7': '🕳️', // Town Mines Level 2
   'hole-to-8': '🕳️', // Town Mines level 3
   'hole-to-9': '🕳️', // Dead Shriek's lair
+  'hole-to-10': '🕳️', // Slime Cave 1
   ladder: '🪜',
   castle: '🏰',
   // QUEST ITEMS

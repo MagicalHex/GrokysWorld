@@ -438,29 +438,20 @@ font-size: 60px;
   animation: potion-bubble 3s ease-in-out infinite;
   filter: drop-shadow(0 0 4px #9932CC);
 }
-.object.hole-to-1,
-.object.hole-to-2,
-.object.hole-to-3,
-.object.hole-to-4,
-.object.hole-to-5,
-.object.hole-to-6,
-.object.hole-to-7,
-.object.hole-to-8,
-.object.hole-to-9 { 
-  font-size: 50px; 
+/* Common styles for all holes and ropes*/
+.object[class*="hole-to-"],
+.object[class*="rope-to-"] {
+  font-size: 50px;
   filter: drop-shadow(0 0 4px #000000);
+}
+
+/* Specific text-shadow for hole-to-* */
+.object[class*="hole-to-"] {
   text-shadow: 0px 0px 10px rgb(146, 146, 146);
 }
-.object.rope-to-1,
-.object.rope-to-2,
-.object.rope-to-3,
-.object.rope-to-4,
-.object.rope-to-5,
-.object.rope-to-6,
-.object.rope-to-7,
-.object.rope-to-8 { 
-  font-size: 50px; 
-  filter: drop-shadow(0 0 4px #000000);
+
+/* Specific text-shadow for rope-to-* */
+.object[class*="rope-to-"] {
   text-shadow: 0px 0px 10px rgb(117, 117, 117);
 }
 .object.ropeobject {

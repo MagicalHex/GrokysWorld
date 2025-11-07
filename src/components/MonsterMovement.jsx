@@ -1,6 +1,7 @@
 // MonsterMovement.jsx
 import React, { useEffect, useCallback, useRef } from 'react';
 import { subscribe } from '../utils/gameLoop';
+import MONSTER_DATA from '../../public/data/monsters.json';
 
 const MonsterMovement = ({
   objects,
@@ -56,6 +57,9 @@ const MonsterMovement = ({
   //   const distToPlayer = distance({ x: mx, y: my }, playerPos);
   //   const maxChaseDistance = monsterType === 'spider' ? 12 : 7;
   //   if (distToPlayer > maxChaseDistance) return null;
+
+  const MONSTER_TYPES = Object.keys(MONSTER_DATA);
+  const isMonster = (type) => MONSTER_TYPES.includes(type);
 
   // FROM HERE - THIS CODE WORKS WELL BUT MONSTERS CAN GET WEIRD STUCK BUT THEY SEEM TO ATTACK BETTER
   const getBestMove = useCallback((mx, my, monsterType) => {
@@ -131,8 +135,8 @@ const MonsterMovement = ({
 
     const monsters = [];
     Object.entries(objects).forEach(([key, monsterId]) => {
-      const type = monsterTypes[monsterId];
-      if (['skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
+        const type = monsterTypes[monsterId];
+        if (isMonster(type)) {
         const [x, y] = key.split(',').map(Number);
         const health = globalMonsterHealths[monsterId] ?? 100;
         if (health > 0) {
@@ -157,9 +161,7 @@ const MonsterMovement = ({
 
       // === ALLOW SWAPPING WITH OTHER MONSTERS ===
       const occupant = newObjects[toKey];
-      if (occupant && monsterTypes[occupant] && [
-        'skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'
-      ].includes(monsterTypes[occupant])) {
+      if (occupant && isMonster(monsterTypes[occupant])) {
         // Swap positions!
         newObjects[key] = occupant;
         newObjects[toKey] = monsterId;

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadMaps } from '../data/loadMaps';
 import MONSTER_DATA from '../../public/data/monsters.json';
+import { MONSTER_TYPES, isMonster } from '../utils/monsterRegistry';
 import { ITEMS } from '../components/Items.jsx';
 
 const ROWS = 16;
@@ -12,11 +13,12 @@ const PORTAL_ENTRY_POINTS = {
   3: { x: 1, y: 2 }, // Slimecave
   4: { x: 4, y: 4 }, // StoneCave
   5: { x: 1, y: 2 }, // Town Mines level 1
-  6: { x: 1, y: 2 },  // Slimecave 1
+  6: { x: 1, y: 2 },  // Slimecave 3
   7: { x: 21, y: 3 }, // Town Mines level 2
   8: { x: 6, y: 4 }, // Town Mines level 3
-  9: { x: 21, y: 14 }, }; // Deadshriek's lair
-  
+  9: { x: 21, y: 14 }, // Deadshriek's lair
+  10: { x: 1, y: 2 }, }; // Slimecave 2
+
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
   'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl', 'lava', 'slime', 'slimedark'
@@ -36,7 +38,11 @@ export const useGameState = () => {
   const [globalMonsterHealths, setGlobalMonsterHealths] = useState({}); // New state
   const [monsterTypes, setMonsterTypes] = useState({}); // New: Maps ID to type (e.g., { 'spider_2_18_2': 'spider' })
   const [originalSpawns, setOriginalSpawns] = useState({});
-const [lastDamageTime, setLastDamageTime] = useState(Date.now());
+  const [lastDamageTime, setLastDamageTime] = useState(Date.now());
+
+  // Derive monster types directly from JSON
+  const MONSTER_TYPES = Object.keys(MONSTER_DATA);
+  const isMonster = (type) => MONSTER_TYPES.includes(type);
 
   /* --------------------------------------------------------------
      2. Helper: update a single level (must be defined first)
@@ -277,7 +283,11 @@ const RESPAWN_DELAYS = {
   littlespider: 2000,
   skeleton1: 30000,
   cavespider: 50000,      
-  deadshriek: 50000,    
+  deadshriek: 50000,
+  swamptroll: 30000,
+  swamptroll1: 30000,
+  swampgolem: 30000,
+  swampgolem1: 30000,
   default: 10000
 };
 
@@ -513,11 +523,11 @@ useEffect(() => {
     // Scan current monsters in objects
     Object.entries(level.objects).forEach(([key, objId]) => {
       if (typeof objId !== 'string' || !objId.includes('_')) return;
-      
-      const type = objId.split('_')[0];
-      if (!['spider', 'littlespider', 'skeleton1', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
 
-      // If tile is empty or wrong → respawn
+      const type = objId.split('_')[0];
+      if (!isMonster(type)) return;
+
+      // Respawn if missing or changed
       if (!level.objects[key] || level.objects[key] !== objId) {
         console.log(`[SWEEP] Respawn ${type} at ${key}`);
         scheduleRespawn(currentLevel, key, type, 0);
@@ -558,18 +568,13 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
 
   // === MONSTER IS DEAD ===
   const type = monsterTypes[monsterId];
-  if (!['spider', 'littlespider', 'skeleton1', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
+  if (!isMonster(type)) return;
 
   // 1. DROP LOOT (in objects)
   const parts = monsterId.split('_');
   const x = parts[2], y = parts[3];
   const key = `${x},${y}`;
   const levelId = Number(parts[1]);
-
-  // Loot handled in CombatSystem
-  // const loot = ['spider', 'littlespider', 'cavespider'].includes(type) && Math.random() < 0.33
-  //   ? 'spiderweb'
-  //   : 'gold';
 
   // 2. FULL CLEANUP
   setGlobalMonsterHealths(prev => {
@@ -626,17 +631,17 @@ useEffect(() => {
       /* ---------- objects → monster IDs ---------- */
       const objects = { ...data.objects || {} };
       Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (['skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
+        if (isMonster(type)) {
           const [x, y] = key.split(',').map(Number);
           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
           objects[key] = monsterId;
 
           setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
           // ── use base health from monsterData ──
-setGlobalMonsterHealths(prev => ({
-  ...prev,
-  [monsterId]: MONSTER_DATA[type]?.hp ?? 100
-}));
+          setGlobalMonsterHealths(prev => ({
+            ...prev,
+            [monsterId]: MONSTER_DATA[type]?.hp ?? 100
+          }));
 
         }
       });
