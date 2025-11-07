@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadMaps } from '../data/loadMaps';
 import MONSTER_DATA from '../../public/data/monsters.json';
+import { ITEMS } from '../components/Items.jsx';
 
 const ROWS = 16;
 const COLS = 24;
@@ -141,9 +142,22 @@ const onHealPopupFinish = useCallback(() => {
   setHealPopup(null);
 }, []);
 // Inventory
-  const onInventoryChange = useCallback((updater) => {
-    setGlobalInventory(prev => (typeof updater === 'function' ? updater(prev) : updater));
-  }, []);
+const onInventoryChange = useCallback((updater) => {
+  setGlobalInventory(prev => {
+    const next = typeof updater === 'function' ? updater(prev) : updater;
+
+    // Clean zero quantities
+    const cleaned = { ...next };
+    Object.keys(cleaned).forEach(key => {
+      if (cleaned[key] === 0) delete cleaned[key];
+    });
+
+    return cleaned; // ← NO equipment here!
+  });
+}, []);
+  // const onInventoryChange = useCallback((updater) => {
+  //   setGlobalInventory(prev => (typeof updater === 'function' ? updater(prev) : updater));
+  // }, []);
 
   
   /* --------------------------------------------------------------
@@ -168,7 +182,8 @@ const onHealPopupFinish = useCallback(() => {
   if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
   // ---- 3. PICK-UP -------------------------------------------------
-  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject','rockobject', 'dark-armor', 'knights-armor', 'short-sword']);
+  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject',
+    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow']);
   let pickupItem = null;
 
   if (targetObj && PICKUP.has(targetObj)) {

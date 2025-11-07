@@ -3,15 +3,20 @@
     "hp": 200, 
     "name": "SKELETON",
     "xp": [35, 55],
+    "damage": { "min": 10, "max": 15 },
+    "range": 1,
     "loot": [
-      { "id": "knights-armor", "chance": 0.8 },
-      { "id": "short-sword", "chance": 0.6 }
+      { "id": "bow", "chance": 0.8 },
+      { "id": "knights-armor", "chance": 0.5 },
+      { "id": "short-sword", "chance": 0.5 }
     ]
   },
   "spider": { 
     "hp": 200, 
     "name": "SPIDER",
     "xp": [25, 45],
+    "damage": { "min": 0, "max": 15 },
+    "range": 1,
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },
@@ -22,6 +27,8 @@
     "hp": 300, 
     "name": "ARACHNID",
     "xp": [50, 80],
+    "damage": { "min": 0, "max": 10 },
+    "range": 1,
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },
@@ -32,6 +39,8 @@
     "hp": 500, 
     "name": "CAVE SPIDER",
     "xp": [120, 180],
+    "damage": { "min": 0, "max": 30 },
+    "range": 1,
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },
@@ -42,6 +51,8 @@
     "hp": 600, 
     "name": "DEMON SPIDER",
     "xp": [200, 300],
+    "damage": { "min": 20, "max": 70 },
+    "range": 3,
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },
@@ -52,6 +63,8 @@
     "hp": 1000, 
     "name": "DEAD SHRIEK",
     "xp": [500, 750],
+    "damage": { "min": 15, "max": 70 },
+    "range": 4,
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },

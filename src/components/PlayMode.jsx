@@ -15,6 +15,8 @@ import './PlayMode.css';
 import { PickupPopup } from './PickupPopup';
 import { DamagePopup } from './DamagePopup';
 
+import { useEquipment } from './hooks/useEquipment';
+
 // For cool downs (CombatSystem and CooldownBar)
 const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
 // Add this near your other constants (e.g. in Objects.js or a new file)
@@ -94,6 +96,14 @@ useEffect(() => {
   // Tell .player class which direction class to render 
   const [moveDirection, setMoveDirection] = useState(null);
   // console.log('[PlayMode] current moveDirection →', moveDirection);
+
+  // -- Equipment ------------------------
+  // ---- ONE place that knows what is equipped ----
+  const { equipment, inventory } = useEquipment(globalInventory);
+  // ← PUT IT HERE
+  useEffect(() => {
+    console.log('EQUIPPED:', equipment);
+  }, [equipment]); // ← Re-run when equipment changes
   // ── Battle System ─────────────────────────────────────────────────────
   // Stand still in same area as monsters to start loading range combat
 const [cooldownSignal, setCooldownSignal] = useState({ active: false, type: null });
@@ -192,7 +202,9 @@ const removePickupPopup = useCallback((id) => {
   useEffect(() => {
     const newDropped = new Set();
     Object.keys(objects).forEach(k => {
-      if (objects[k] === 'woodobject' || objects[k] === 'rockobject' || objects[k] === 'spiderweb') newDropped.add(k);
+      if (objects[k] === 'woodobject' || objects[k] === 'rockobject' || objects[k] === 'spiderweb' || objects[k] === 'knights-armor' 
+        || objects[k] === 'short-sword' || objects[k] === 'wing-armor'
+      ) newDropped.add(k);
     });
     setDroppedItems(newDropped);
   }, [objects]);
@@ -270,6 +282,7 @@ const removePickupPopup = useCallback((id) => {
         monsterData={monsterData}
         // playerXp={player.xp}
         // setPlayerXp={setPlayerXp}
+        equipment={equipment}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -287,6 +300,7 @@ const removePickupPopup = useCallback((id) => {
         inventory={globalInventory}
         onInventoryChange={onInventoryChange}
         activeQuests={activeQuests}
+        equipment={equipment}
       />
 
       {/* ---------- DEATH SCREEN ---------- */}

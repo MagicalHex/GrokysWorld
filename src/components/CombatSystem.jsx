@@ -2,43 +2,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 // import { DamagePopup } from './DamagePopup';
 import { subscribe } from '../utils/gameLoop';
+import { ITEMS } from './Items';
+
+import {
+  getWeaponStats,
+  getArmorDefense
+} from './combatUtils';
 
 // Random integer in [min, max] inclusive
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-// -------------------------------------------------------------------
-// 1. Weapon → damage table
-// -------------------------------------------------------------------
-const WEAPON_DAMAGE_RANGES = {
-  fist:   { min:  40, max: 50 },
-  dagger: { min: 12, max: 20 },
-  sword:  { min: 18, max: 25 },
-  crossbow: { min:  5, max:  70 }, // Auto-use this when in range
-};
+// ---------------------------------------------------------------------
 
-const MONSTER_DAMAGE_RANGES = {
-  littlespider:     { min:  0, max: 10 },
-  spider:     { min:  0, max: 15 },
-  skeleton:   { min:  0, max: 20 },
-  cavespider: { min:  0, max: 30 },
-  demonspider: { min:  0, max: 70 },
-  deadshriek: { min:  0, max: 70 },
-};
-
-const getEquippedWeapon = (inventory) => {
-  if (!inventory) return 'fist';
-  if (Array.isArray(inventory)) {
-    const equipped = inventory.find(item => item.equipped);
-    return equipped?.type || 'fist';
-  }
-  if (typeof inventory === 'object') {
-    if (inventory.equipped) return inventory.equipped;
-    if (inventory.sword) return 'sword';
-    if (inventory.dagger) return 'dagger';
-    if (inventory.crossbow) return 'crossbow';
-  }
-  return 'fist';
-};
+// Monster stats (hardcoded for now - can move to separate file later)
+// const getMonsterStats = (type) => ({
+//   littlespider:  { min:  0, max: 10, range: 1 },
+//   spider:        { min:  0, max: 15, range: 1 },
+//   skeleton:      { min:  0, max: 20, range: 1 },
+//   cavespider:    { min:  0, max: 30, range: 1 },
+//   demonspider:   { min: 20, max: 70, range: 3 },
+//   deadshriek:    { min: 15, max: 70, range: 4 }
+// }[type] || { min: 0, max: 20, range: 1 });
 
 export default function CombatSystem({
   playerPos,
@@ -66,7 +50,8 @@ export default function CombatSystem({
   cooldowns,
   monsterData,
   playerXp,
-  setPlayerXp
+  setPlayerXp,
+  equipment
 }) {
   // const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const distance = (p1, p2) => {
@@ -91,7 +76,8 @@ export default function CombatSystem({
     addPopup: null, // will be set below
       cooldownSignal,
   setCooldownSignal,
-  currentLevel
+  currentLevel,
+  equipment
   });
 
   // Update refs on every render
@@ -111,7 +97,8 @@ export default function CombatSystem({
       addPopup: refs.current.addPopup, // preserve function
         cooldownSignal,
   setCooldownSignal,
-  currentLevel
+  currentLevel,
+  equipment
     };
   }, [
     playerPos,
@@ -129,7 +116,8 @@ export default function CombatSystem({
     popups,
       cooldownSignal,
   setCooldownSignal,
-  currentLevel
+  currentLevel,
+  equipment
   ]);
 
   // === DAMAGE POPUPS ===
@@ -189,6 +177,16 @@ useEffect(() => {
   return () => clearTimeout(timer);
 }, [healPopup, onHealPopupFinish, addPopup]);
 
+// Inside your CombatSystem component (attack loop/tick)
+useEffect(() => {
+  // Log ONCE when equipment changes
+  console.log('🎮 COMBAT SYSTEM - Equipment:', equipment);
+  const weaponStats = getWeaponStats(equipment);
+  const armorDefense = getArmorDefense(equipment);
+  
+  console.log('⚔️  WEAPON STATS:', weaponStats);
+  console.log('🛡️  ARMOR DEFENSE:', armorDefense);
+}, [equipment]); // Re-run when equipment changes
   // === MAIN COMBAT LOOP (via gameLoop) ===
 useEffect(() => {
   // === Used for both attacks (here) and CooldownBar (PlayMode) to reset. ===
@@ -216,7 +214,8 @@ useEffect(() => {
       inventory,
       addPopup,
       setCooldownSignal,
-      currentLevel
+      currentLevel,
+      equipment
     } = refs.current;
 
     if (isDead) return;
@@ -243,37 +242,40 @@ let attackCooldownType = null;
       if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
       // if (mLevel !== currentLevel) continue; This breaks it
 
-      const d = distance(mPos, playerPos);
-      const isAdjacent = d <= 1;
-      const isInRanged = d <= 3;
+// 1. PLAYER ATTACK - Updated to use dynamic weapon range/damage
+const d = distance(mPos, playerPos);
+// const weapon = getEquippedWeapon(inventory);  // Gets 'bow', 'sword', etc.
+const weaponStats = getWeaponStats(equipment);  // { damage: {min,max}, range }
+const weaponRange = weaponStats.range || 1;
+const isInWeaponRange = d <= weaponRange;
+const isAdjacent = d <= 1;
 
-if (isInRanged) {
-    hasMonsterInRange = true;
-    if (isAdjacent) nearestRangeType = 'melee';
-    else if (!nearestRangeType) nearestRangeType = 'ranged';
-  }
+if (isInWeaponRange) {
+  hasMonsterInRange = true;
+  if (isAdjacent) nearestRangeType = 'melee';
+  else if (!nearestRangeType) nearestRangeType = 'ranged';
+}
 
-  // === PLAYER ATTACK — ONLY ONCE PER TICK ===
-  if (!attackedThisTick && 
-      isInRanged && 
-now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
-    
-    // === DO THE ATTACK ===
-    const weapon = getEquippedWeapon(inventory);
-    const range = isAdjacent 
-      ? (WEAPON_DAMAGE_RANGES[weapon] ?? WEAPON_DAMAGE_RANGES.fist)
-      : WEAPON_DAMAGE_RANGES.crossbow;
-    const dmg = randInt(range.min, range.max);
+// === PLAYER ATTACK — ONLY ONCE PER TICK ===
+if (!attackedThisTick && 
+    isInWeaponRange && 
+    now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
+  
+  // === DO THE ATTACK ===
+  const { min: dmgMin, max: dmgMax } = weaponStats.damage;
+  const dmg = randInt(dmgMin, dmgMax);
 
-    const curHealth = globalMonsterHealths[objId] ?? 100;
-    const newHealth = Math.max(0, curHealth - dmg);
+  console.log(`⚔️  Player (${dmgMin}-${dmgMax}) → ${dmg} dmg to ${type}`);
 
-    onMonsterHealthChange(objId, newHealth);
-    addPopup({
-      x: mPos.x,
-      y: mPos.y,
-      dmg
-    });
+  const curHealth = globalMonsterHealths[objId] ?? 100;
+  const newHealth = Math.max(0, curHealth - dmg);
+
+  onMonsterHealthChange(objId, newHealth);
+  addPopup({
+    x: mPos.x,
+    y: mPos.y,
+    dmg
+  });
 
 if (newHealth <= 0) {
   const monster = monsterData[type];
@@ -310,13 +312,7 @@ if (newHealth <= 0) {
     }
   });
 
-  // 3. Special case: spider web drop
-  // const isSpider = ['spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type);
-  // if (isSpider && Math.random() < 0.33) {
-  //   drops.push('spiderweb');
-  // }
-
-  // 4. Pick one drop (or default to gold)
+  // 3. Pick one drop (or default to gold)
   const droppedItem = drops.length > 0 ? drops[Math.floor(Math.random() * drops.length)] : 'gold';
   newObjects[key] = droppedItem;
   objectsChanged = true;
@@ -331,18 +327,37 @@ if (newHealth <= 0) {
     setCooldownSignal({ active: true, type: attackCooldownType });
       }
 
-      // === MONSTER ATTACK ===
-      if (isAdjacent && now - (lastMonsterAttack[objId] ?? 0) >= MONSTER_COOLDOWN) {
-        const { min, max } = MONSTER_DAMAGE_RANGES[type] ?? MONSTER_DAMAGE_RANGES.skeleton;
-        const dmg = randInt(min, max);
-        onPlayerHealthChange(prev => {
-          const newHealth = Math.max(0, prev - dmg);
-          if (newHealth < prev) refs.current.setLastDamageTime?.(Date.now());
-          if (newHealth <= 0 && !refs.current.isDead) refs.current.setIsDead(true);
-          return newHealth;
-        });
-        lastMonsterAttack[objId] = now;
-      }
+// === MONSTER ATTACK ===
+const monster = monsterData[type];
+if (!monster) {
+  console.warn(`No monster data for type: ${type}`);
+  continue; // skip
+}
+
+const { damage, range: monsterRange = 1 } = monster;
+if (!damage) {
+  console.warn(`No damage defined for ${type}, using fallback`);
+  damage = { min: 5, max: 10 };
+}
+
+// const d = distance(mPos, playerPos);
+
+if (d <= monsterRange && now - (lastMonsterAttack[objId] ?? 0) >= MONSTER_COOLDOWN) {
+  const rawDmg = randInt(damage.min, damage.max);
+  const armorDefense = getArmorDefense(equipment);
+  const finalDmg = Math.max(1, rawDmg - armorDefense);
+
+  console.log(`Monster ${type}: ${rawDmg} - ${armorDefense} = ${finalDmg} dmg → player`);
+
+  onPlayerHealthChange(prev => {
+    const newHealth = Math.max(0, prev - finalDmg);
+    if (newHealth < prev) refs.current.setLastDamageTime?.(Date.now());
+    if (newHealth <= 0 && !refs.current.isDead) refs.current.setIsDead(true);
+    return newHealth;
+  });
+
+  lastMonsterAttack[objId] = now;
+}
     }
 
     if (objectsChanged) onObjectsChange(newObjects);
