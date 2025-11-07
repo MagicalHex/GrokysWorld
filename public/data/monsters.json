@@ -11,6 +11,18 @@
       { "id": "short-sword", "chance": 0.5 }
     ]
   },
+  "skeleton1": { 
+    "hp": 200, 
+    "name": "SKELETON",
+    "xp": [35, 55],
+    "damage": { "min": 10, "max": 15 },
+    "range": 1,
+    "loot": [
+      { "id": "bow", "chance": 0.8 },
+      { "id": "knights-armor", "chance": 0.5 },
+      { "id": "short-sword", "chance": 0.5 }
+    ]
+  },
   "spider": { 
     "hp": 200, 
     "name": "SPIDER",

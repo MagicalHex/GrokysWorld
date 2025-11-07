@@ -1141,6 +1141,66 @@ ease-in-out infinite; */
   0%, 100% { filter: brightness(1); }
   50% { filter: brightness(1.1) hue-rotate(5deg); }
 }
+.object.mossystonelarge {
+  /* SIZE */
+  width: 92px;
+  height: 92px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: 
+    translateX(-10px) 
+    translateY(-15px) 
+    perspective(600px) 
+    rotateX(12deg) 
+    rotateZ(-3deg);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* MAIN ROCK BODY */
+.object.mossystonelarge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 30% 30%, #2a5e2a 0%, transparent 50%),
+    linear-gradient(135deg, 
+      #3a3a3a 0%, 
+      #2d2d2d 30%, 
+      #1b4a1b 60%, 
+      #1a3d1a 80%, 
+      #163416 100%
+    );
+  background-size: cover;
+  border-radius: 
+    12px 28px 18px 22px / 
+    20px 16px 30px 24px;
+  
+  box-shadow: 
+    16px 20px 24px rgba(10, 20, 10, 0.6),
+    8px 12px 16px rgba(0, 0, 0, 0.5),
+    4px 6px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(100, 255, 100, 0.25),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(39, 255, 39, 0.2); 
+  
+  border: 1px solid #1a3a1a;
+  filter: contrast(1.1) brightness(0.95);
+  z-index: 1;
+}
+
+.rock:hover::before {
+  box-shadow: 
+    16px 24px 28px rgba(10, 20, 10, 0.7),
+    8px 14px 18px rgba(0, 0, 0, 0.6),
+    4px 8px 10px rgba(0, 0, 0, 0.5),
+    inset 0 2px 5px rgba(100, 255, 100, 0.35),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+    0 0 30px rgba(39, 255, 39, 0.35);
+}
+
+/* OTHER */ 
 
 /* Animation for dropped items */
 .object.dropped-item {
@@ -1256,6 +1316,48 @@ ease-in-out infinite; */
   width: 300%;
   height: 300%;
   animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.demon1 {
+  background: url('/ownemojis/demon1.webp') center/contain no-repeat;
+  width: 300%;
+  height: 300%;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.swampgolem {
+  background: url('/ownemojis/swampgolem.webp') center/contain no-repeat;
+  width: 300%;
+  height: 300%;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.swampgolem1 {
+  background: url('/ownemojis/swampgolem1.webp') center/contain no-repeat;
+  width: 200%;
+  height: 200%;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.swamptroll {
+  background: url('/ownemojis/swamptroll.webp') center/contain no-repeat;
+  width: 200%;
+  height: 200%;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.swamptroll1 {
+  background: url('/ownemojis/swamptroll1.webp') center/contain no-repeat;
+  width: 200%;
+  height: 200%;
+  animation: skeleton-rattle 0.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px red);
+}
+.object.skeleton1 {
+  background: url('/ownemojis/skeleton1.webp') center/contain no-repeat;
+  width: 180%;
+  height: 180%;
+  animation: skeleton-rattle 1s ease-in-out infinite;
   filter: drop-shadow(0 0 3px red);
 }
 .object.littlespider {

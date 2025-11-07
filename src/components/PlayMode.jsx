@@ -350,7 +350,7 @@ const removePickupPopup = useCallback((id) => {
 
     {/* Health Bar for monsters */}
 {/* Health Bar for monsters */}
-{['skeleton', 'spider', 'littlespider', 'demonspider', 'deadshriek', 'cavespider'].includes(monsterTypes[obj]) && (
+{['skeleton1', 'spider', 'littlespider', 'demonspider', 'deadshriek', 'cavespider'].includes(monsterTypes[obj]) && (
   <div className="monster-health-container">
     <div className="monster-name">
       {monsterData[monsterTypes[obj]]?.name}

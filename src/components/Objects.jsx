@@ -115,6 +115,7 @@ export const OBJECTS = {
   // Stones with moss
   stonemossy: '',
   mossystone: '',
+  mossystonelarge: '',
 
   // Demon/Deep dark caves
   stoneobjectjagged: '',
@@ -148,6 +149,15 @@ export const OBJECTS = {
   demonspider: '',
   demonspider1: '',
   deadshriek: '',
+  demon1: '',
+
+  // SWAMP MONSTERS
+  swampgolem:'',
+  swampgolem1:'',
+  swamptroll:'',
+  swamptroll1:'',
+  skeleton1: '',
+
   // ITEMS - ARMORS
   'dark-armor': '',
   'knights-armor': '',

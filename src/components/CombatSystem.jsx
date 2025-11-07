@@ -238,7 +238,7 @@ let attackCooldownType = null;
 
       // Skip non-monsters, dead, or wrong level
       const type = monsterTypes[objId];
-      if (!type || !['skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) continue;
+      if (!type || !['skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) continue;
       if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
       // if (mLevel !== currentLevel) continue; This breaks it
 

@@ -19,7 +19,7 @@ const PORTAL_ENTRY_POINTS = {
   
 const RESTRICTED_TERRAIN = new Set([
   'stone', 'stonepillar', 'grassnowalk',
-  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl', 'lava'
+  'timberwallup', 'timberwallside', 'timberwallcornerright', 'timberwallcornerleft', 'mscv', 'none', 'mscl', 'lava', 'slime', 'slimedark'
 ]);
 
 export const useGameState = () => {
@@ -275,7 +275,7 @@ const RESPAWN_DELAYS = {
   lightstoneobject: 2000,
   spider: 2000,
   littlespider: 2000,
-  skeleton: 30000,
+  skeleton1: 30000,
   cavespider: 50000,      
   deadshriek: 50000,    
   default: 10000
@@ -515,7 +515,7 @@ useEffect(() => {
       if (typeof objId !== 'string' || !objId.includes('_')) return;
       
       const type = objId.split('_')[0];
-      if (!['spider', 'littlespider', 'skeleton', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
+      if (!['spider', 'littlespider', 'skeleton1', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
 
       // If tile is empty or wrong → respawn
       if (!level.objects[key] || level.objects[key] !== objId) {
@@ -558,7 +558,7 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
 
   // === MONSTER IS DEAD ===
   const type = monsterTypes[monsterId];
-  if (!['spider', 'littlespider', 'skeleton', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
+  if (!['spider', 'littlespider', 'skeleton1', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) return;
 
   // 1. DROP LOOT (in objects)
   const parts = monsterId.split('_');
@@ -626,7 +626,7 @@ useEffect(() => {
       /* ---------- objects → monster IDs ---------- */
       const objects = { ...data.objects || {} };
       Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (['skeleton', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
+        if (['skeleton1', 'spider', 'littlespider', 'cavespider', 'demonspider', 'deadshriek'].includes(type)) {
           const [x, y] = key.split(',').map(Number);
           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
           objects[key] = monsterId;
