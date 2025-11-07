@@ -21,6 +21,7 @@ function App() {
   const [mode, setMode] = useState('free');
   const [playMode, setPlayMode] = useState(false);
   const [sessionId] = useState(uuidv4());
+  const [hasSeenIntro, setHasSeenIntro] = useState(false); // Show intro once
 
   // ------------------------------------------------------------------ //
   // Game loop (unchanged)
@@ -182,21 +183,27 @@ useEffect(() => {
   }
 
   // ------------------------------------------------------------------ //
-  // 3. PRODUCTION-ONLY WELCOME OVERLAY
+  // 3. PRODUCTION-ONLY WELCOME OVERLAY (only on first load)
   // ------------------------------------------------------------------ //
-  if (!isDev && !playMode) {
+  if (!isDev && !playMode && !hasSeenIntro) {
     return (
       <div className="welcome-overlay">
         <div className="welcome-modal">
-          <h1>Welcome to Groky's World! 🌟</h1>
+          <h1>Welcome to Groky's World!</h1>
           <p>
-            <kbd>↑↓←→</kbd> to move around<br/><br/>
-            <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them<br/><br/>
+            <kbd>↑↓←→</kbd> to move around. You will only use the key arrows for everything.<br/><br/>
+            <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them (like IRL)<br/><br/>
             Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/><br/>
             Talk to the <strong>mushroom in town</strong> for quests
           </p>
-          <button className="play-button" onClick={() => setPlayMode(true)}>
-            PLAY 🎮
+          <button 
+            className="play-button" 
+            onClick={() => {
+              setPlayMode(true);
+              setHasSeenIntro(true);
+            }}
+          >
+            PLAY
           </button>
         </div>
       </div>
