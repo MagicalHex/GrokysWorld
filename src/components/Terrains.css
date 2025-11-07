@@ -91,6 +91,130 @@ background: linear-gradient(to right, #026802 0%, #006400 50%, #006800 100%);
       inset 0 0 20px rgba(255, 140, 0, 0.6);
   }
 }
+.tile.slimedark {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(59, 59, 59);
+  border-radius: 6px 12px;
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    #003300 0%,    /* dark green at top (source) */
+    #006600 25%,
+    #003500 60%,
+    #083300 100%   /* bright glow at bottom (pool) */
+  );
+  background-size: 100% 200%;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),           /* shadow under (on ground) */
+    0 0 12px #0f5702,
+    0 0 20px #002700,
+    inset 0 2px 4px rgba(0, 255, 0, 0.3),    /* light from below */
+    inset 0 -4px 6px rgba(0, 50, 0, 0.6);    /* dark rim at top */
+  z-index: 5;                               /* below floor tiles */
+  overflow: hidden;
+  transform: translateY(2px);
+}
+.tile.slime {
+  width: 40px;
+  height: 40px;
+  border: 1px solid limegreen;
+  border-radius: 18px 2px 18px 12px;
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    #37ff1476 0%,
+    #00cc00 30%,
+    #1f9a1f 60%,
+    #0f5c0f 100%
+  );
+  background-size: 200% 200%;
+  box-shadow: 
+    0 0 12px #39ff14,
+    0 0 20px #00ff00,
+    inset 0 0 16px rgba(0, 255, 0, 0.5),
+    inset 0 -2px 4px rgba(0, 100, 0, 0.6);
+  
+  /* BUBBLE & WOBBLE */
+  /* animation: 
+    slime-bubble 1.6s ease-in-out infinite,
+    slime-wobble 2.2s ease-in-out infinite alternate,
+    slime-glow 3s ease-in-out infinite alternate; */
+  z-index: 10;
+  /* overflow: hidden; */
+}
+
+/* Bubbles rising */
+.slime::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(150, 255, 150, 0.7);
+  border-radius: 50%;
+  top: 80%;
+  left: 20%;
+  animation: bubble-rise 2s infinite ease-out;
+  box-shadow: 0 0 6px #bfff00;
+}
+.slime::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(200, 255, 200, 0.8);
+  border-radius: 50%;
+  top: 85%;
+  left: 60%;
+  animation: bubble-rise 1.8s infinite ease-out 0.4s;
+  box-shadow: 0 0 6px #bfff00;
+}
+@keyframes bubble-rise {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.7; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+
+/* THIS SHOULD PROBABLY BE AN OBJECT ON WATER TERRAIN */
+.tile.nectar {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 2; /* BELOW floor (z-index 10) */
+
+  /* RECESSED CRACK BACKGROUND */
+  background: 
+    radial-gradient(ellipse at center, 
+      #075f07 0%, 
+      #0b9c0b 40%, 
+      #0c6e0c 70%, 
+      #075907 100%
+    ),
+    linear-gradient(180deg, 
+      #065d06 0%, 
+      #0d7d0d 50%, 
+      #074007 100%
+    );
+  background-blend-mode: multiply;
+
+  /* CRACK EDGES — dark rim at top (floor shadow) */
+  box-shadow: 
+    inset 0 6px 8px rgba(0, 0, 0, 0.6),
+    inset 0 -2px 3px rgba(0, 50, 0, 0.4),   
+    0 0 6px rgba(0, 255, 0, 0.15),         
+    0 2px 4px rgba(0, 0, 0, 0.3);     
+
+  border: 20px solid #0a2a0a;
+  border-top: 2px solid #051805;
+  border-radius: 20px;
+
+  /* SINK IT */
+  transform: translateY(3px) scale(0.95);
+  filter: brightness(1.0) contrast(1.1);
+  overflow: hidden;
+}
+
 /* ⛰️ MOUNTAIN - Rocky gray gradient */
 .tile.mountain { 
   background: linear-gradient(145deg, #6c757d 0%, #495057 70%, #343a40 100%);

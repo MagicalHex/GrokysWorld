@@ -112,6 +112,11 @@ export const OBJECTS = {
   stoneobjectstraighthalfuplonger: '',
   stoneobjectstraighthalfside: '',
 
+  // Stones with moss
+  stonemossy: '',
+  mossystone: '',
+
+  // Demon/Deep dark caves
   stoneobjectjagged: '',
   stoneobjectjaggedsmall: '',
 

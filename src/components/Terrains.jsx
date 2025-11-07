@@ -16,6 +16,8 @@ export const TERRAINS = {
   mountain: '#6c757d',
   forest: '#155724',
   field: '#28a745',
+  slime: '#28a745',
+  slimedark: '#28a745',
 
   // CAVE
   msc: 'green', // msc = mossy cave tile
