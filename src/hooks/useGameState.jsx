@@ -8,7 +8,7 @@ import { ITEMS } from '../components/Items.jsx';
 const ROWS = 16;
 const COLS = 24;
 const PORTAL_ENTRY_POINTS = { 
-  1: { x: 1, y: 1 }, // Town
+  1: { x: 11, y: 8 }, // Town
   2: { x: 1, y: 2 }, // Wilderness
   3: { x: 1, y: 2 }, // Slimecave
   4: { x: 4, y: 4 }, // StoneCave
@@ -700,7 +700,7 @@ useEffect(() => {
     setLastDamageTime,
 
     monsterData: MONSTER_DATA, // For setting different healths on different monsters
-
+PORTAL_ENTRY_POINTS,
     setCurrentLevel,
     onLevelChange,
     onObjectsChange,

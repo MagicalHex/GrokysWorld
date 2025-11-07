@@ -88,7 +88,42 @@ function App() {
     onHealPopupFinish,
     lastDamageTime,
     setLastDamageTime,
+    PORTAL_ENTRY_POINTS
   } = game;
+
+// ------------------------------------------------------------------ //
+// AUTO-SET PLAYER SPAWN POSITION after load
+// ------------------------------------------------------------------ //
+useEffect(() => {
+  if (!isLoading && currentLevelData && !playMode) {
+    const level = currentLevel || 1;
+    const spawn = PORTAL_ENTRY_POINTS[level] || { x: 11, y: 8 };
+    
+    // Only set if no playerPos exists OR it's the default (0,0)
+    if (
+      !currentLevelData.playerPos || 
+      (currentLevelData.playerPos.x === 0 && currentLevelData.playerPos.y === 0)
+    ) {
+      console.log(`[AUTO-SPAWN] Setting player to level ${level} spawn: (${spawn.x}, ${spawn.y})`);
+      
+      // Use the same logic as EditWorld's player placement
+      const key = `${spawn.x},${spawn.y}`;
+      const newObjects = { ...currentLevelData.objects };
+      
+      // Remove any existing player object
+      Object.keys(newObjects).forEach(objKey => {
+        if (newObjects[objKey] === 'player') {
+          delete newObjects[objKey];
+        }
+      });
+      
+      // Set new player position
+      newObjects[key] = 'player';
+      onPlayerPosChange({ x: spawn.x, y: spawn.y });
+      onObjectsChange(newObjects);
+    }
+  }
+}, [isLoading, currentLevelData, currentLevel, playMode, onPlayerPosChange, onObjectsChange]);
 
   // ------------------------------------------------------------------ //
   // Loading screen
@@ -153,64 +188,17 @@ function App() {
     return (
       <div className="welcome-overlay">
         <div className="welcome-modal">
-          <h1>Welcome to Groky's World!</h1>
+          <h1>Welcome to Groky's World! 🌟</h1>
           <p>
-            Use <kbd>WASD</kbd> or <kbd>↑←↓→</kbd> to move.<br />
-            Pick up items, fight monsters, and explore the levels.
+            <kbd>↑↓←→</kbd> to move around<br/><br/>
+            <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them<br/><br/>
+            Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/><br/>
+            Talk to the <strong>mushroom in town</strong> for quests
           </p>
           <button className="play-button" onClick={() => setPlayMode(true)}>
             PLAY 🎮
           </button>
         </div>
-
-        {/* Inline CSS – you can move this to App.css if you prefer */}
-        <style jsx>{`
-          .welcome-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            font-family: system-ui, sans-serif;
-          }
-          .welcome-modal {
-            background: #fff;
-            padding: 2rem 3rem;
-            border-radius: 12px;
-            text-align: center;
-            max-width: 90%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-          }
-          .welcome-modal h1 {
-            margin: 0 0 1rem;
-            font-size: 2rem;
-          }
-          .welcome-modal p {
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-          }
-          .play-button {
-            background: #28a745;
-            color: #fff;
-            border: none;
-            padding: 0.75rem 2rem;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-          }
-          .play-button:hover {
-            background: #218838;
-          }
-          kbd {
-            background: #eee;
-            padding: 0.2em 0.4em;
-            border-radius: 4px;
-            font-family: monospace;
-          }
-        `}</style>
       </div>
     );
   }
