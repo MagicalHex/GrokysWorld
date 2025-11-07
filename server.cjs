@@ -55,32 +55,53 @@ if (process.env.MONGODB_URI) {
 } else {
   console.warn('MONGODB_URI not set — running without DB');
 }
+  // === API: CONNECT (deduplicated per sessionId, 10 min cooldown) ===
+  app.post('/api/connect', async (req, res) => {
+    if (!db) return res.json({ ok: false, error: 'DB not ready' });
 
-// === API: CONNECT (insert into BOTH collections) ===
-app.post('/api/connect', async (req, res) => {
-  if (!db) return res.json({ ok: false, error: 'DB not ready' });
+    const liveCol = db.collection('connections_live');
+    const logCol  = db.collection('connections_log');
 
-  const liveCol = db.collection('connections_live');
-  const logCol  = db.collection('connections_log');
+    const { sessionId } = req.body;
+    if (!sessionId) {
+      return res.status(400).json({ ok: false, error: 'Missing sessionId' });
+    }
 
-  const doc = {
-    sessionId: req.body.sessionId || 'unknown',
-    timestamp: new Date(),
-    userAgent: req.headers['user-agent'] || 'unknown'
-  };
+    const now = new Date();
+    const cooldownMs = 10 * 60 * 1000; // 10 minutes
+    const cutoff = new Date(now.getTime() - cooldownMs);
 
-  try {
-    await Promise.all([
-      liveCol.insertOne(doc),
-      logCol.insertOne(doc)
-    ]);
-    console.log('Logged session:', doc.sessionId);
-    res.json({ ok: true });
-  } catch (e) {
-    console.error('POST /api/connect error:', e);
-    res.status(500).json({ error: e.message });
-  }
-});
+    try {
+      // Check if this sessionId was logged in last 10 minutes
+      const recent = await liveCol.findOne({
+        sessionId,
+        timestamp: { $gt: cutoff }
+      });
+
+      if (recent) {
+        console.log('Session already logged recently:', sessionId);
+        return res.json({ ok: true, alreadyCounted: true });
+      }
+
+      // Otherwise, log it
+      const doc = {
+        sessionId,
+        timestamp: now,
+        userAgent: req.headers['user-agent'] || 'unknown'
+      };
+
+      await Promise.all([
+        liveCol.insertOne(doc),
+        logCol.insertOne(doc)
+      ]);
+
+      console.log('New session logged:', sessionId);
+      res.json({ ok: true, alreadyCounted: false });
+    } catch (e) {
+      console.error('POST /api/connect error:', e);
+      res.status(500).json({ error: e.message });
+    }
+  });
 
 // === API: STATS (live = TTL, today = permanent) ===
 app.get('/api/stats', async (req, res) => {
