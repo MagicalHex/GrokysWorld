@@ -228,45 +228,45 @@ const removePickupPopup = useCallback((id) => {
   /* --------------------------------------------------------------
      MOBILE JOYSTICK
      -------------------------------------------------------------- */
-  useEffect(() => {
-    if (!isMobileDevice || !joystickRef.current) return;
+useEffect(() => {
+  if (!isMobileDevice || !joystickRef.current) return;
 
-    const manager = nipplejs.create({
-      zone: joystickRef.current,
-      mode: 'static',
-      position: { left: '80px', bottom: '80px' },
-      color: 'rgba(255,255,255,0.7)',
-      size: 100,
-      threshold: 0.1,
-      restOpacity: 0.6,
-    });
+  const manager = nipplejs.create({
+    zone: joystickRef.current,
+    mode: 'static',
+    position: { left: '50%', top: '50%' },  // Center of its zone
+    color: 'rgba(255,255,255,0.7)',
+    size: 90,
+    threshold: 0.1,
+    restOpacity: 0.6,
+  });
 
-    let moveInterval = null;
+  let moveInterval = null;
 
-manager.on('move', (evt, data) => {
-  if (!data.direction) return;
-  if (moveInterval) clearInterval(moveInterval);
+  manager.on('move', (evt, data) => {
+    if (!data.direction) return;
+    if (moveInterval) clearInterval(moveInterval);
 
-  moveInterval = setInterval(() => {
-    const dir = data.direction.angle;
-    let dx = 0, dy = 0;
-    if (dir === 'up')    dy = -1;
-    if (dir === 'down')  dy = 1;
-    if (dir === 'left')  dx = -1;
-    if (dir === 'right') dx = 1;
+    moveInterval = setInterval(() => {
+      const dir = data.direction.angle;
+      let dx = 0, dy = 0;
+      if (dir === 'up') dy = -1;
+      if (dir === 'down') dy = 1;
+      if (dir === 'left') dx = -1;
+      if (dir === 'right') dx = 1;
 
-    if (dx || dy) {
-      moveAttemptRef.current({ dx, dy });  // ← NOW SENDS {dx,dy}
-    }
-  }, 100);
-});
+      if (dx || dy) {
+        moveAttemptRef.current({ dx, dy });
+      }
+    }, 150);
+  });
 
-    manager.on('end', () => {
-      if (moveInterval) clearInterval(moveInterval);
-    });
+  manager.on('end', () => {
+    if (moveInterval) clearInterval(moveInterval);
+  });
 
-    return () => manager.destroy();
-  }, [isMobileDevice]);
+  return () => manager.destroy();
+}, [isMobileDevice]);
 
   /* --------------------------------------------------------------
      3. Render
@@ -521,23 +521,80 @@ setCooldownSignal={setCooldownSignal}
 cooldowns={COOLDOWNS}
 />
 
-{/* MOBILE JOYSTICK */}
-      {isMobileDevice && (
-        <div
-          ref={joystickRef}
-          style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            width: '180px',
-            height: '180px',
-            zIndex: 1000,
-            pointerEvents: 'auto',
-          }}
-        />
-      )}
+{/* MOBILE CONTROLS BAR */}
+{isMobileDevice && (
+  <div
+    style={{
+      position: 'absolute',
+      bottom: 20,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '40px',
+      zIndex: 1000,
+      pointerEvents: 'none', // Allow clicks through
+    }}
+  >
+    {/* EDIT BUTTON */}
+    <button
+      onClick={onExit}
+      style={{
+        width: 60,
+        height: 60,
+        borderRadius: '50%',
+        background: '#333',
+        color: 'white',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        border: '3px solid #666',
+        pointerEvents: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      E
+    </button>
 
-      <button onClick={onExit}>Edit Mode</button>
+    {/* JOYSTICK ZONE - CENTERED */}
+    <div
+      ref={joystickRef}
+      style={{
+        width: '120px',
+        height: '120px',
+        pointerEvents: 'auto',
+      }}
+    />
+
+    {/* INVENTORY BUTTON */}
+    <button
+      onClick={openInventory}
+      style={{
+        width: 60,
+        height: 60,
+        borderRadius: '50%',
+        background: '#333',
+        color: 'white',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        border: '3px solid #666',
+        pointerEvents: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      I
+    </button>
+  </div>
+)}
+
+      {/* Desktop Edit Button - Hidden on Mobile */}
+{!isMobileDevice && (
+  <button onClick={onExit}>Edit Mode</button>
+)}
     </div>
   );
 };
