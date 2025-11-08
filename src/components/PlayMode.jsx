@@ -278,14 +278,12 @@ useEffect(() => {
      3. Render
      -------------------------------------------------------------- */
   return (
-<div className={`play-mode-container ${isMobileDevice ? 'mobile' : 'desktop'}`}>
+    <div className="play-mode">
 
       <div className="level-label">
         {displayName}
       </div>
 
-{/* MAIN GAME CONTENT */}
-    <div className="play-mode">
       {/* ---------- INPUT ---------- */}
       <PlayerMovement
         playerPos={playerPos}
@@ -525,20 +523,27 @@ useEffect(() => {
       />
 
     {/* COOLDOWN / CHARGE BAR */}
-<CooldownBar signal={cooldownSignal} setCooldownSignal={setCooldownSignal} cooldowns={COOLDOWNS} />
-      {!isMobileDevice && <button onClick={onExit}>Edit Mode</button>}
-    </div>
+<CooldownBar 
+signal={cooldownSignal} 
+setCooldownSignal={setCooldownSignal}
+cooldowns={COOLDOWNS}
+/>
 
-    {/* MOBILE CONTROLS - MOVED OUTSIDE .play-mode, FIXED AT BOTTOM */}
-    {isMobileDevice && (
-      <div className="mobile-controls-bar">
-        <button onClick={onExit} className="mobile-btn">E</button>
+{/* MOBILE CONTROLS BAR */}
+{isMobileDevice && (
+      <div className="mobile-controls">
+        <button onClick={onExit}>E</button>
         <div ref={joystickRef} className="joystick-zone" />
-        <button onClick={openInventory} className="mobile-btn">I</button>
+        <button onClick={openInventory}>I</button>
       </div>
     )}
-  </div>
-);
-}
+
+      {/* Desktop Edit Button - Hidden on Mobile */}
+{!isMobileDevice && (
+  <button onClick={onExit}>Edit Mode</button>
+)}
+    </div>
+  );
+};
 
 export default PlayMode;
