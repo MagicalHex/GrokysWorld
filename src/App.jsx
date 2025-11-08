@@ -149,7 +149,7 @@ useEffect(() => {
         levelName={currentLevelData.name || `Level ${currentLevel}`}
         playerPos={currentLevelData.playerPos}
         onExit={() => setPlayMode(false)}
-baseTileSize={40}
+        tileSize={40}
         rows={rows}
         columns={columns}
         onObjectsChange={onObjectsChange}
