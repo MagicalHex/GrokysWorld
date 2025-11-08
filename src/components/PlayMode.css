@@ -1,7 +1,20 @@
+/* PlayMode.css */
+
+/* DEFAULT: Mobile-first → NO padding */
 .play-mode {
-    background: black;
-      display: grid;
-      padding: 3rem;
+  background: black;
+  display: grid;
+  padding: 1.4rem;
+  margin: 0;
+  /* height: 100%; */
+  overflow: hidden;
+}
+
+/* DESKTOP ONLY: Add padding when screen is large enough */
+@media (min-width: 768px) {
+  .play-mode {
+    padding: 3rem;
+  }
 }
 
 .play-grid {

@@ -1,0 +1,67 @@
+/* src/components/MobileControls.css */
+
+.mobile-controls-bar {
+  /* position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  z-index: 1000;
+  pointer-events: none; /* Let clicks pass through container */
+  padding-bottom: env(safe-area-inset-bottom, 20px); /* iPhone notch support */
+}
+
+.mobile-control-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #333;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: inherit;
+  border: 3px solid #666;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mobile-control-btn:active {
+  transform: scale(0.92);
+  background: #444;
+  border-color: #888;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Optional: subtle glow on hover (desktop PWA) */
+.mobile-control-btn:hover {
+  background: #3a3a3a;
+}
+
+/* Joystick Zone */
+.mobile-joystick-zone {
+  width: 80px;
+  height: 80px;
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px dashed #666;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.mobile-joystick-zone.active {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.15);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  border-style: solid;
+}

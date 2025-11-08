@@ -16,6 +16,7 @@ import { PickupPopup } from './PickupPopup'; // Pickup popup  on player (when mo
 import { DamagePopup } from './DamagePopup'; // Damage popups on monster or player
 import { useEquipment } from './hooks/useEquipment'; // For using equipment
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
+import MobileControls from './MobileControls'; // joystick for mobile and styling
 
 // Mobile play
 import nipplejs from 'nipplejs';
@@ -78,7 +79,7 @@ tileSize: baseTileSize,
     moveAttemptRef.current = onPlayerMoveAttempt;
   }, [onPlayerMoveAttempt]);
 
-  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.6) : baseTileSize;
+  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
@@ -529,13 +530,13 @@ setCooldownSignal={setCooldownSignal}
 cooldowns={COOLDOWNS}
 />
 
-{/* MOBILE CONTROLS BAR */}
-{isMobileDevice && (
-      <div className="mobile-controls">
-        <button onClick={onExit}>E</button>
-        <div ref={joystickRef} className="joystick-zone" />
-        <button onClick={openInventory}>I</button>
-      </div>
+{/* MOBILE CONTROLS - CLEAN & MODULAR */}
+    {isMobileDevice && (
+      <MobileControls
+        onExit={onExit}
+        openInventory={openInventory}
+        joystickRef={joystickRef}
+      />
     )}
 
       {/* Desktop Edit Button - Hidden on Mobile */}
