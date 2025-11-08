@@ -169,34 +169,44 @@ const onInventoryChange = useCallback((updater) => {
   /* --------------------------------------------------------------
      6. NEW: PLAYER MOVE – the whole logic lives here
      -------------------------------------------------------------- */
-  const onPlayerMoveAttempt = useCallback((newPos) => {
+  const onPlayerMoveAttempt = useCallback((move) => {
   const levelId = currentLevel;
   const level = levels[levelId];
   if (!level) return;
 
   const { objects = {}, playerPos, restrictedTiles = new Set() } = level;
 
+  // NORMALIZE: Accept {x,y} OR {dx,dy}
+  let newPos;
+  if ('dx' in move || 'dy' in move) {
+    if (!playerPos) return;
+    newPos = {
+      x: playerPos.x + (move.dx || 0),
+      y: playerPos.y + (move.dy || 0),
+    };
+  } else {
+    newPos = { x: move.x, y: move.y };
+  }
+
+  // Bounds check
+  if (newPos.x < 0 || newPos.x >= columns || newPos.y < 0 || newPos.y >= rows) return;
+
   const newKey = `${newPos.x},${newPos.y}`;
   const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
 
-  // ---- 1. Validate -------------------------------------------------
   if (restrictedTiles.has(newKey)) return;
   const targetObj = objects[newKey];
 
-  // ---- 2. Build new objects map ----------------------------------
   const newObjs = { ...objects };
   if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
-  // ---- 3. PICK-UP -------------------------------------------------
   const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject',
     'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow']);
   let pickupItem = null;
 
   if (targetObj && PICKUP.has(targetObj)) {
-    pickupItem = targetObj;               // <-- tell UI to animate
-    // **Do NOT delete the item yet** – UI will delete after animation
+    pickupItem = targetObj;
   } else {
-    // OBJECTS MUST BE ADDED HERE, OTHERWISE THEY WILL VANISH IN PRODUCTION
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
       'bridge','ladder','hole-to-4', 'hole-to-5', 'hole-to-6', 'hole-to-7', 'hole-to-8', 'hole-to-9',
@@ -209,16 +219,13 @@ const onInventoryChange = useCallback((updater) => {
     }
   }
 
-  // ---- 4. Commit (objects + playerPos + pendingPickup) ------------
   updateLevel(levelId, {
     objects: newObjs,
     playerPos: newPos,
     pendingPickup: pickupItem
   });
-  
-}, [
-  currentLevel, levels, updateLevel, onLevelChange
-]);
+
+}, [currentLevel, levels, updateLevel, columns, rows]);
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
    -------------------------------------------------------------- */

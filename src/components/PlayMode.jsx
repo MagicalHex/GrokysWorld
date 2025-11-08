@@ -243,23 +243,23 @@ const removePickupPopup = useCallback((id) => {
 
     let moveInterval = null;
 
-    manager.on('move', (evt, data) => {
-      if (!data.direction) return;
-      if (moveInterval) clearInterval(moveInterval);
+manager.on('move', (evt, data) => {
+  if (!data.direction) return;
+  if (moveInterval) clearInterval(moveInterval);
 
-      moveInterval = setInterval(() => {
-        const dir = data.direction.angle;
-        let dx = 0, dy = 0;
-        if (dir === 'up') dy = -1;
-        if (dir === 'down') dy = 1;
-        if (dir === 'left') dx = -1;
-        if (dir === 'right') dx = 1;
+  moveInterval = setInterval(() => {
+    const dir = data.direction.angle;
+    let dx = 0, dy = 0;
+    if (dir === 'up')    dy = -1;
+    if (dir === 'down')  dy = 1;
+    if (dir === 'left')  dx = -1;
+    if (dir === 'right') dx = 1;
 
-        if (dx || dy) {
-          moveAttemptRef.current({ dx, dy });
-        }
-      }, 100);
-    });
+    if (dx || dy) {
+      moveAttemptRef.current({ dx, dy });  // ← NOW SENDS {dx,dy}
+    }
+  }, 100);
+});
 
     manager.on('end', () => {
       if (moveInterval) clearInterval(moveInterval);
