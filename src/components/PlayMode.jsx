@@ -240,27 +240,32 @@ useEffect(() => {
   });
 
   manager.on('move', (evt, data) => {
-    if (!data.direction) return;
+    if (!data.direction || !playerPos) return;  // ← ADD playerPos check
 
     const now = Date.now();
     if (now - lastMoveTime.current < moveDelay) return;
     lastMoveTime.current = now;
 
     const dir = data.direction.angle;
-    const dx = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
-    const dy = dir === 'up' ? -1 : dir === 'down' ? 1 : 0;
+    let dx = 0, dy = 0;
+    if (dir === 'up')    dy = -1;
+    if (dir === 'down')  dy = 1;
+    if (dir === 'left')  dx = -1;
+    if (dir === 'right') dx = 1;
 
-    if (dx || dy) {
-      onPlayerMoveAttempt({ dx, dy }); // ← SAME AS KEYBOARD
-    }
-  });
+    // 🔥 FIX: Convert dx,dy → newPos (SAME AS KEYBOARD)
+    const newPos = { 
+      x: playerPos.x + dx, 
+      y: playerPos.y + dy 
+    };
 
-  manager.on('end', () => {
-    setMoveDirection(null); // optional: clear animation
+    console.log('[JOYSTICK] Moving to:', newPos);  // ← LOGGING
+
+    onPlayerMoveAttempt(newPos);  // ← NOW PERFECT MATCH
   });
 
   return () => manager.destroy();
-}, [isMobileDevice, onPlayerMoveAttempt]);
+}, [isMobileDevice, onPlayerMoveAttempt, playerPos]);  // ← ADD playerPos dep
 
   /* --------------------------------------------------------------
      3. Render

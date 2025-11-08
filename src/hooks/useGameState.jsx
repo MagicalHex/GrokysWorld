@@ -170,13 +170,27 @@ const onInventoryChange = useCallback((updater) => {
      6. NEW: PLAYER MOVE – the whole logic lives here
      -------------------------------------------------------------- */
   const onPlayerMoveAttempt = useCallback((newPos) => {
+  console.log('[MOVE ATTEMPT] Input:', newPos);  // ← FIXED: use `newPos`
+
+  // Handle BOTH {x,y} AND {dx,dy}
+  let finalPos;
+  if (newPos.dx !== undefined) {
+    // Joystick format
+    finalPos = { x: playerPos.x + newPos.dx, y: playerPos.y + newPos.dy };
+    console.log('[MOVE] Joystick →', finalPos);
+  } else {
+    // Keyboard format  
+    finalPos = newPos;
+    console.log('[MOVE] Keyboard →', finalPos);
+  }
+
   const levelId = currentLevel;
   const level = levels[levelId];
   if (!level) return;
 
   const { objects = {}, playerPos, restrictedTiles = new Set() } = level;
 
-  const newKey = `${newPos.x},${newPos.y}`;
+  const newKey = `${finalPos.x},${finalPos.y}`;
   const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
 
   // ---- 1. Validate -------------------------------------------------
@@ -188,15 +202,15 @@ const onInventoryChange = useCallback((updater) => {
   if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
   // ---- 3. PICK-UP -------------------------------------------------
-  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject',
-    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow']);
+  const PICKUP = new Set([
+    'spiderweb','timber','coin','gold','potion','woodobject',
+    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow'
+  ]);
   let pickupItem = null;
 
   if (targetObj && PICKUP.has(targetObj)) {
-    pickupItem = targetObj;               // <-- tell UI to animate
-    // **Do NOT delete the item yet** – UI will delete after animation
+    pickupItem = targetObj;
   } else {
-    // OBJECTS MUST BE ADDED HERE, OTHERWISE THEY WILL VANISH IN PRODUCTION
     const PERSIST = new Set([
       'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
       'bridge','ladder','hole-to-4', 'hole-to-5', 'hole-to-6', 'hole-to-7', 'hole-to-8', 'hole-to-9',
@@ -209,16 +223,14 @@ const onInventoryChange = useCallback((updater) => {
     }
   }
 
-  // ---- 4. Commit (objects + playerPos + pendingPickup) ------------
+  // ---- 4. Commit --------------------------------------------------
   updateLevel(levelId, {
     objects: newObjs,
-    playerPos: newPos,
+    playerPos: finalPos,
     pendingPickup: pickupItem
   });
   
-}, [
-  currentLevel, levels, updateLevel, onLevelChange
-]);
+}, [currentLevel, levels, updateLevel, playerPosRef]); // ← ADD playerPos!
 
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
