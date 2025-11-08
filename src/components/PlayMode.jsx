@@ -38,7 +38,7 @@ const PlayMode = ({
   levelName,
   playerPos,
   onExit,
-baseTileSize,  // ← renamed from `tileSize`
+tileSize: baseTileSize,
   rows,
   columns,
   onPlayerMoveAttempt,
@@ -78,44 +78,8 @@ baseTileSize,  // ← renamed from `tileSize`
   useEffect(() => {
     moveAttemptRef.current = onPlayerMoveAttempt;
   }, [onPlayerMoveAttempt]);
-  
-const [tileSize, setTileSize] = useState(baseTileSize);
 
-useEffect(() => {
-  const updateTileSize = () => {
-    if (!isMobileDevice) {
-      setTileSize(baseTileSize);
-      return;
-    }
-
-    // === 1. Use almost full screen ===
-    const availableWidth = window.innerWidth * 0.98;   // ← 98%
-    const availableHeight = window.innerHeight * 0.92; // ← 92% (8% for all UI)
-
-    // === 2. Fit entire grid ===
-    const tileByWidth = availableWidth / columns;
-    const tileByHeight = availableHeight / rows;
-
-    const maxFit = Math.min(tileByWidth, tileByHeight);
-
-    // === 3. Enforce minimum size (optional) ===
-    const finalSize = Math.max(Math.floor(maxFit), 20); // ← allow 20px if needed
-
-    setTileSize(finalSize);
-  };
-
-  updateTileSize();
-  const handler = () => setTimeout(updateTileSize, 50); // tiny debounce
-  window.addEventListener('resize', handler);
-  window.addEventListener('orientationchange', handler);
-
-  return () => {
-    window.removeEventListener('resize', handler);
-    window.removeEventListener('orientationchange', handler);
-  };
-}, [isMobileDevice, baseTileSize, columns, rows]);
-
-  // const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
+  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
@@ -286,31 +250,27 @@ useEffect(() => {
 
   let moveInterval = null;
 
-manager.on('move', (evt, data) => {
-  if (!data.direction) return;
+  manager.on('move', (evt, data) => {
+    if (!data.direction) return;
+    if (moveInterval) clearInterval(moveInterval);
 
-  // Clear any pending move
-  if (moveInterval) clearTimeout(moveInterval);
+    moveInterval = setInterval(() => {
+      const dir = data.direction.angle;
+      let dx = 0, dy = 0;
+      if (dir === 'up') dy = -1;
+      if (dir === 'down') dy = 1;
+      if (dir === 'left') dx = -1;
+      if (dir === 'right') dx = 1;
 
-  // One move per direction change
-  const dir = data.direction.angle;
-  let dx = 0, dy = 0;
-  if (dir === 'up') dy = -1;
-  if (dir === 'down') dy = 1;
-  if (dir === 'left') dx = -1;
-  if (dir === 'right') dx = 1;
+      if (dx || dy) {
+        moveAttemptRef.current({ dx, dy });
+      }
+    }, 150);
+  });
 
-  if (dx || dy) {
-    moveAttemptRef.current({ dx, dy });
-  }
-
-  // Optional: prevent spam
-  moveInterval = setTimeout(() => {}, 200); // debounce
-});
-
-manager.on('end', () => {
-  if (moveInterval) clearTimeout(moveInterval);
-});
+  manager.on('end', () => {
+    if (moveInterval) clearInterval(moveInterval);
+  });
 
   return () => manager.destroy();
 }, [isMobileDevice]);
