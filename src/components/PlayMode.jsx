@@ -112,8 +112,14 @@ const addPopup = useCallback((popup) => {
   // Tell .player class which direction class to render 
   const [moveDirection, setMoveDirection] = useState(null);
   // console.log('[PlayMode] current moveDirection →', moveDirection);
+  // ── Inventory ─────────────────────────────────────────────────────
+  const [showInventory, setShowInventory] = useState(false);
 
-  // -- Equipment ------------------------
+  const openInventory = useCallback(() => {
+    setShowInventory(true);
+  }, []);
+
+  // ── Equipment ─────────────────────────────────────────────────────
   // ---- ONE place that knows what is equipped ----
   const { equipment, inventory } = useEquipment(globalInventory);
   // ← PUT IT HERE
@@ -360,6 +366,8 @@ useEffect(() => {
         onInventoryChange={onInventoryChange}
         activeQuests={activeQuests}
         equipment={equipment}
+        showInventory={showInventory}           // ← ADD
+        setShowInventory={setShowInventory}
       />
 
       {/* ---------- DEATH SCREEN ---------- */}

@@ -103,16 +103,19 @@ const PlayerInventory = ({
   equipment, // ← from useEquipment in parent
   onInventoryChange,
   activeQuests = {},
+  showInventory,        // ← RECEIVE
+  setShowInventory
 }) => {
-  const [showInventory, setShowInventory] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     const handler = (e) => {
-      if (e.code === 'ControlRight') setShowInventory(p => !p);
+      if (e.code === 'ControlRight') {
+        setShowInventory(p => !p);
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [setShowInventory]); // ← use prop
 
   // Compute clean inventory (remove equipped items)
   const inventory = useMemo(() => {
