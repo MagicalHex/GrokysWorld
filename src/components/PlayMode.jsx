@@ -5,8 +5,8 @@ import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
 import CombatSystem from './CombatSystem';
 import HealthRegenSystem from './HealthRegenSystem';
-import HealthBar from './HealthBar'; // Old
-import ActionBar from './ActionBar'; // new, holds both progress and health
+import HealthBar from './HealthBar'; // Used by Monsters
+import ActionBar from './ActionBar'; // Used by Players, holds both progress and health
 import CooldownBar from './CooldownBar';
 import InteractionSystem from './InteractionSystem/InteractionSystem';
 import { CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, getQuestMarker } from './InteractionSystem/InteractionConstants';
@@ -16,6 +16,10 @@ import { PickupPopup } from './PickupPopup'; // Pickup popup  on player (when mo
 import { DamagePopup } from './DamagePopup'; // Damage popups on monster or player
 import { useEquipment } from './hooks/useEquipment'; // For using equipment
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
+
+// Mobile play
+import nipplejs from 'nipplejs';
+import { isMobile } from '../utils/isMobile';
 
 // For cool downs (CombatSystem and CooldownBar)
 const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
@@ -33,7 +37,7 @@ const PlayMode = ({
   levelName,
   playerPos,
   onExit,
-  tileSize,
+tileSize: baseTileSize,
   rows,
   columns,
   onPlayerMoveAttempt,
@@ -63,6 +67,18 @@ const PlayMode = ({
   lastDamageTime,
   setLastDamageTime
 }) => {
+  /* --------------------------------------------------------------
+     MOBILE AREA
+     -------------------------------------------------------------- */
+  const isMobileDevice = isMobile();
+  const joystickRef = useRef(null);
+  const moveAttemptRef = useRef(onPlayerMoveAttempt);
+
+  useEffect(() => {
+    moveAttemptRef.current = onPlayerMoveAttempt;
+  }, [onPlayerMoveAttempt]);
+
+  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.6) : baseTileSize;
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
@@ -208,6 +224,49 @@ const removePickupPopup = useCallback((id) => {
     });
     setDroppedItems(newDropped);
   }, [objects]);
+
+  /* --------------------------------------------------------------
+     MOBILE JOYSTICK
+     -------------------------------------------------------------- */
+  useEffect(() => {
+    if (!isMobileDevice || !joystickRef.current) return;
+
+    const manager = nipplejs.create({
+      zone: joystickRef.current,
+      mode: 'static',
+      position: { left: '80px', bottom: '80px' },
+      color: 'rgba(255,255,255,0.7)',
+      size: 100,
+      threshold: 0.1,
+      restOpacity: 0.6,
+    });
+
+    let moveInterval = null;
+
+    manager.on('move', (evt, data) => {
+      if (!data.direction) return;
+      if (moveInterval) clearInterval(moveInterval);
+
+      moveInterval = setInterval(() => {
+        const dir = data.direction.angle;
+        let dx = 0, dy = 0;
+        if (dir === 'up') dy = -1;
+        if (dir === 'down') dy = 1;
+        if (dir === 'left') dx = -1;
+        if (dir === 'right') dx = 1;
+
+        if (dx || dy) {
+          moveAttemptRef.current({ dx, dy });
+        }
+      }, 100);
+    });
+
+    manager.on('end', () => {
+      if (moveInterval) clearInterval(moveInterval);
+    });
+
+    return () => manager.destroy();
+  }, [isMobileDevice]);
 
   /* --------------------------------------------------------------
      3. Render
@@ -461,6 +520,22 @@ signal={cooldownSignal}
 setCooldownSignal={setCooldownSignal}
 cooldowns={COOLDOWNS}
 />
+
+{/* MOBILE JOYSTICK */}
+      {isMobileDevice && (
+        <div
+          ref={joystickRef}
+          style={{
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            width: '180px',
+            height: '180px',
+            zIndex: 1000,
+            pointerEvents: 'auto',
+          }}
+        />
+      )}
 
       <button onClick={onExit}>Edit Mode</button>
     </div>
