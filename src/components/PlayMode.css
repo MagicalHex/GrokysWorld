@@ -1,5 +1,4 @@
 /* PlayMode.css */
-
 /* DEFAULT: Mobile-first → NO padding */
 .play-mode {
   background: black;
@@ -8,6 +7,9 @@
   margin: 0;
   /* height: 100%; */
   overflow: hidden;
+  touch-action: none;     /* Blocks pinch, scroll, double-tap */
+  position: fixed;
+  overscroll-behavior: none;
 }
 
 /* DESKTOP ONLY: Add padding when screen is large enough */

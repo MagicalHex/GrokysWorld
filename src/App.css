@@ -1,16 +1,3 @@
-/* LOCK SCROLL ON MOBILE ONLY */
-@media (max-width: 767px) {
-  html, body, #root, .play-mode {
-    overflow: hidden !important;
-    touch-action: none !important;     /* Blocks pinch, scroll, double-tap */
-    position: fixed !important;
-  }
-  /* Prevent iOS rubber-band bounce */
-  body {
-    overscroll-behavior: none;
-  }
-}
-
 .App { 
   text-align: center; 
   padding: 20px; 
