@@ -219,6 +219,7 @@ const onInventoryChange = useCallback((updater) => {
 }, [
   currentLevel, levels, updateLevel, onLevelChange
 ]);
+
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
    -------------------------------------------------------------- */

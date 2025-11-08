@@ -16,11 +16,11 @@ import { PickupPopup } from './PickupPopup'; // Pickup popup  on player (when mo
 import { DamagePopup } from './DamagePopup'; // Damage popups on monster or player
 import { useEquipment } from './hooks/useEquipment'; // For using equipment
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
-import MobileControls from './MobileControls'; // joystick for mobile and styling
 
-// Mobile play
+// Add these imports
 import nipplejs from 'nipplejs';
 import { isMobile } from '../utils/isMobile';
+import MobileControls from './MobileControls';
 
 // For cool downs (CombatSystem and CooldownBar)
 const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
@@ -38,7 +38,7 @@ const PlayMode = ({
   levelName,
   playerPos,
   onExit,
-tileSize: baseTileSize,
+  tileSize,
   rows,
   columns,
   onPlayerMoveAttempt,
@@ -68,18 +68,6 @@ tileSize: baseTileSize,
   lastDamageTime,
   setLastDamageTime
 }) => {
-  /* --------------------------------------------------------------
-     MOBILE AREA
-     -------------------------------------------------------------- */
-  const isMobileDevice = isMobile();
-  const joystickRef = useRef(null);
-  const moveAttemptRef = useRef(onPlayerMoveAttempt);
-
-  useEffect(() => {
-    moveAttemptRef.current = onPlayerMoveAttempt;
-  }, [onPlayerMoveAttempt]);
-
-  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
@@ -113,17 +101,16 @@ const addPopup = useCallback((popup) => {
   // Tell .player class which direction class to render 
   const [moveDirection, setMoveDirection] = useState(null);
   // console.log('[PlayMode] current moveDirection →', moveDirection);
-  // ── Inventory ─────────────────────────────────────────────────────
+    // ── Inventory ─────────────────────────────────────────────────────
   const [showInventory, setShowInventory] = useState(false);
-
   const openInventory = useCallback(() => {
     setShowInventory(true);
   }, []);
 
-  // ── Equipment ─────────────────────────────────────────────────────
+  // -- Equipment ------------------------
   // ---- ONE place that knows what is equipped ----
   const { equipment, inventory } = useEquipment(globalInventory);
-  // ← PUT IT HERE
+  // Equip useffect
   useEffect(() => {
     console.log('EQUIPPED:', equipment);
   }, [equipment]); // ← Re-run when equipment changes
@@ -233,47 +220,47 @@ const removePickupPopup = useCallback((id) => {
   }, [objects]);
 
   /* --------------------------------------------------------------
-     MOBILE JOYSTICK
-     -------------------------------------------------------------- */
+   MOBILE JOYSTICK — CLEAN, SAFE, NO FREEZE
+   -------------------------------------------------------------- */
+const isMobileDevice = isMobile();
+const joystickRef = useRef(null);
+const lastMoveTime = useRef(0);
+const moveDelay = 300; // ← MUST MATCH PlayerMovement's moveDelay
+
 useEffect(() => {
   if (!isMobileDevice || !joystickRef.current) return;
 
   const manager = nipplejs.create({
     zone: joystickRef.current,
     mode: 'static',
-    position: { left: '50%', top: '50%' },  // Center of its zone
-    color: 'rgba(255,255,255,0.7)',
-    size: 90,
-    threshold: 0.1,
+    position: { left: '50%', top: '50%' },
+    color: 'rgba(255, 255, 255, 0.7)',
+    size: 100,
     restOpacity: 0.6,
   });
 
-  let moveInterval = null;
-
   manager.on('move', (evt, data) => {
     if (!data.direction) return;
-    if (moveInterval) clearInterval(moveInterval);
 
-    moveInterval = setInterval(() => {
-      const dir = data.direction.angle;
-      let dx = 0, dy = 0;
-      if (dir === 'up') dy = -1;
-      if (dir === 'down') dy = 1;
-      if (dir === 'left') dx = -1;
-      if (dir === 'right') dx = 1;
+    const now = Date.now();
+    if (now - lastMoveTime.current < moveDelay) return;
+    lastMoveTime.current = now;
 
-      if (dx || dy) {
-        moveAttemptRef.current({ dx, dy });
-      }
-    }, 150);
+    const dir = data.direction.angle;
+    const dx = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
+    const dy = dir === 'up' ? -1 : dir === 'down' ? 1 : 0;
+
+    if (dx || dy) {
+      onPlayerMoveAttempt({ dx, dy }); // ← SAME AS KEYBOARD
+    }
   });
 
   manager.on('end', () => {
-    if (moveInterval) clearInterval(moveInterval);
+    setMoveDirection(null); // optional: clear animation
   });
 
   return () => manager.destroy();
-}, [isMobileDevice]);
+}, [isMobileDevice, onPlayerMoveAttempt]);
 
   /* --------------------------------------------------------------
      3. Render
@@ -367,8 +354,8 @@ useEffect(() => {
         onInventoryChange={onInventoryChange}
         activeQuests={activeQuests}
         equipment={equipment}
-        showInventory={showInventory}           // ← ADD
         setShowInventory={setShowInventory}
+        showInventory={showInventory}
       />
 
       {/* ---------- DEATH SCREEN ---------- */}
@@ -529,20 +516,17 @@ signal={cooldownSignal}
 setCooldownSignal={setCooldownSignal}
 cooldowns={COOLDOWNS}
 />
-
-{/* MOBILE CONTROLS - CLEAN & MODULAR */}
-    {isMobileDevice && (
-      <MobileControls
-        onExit={onExit}
-        openInventory={openInventory}
-        joystickRef={joystickRef}
-      />
-    )}
-
-      {/* Desktop Edit Button - Hidden on Mobile */}
-{!isMobileDevice && (
-  <button onClick={onExit}>Edit Mode</button>
+{isMobileDevice && (
+  <MobileControls
+    joystickRef={joystickRef}
+    onExit={onExit}
+    openInventory={openInventory}
+  />
 )}
+
+{!isMobileDevice && (
+      <button onClick={onExit}>Edit Mode</button>
+      )}
     </div>
   );
 };
