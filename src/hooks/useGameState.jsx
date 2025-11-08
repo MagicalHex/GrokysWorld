@@ -169,14 +169,14 @@ const onInventoryChange = useCallback((updater) => {
   /* --------------------------------------------------------------
      6. NEW: PLAYER MOVE – the whole logic lives here
      -------------------------------------------------------------- */
-  const onPlayerMoveAttempt = useCallback((move) => {
+const onPlayerMoveAttempt = useCallback((move) => {
   const levelId = currentLevel;
   const level = levels[levelId];
   if (!level) return;
 
   const { objects = {}, playerPos, restrictedTiles = new Set() } = level;
 
-  // NORMALIZE: Accept {x,y} OR {dx,dy}
+  // --- NORMALIZE INPUT ---
   let newPos;
   if ('dx' in move || 'dy' in move) {
     if (!playerPos) return;
@@ -188,8 +188,8 @@ const onInventoryChange = useCallback((updater) => {
     newPos = { x: move.x, y: move.y };
   }
 
-  // Bounds check
-  if (newPos.x < 0 || newPos.x >= columns || newPos.y < 0 || newPos.y >= rows) return;
+  // --- BOUNDS CHECK USING COLS / ROWS ---
+  if (newPos.x < 0 || newPos.x >= COLS || newPos.y < 0 || newPos.y >= ROWS) return;
 
   const newKey = `${newPos.x},${newPos.y}`;
   const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
@@ -200,8 +200,10 @@ const onInventoryChange = useCallback((updater) => {
   const newObjs = { ...objects };
   if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
 
-  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject',
-    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow']);
+  const PICKUP = new Set([
+    'spiderweb','timber','coin','gold','potion','woodobject',
+    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow'
+  ]);
   let pickupItem = null;
 
   if (targetObj && PICKUP.has(targetObj)) {
@@ -225,7 +227,10 @@ const onInventoryChange = useCallback((updater) => {
     pendingPickup: pickupItem
   });
 
-}, [currentLevel, levels, updateLevel, columns, rows]);
+}, [
+  currentLevel, levels, updateLevel, onLevelChange
+  // COLS and ROWS are constants → no need in deps
+]);
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
    -------------------------------------------------------------- */
