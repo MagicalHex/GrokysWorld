@@ -286,27 +286,31 @@ useEffect(() => {
 
   let moveInterval = null;
 
-  manager.on('move', (evt, data) => {
-    if (!data.direction) return;
-    if (moveInterval) clearInterval(moveInterval);
+manager.on('move', (evt, data) => {
+  if (!data.direction) return;
 
-    moveInterval = setInterval(() => {
-      const dir = data.direction.angle;
-      let dx = 0, dy = 0;
-      if (dir === 'up') dy = -1;
-      if (dir === 'down') dy = 1;
-      if (dir === 'left') dx = -1;
-      if (dir === 'right') dx = 1;
+  // Clear any pending move
+  if (moveInterval) clearTimeout(moveInterval);
 
-      if (dx || dy) {
-        moveAttemptRef.current({ dx, dy });
-      }
-    }, 150);
-  });
+  // One move per direction change
+  const dir = data.direction.angle;
+  let dx = 0, dy = 0;
+  if (dir === 'up') dy = -1;
+  if (dir === 'down') dy = 1;
+  if (dir === 'left') dx = -1;
+  if (dir === 'right') dx = 1;
 
-  manager.on('end', () => {
-    if (moveInterval) clearInterval(moveInterval);
-  });
+  if (dx || dy) {
+    moveAttemptRef.current({ dx, dy });
+  }
+
+  // Optional: prevent spam
+  moveInterval = setTimeout(() => {}, 200); // debounce
+});
+
+manager.on('end', () => {
+  if (moveInterval) clearTimeout(moveInterval);
+});
 
   return () => manager.destroy();
 }, [isMobileDevice]);
