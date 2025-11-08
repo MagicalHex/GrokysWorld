@@ -176,7 +176,6 @@ const onPlayerMoveAttempt = useCallback((move) => {
 
   const { objects = {}, playerPos, restrictedTiles = new Set() } = level;
 
-  // --- NORMALIZE INPUT ---
   let newPos;
   if ('dx' in move || 'dy' in move) {
     if (!playerPos) return;
@@ -188,49 +187,72 @@ const onPlayerMoveAttempt = useCallback((move) => {
     newPos = { x: move.x, y: move.y };
   }
 
-  // --- BOUNDS CHECK USING COLS / ROWS ---
+  // BOUNDS
   if (newPos.x < 0 || newPos.x >= COLS || newPos.y < 0 || newPos.y >= ROWS) return;
 
   const newKey = `${newPos.x},${newPos.y}`;
   const oldKey = playerPos ? `${playerPos.x},${playerPos.y}` : null;
-
-  if (restrictedTiles.has(newKey)) return;
   const targetObj = objects[newKey];
 
-  const newObjs = { ...objects };
-  if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
+  // BLOCKED?
+  if (restrictedTiles.has(newKey)) return;
 
-  const PICKUP = new Set([
-    'spiderweb','timber','coin','gold','potion','woodobject',
-    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow'
-  ]);
-  let pickupItem = null;
-
+  // PICKUP?
+  const PICKUP = new Set(['spiderweb','timber','coin','gold','potion','woodobject','rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow']);
   if (targetObj && PICKUP.has(targetObj)) {
-    pickupItem = targetObj;
-  } else {
-    const PERSIST = new Set([
-      'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
-      'bridge','ladder','hole-to-4', 'hole-to-5', 'hole-to-6', 'hole-to-7', 'hole-to-8', 'hole-to-9',
-      'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5', 'rope-to-6', 'rope-to-7', 'rope-to-8',
-      'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
-    ]);
-    const isPersist = targetObj && PERSIST.has(targetObj);
-    if (!isPersist && !targetObj?.startsWith('portal-to-')) {
-      newObjs[newKey] = 'player';
-    }
+    // Let pickup happen
+    const newObjs = { ...objects };
+    if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
+    newObjs[newKey] = 'player'; // Player moves in
+
+    updateLevel(levelId, {
+      objects: newObjs,
+      playerPos: newPos,
+      pendingPickup: targetObj
+    });
+    return;
   }
 
-  updateLevel(levelId, {
-    objects: newObjs,
-    playerPos: newPos,
-    pendingPickup: pickupItem
-  });
+  // PERSISTENT OBJECTS (doors, portals, bridges, etc.)
+  const PERSIST = new Set([
+    'unlockeddoorobject','portal-to-1','portal-to-2','portal-to-3','portal-to-4',
+    'bridge','ladder','hole-to-4', 'hole-to-5', 'hole-to-6', 'hole-to-7', 'hole-to-8', 'hole-to-9',
+    'rope-to-1', 'rope-to-2', 'rope-to-3', 'rope-to-4', 'rope-to-5', 'rope-to-6', 'rope-to-7', 'rope-to-8',
+    'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top'
+  ]);
 
-}, [
-  currentLevel, levels, updateLevel, onLevelChange
-  // COLS and ROWS are constants → no need in deps
-]);
+  // IF TILE HAS PERSISTENT OBJECT → ALLOW WALKING (player on top)
+  if (targetObj && PERSIST.has(targetObj)) {
+    const newObjs = { ...objects };
+    if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
+    newObjs[newKey] = 'player';
+
+    updateLevel(levelId, {
+      objects: newObjs,
+      playerPos: newPos,
+      pendingPickup: null
+    });
+    return;
+  }
+
+  // IF TILE IS EMPTY OR HAS PLAYER → ALLOW MOVE
+  if (!targetObj || targetObj === 'player') {
+    const newObjs = { ...objects };
+    if (oldKey && newObjs[oldKey] === 'player') delete newObjs[oldKey];
+    newObjs[newKey] = 'player';
+
+    updateLevel(levelId, {
+      objects: newObjs,
+      playerPos: newPos,
+      pendingPickup: null
+    });
+    return;
+  }
+
+  // OTHERWISE: BLOCKED (trees, walls, monsters, etc.)
+  return;
+}, [currentLevel, levels, updateLevel]);
+
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
    -------------------------------------------------------------- */
