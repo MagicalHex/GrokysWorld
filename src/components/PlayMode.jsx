@@ -38,7 +38,7 @@ const PlayMode = ({
   levelName,
   playerPos,
   onExit,
-tileSize: baseTileSize,
+baseTileSize,  // ← renamed from `tileSize`
   rows,
   columns,
   onPlayerMoveAttempt,
@@ -78,8 +78,44 @@ tileSize: baseTileSize,
   useEffect(() => {
     moveAttemptRef.current = onPlayerMoveAttempt;
   }, [onPlayerMoveAttempt]);
+  
+const [tileSize, setTileSize] = useState(baseTileSize);
 
-  const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
+useEffect(() => {
+  const updateTileSize = () => {
+    if (!isMobileDevice) {
+      setTileSize(baseTileSize);
+      return;
+    }
+
+    // === 1. Use almost full screen ===
+    const availableWidth = window.innerWidth * 0.98;   // ← 98%
+    const availableHeight = window.innerHeight * 0.92; // ← 92% (8% for all UI)
+
+    // === 2. Fit entire grid ===
+    const tileByWidth = availableWidth / columns;
+    const tileByHeight = availableHeight / rows;
+
+    const maxFit = Math.min(tileByWidth, tileByHeight);
+
+    // === 3. Enforce minimum size (optional) ===
+    const finalSize = Math.max(Math.floor(maxFit), 20); // ← allow 20px if needed
+
+    setTileSize(finalSize);
+  };
+
+  updateTileSize();
+  const handler = () => setTimeout(updateTileSize, 50); // tiny debounce
+  window.addEventListener('resize', handler);
+  window.addEventListener('orientationchange', handler);
+
+  return () => {
+    window.removeEventListener('resize', handler);
+    window.removeEventListener('orientationchange', handler);
+  };
+}, [isMobileDevice, baseTileSize, columns, rows]);
+
+  // const tileSize = isMobileDevice ? Math.floor(baseTileSize * 0.5) : baseTileSize;
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
