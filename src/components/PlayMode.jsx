@@ -278,12 +278,14 @@ useEffect(() => {
      3. Render
      -------------------------------------------------------------- */
   return (
-    <div className="play-mode">
+<div className={`play-mode-container ${isMobileDevice ? 'mobile' : 'desktop'}`}>
 
       <div className="level-label">
         {displayName}
       </div>
 
+{/* MAIN GAME CONTENT */}
+    <div className="play-mode">
       {/* ---------- INPUT ---------- */}
       <PlayerMovement
         playerPos={playerPos}
@@ -523,88 +525,20 @@ useEffect(() => {
       />
 
     {/* COOLDOWN / CHARGE BAR */}
-<CooldownBar 
-signal={cooldownSignal} 
-setCooldownSignal={setCooldownSignal}
-cooldowns={COOLDOWNS}
-/>
-
-{/* MOBILE CONTROLS BAR */}
-{isMobileDevice && (
-  <div
-    style={{
-      position: 'absolute',
-      bottom: 20,
-      left: 0,
-      right: 0,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: '40px',
-      zIndex: 1000,
-      pointerEvents: 'none', // Allow clicks through
-    }}
-  >
-    {/* EDIT BUTTON */}
-    <button
-      onClick={onExit}
-      style={{
-        width: 60,
-        height: 60,
-        borderRadius: '50%',
-        background: '#333',
-        color: 'white',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        border: '3px solid #666',
-        pointerEvents: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      E
-    </button>
-
-    {/* JOYSTICK ZONE - CENTERED */}
-    <div
-      ref={joystickRef}
-      style={{
-        width: '120px',
-        height: '120px',
-        pointerEvents: 'auto',
-      }}
-    />
-
-    {/* INVENTORY BUTTON */}
-    <button
-      onClick={openInventory}
-      style={{
-        width: 60,
-        height: 60,
-        borderRadius: '50%',
-        background: '#333',
-        color: 'white',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        border: '3px solid #666',
-        pointerEvents: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      I
-    </button>
-  </div>
-)}
-
-      {/* Desktop Edit Button - Hidden on Mobile */}
-{!isMobileDevice && (
-  <button onClick={onExit}>Edit Mode</button>
-)}
+<CooldownBar signal={cooldownSignal} setCooldownSignal={setCooldownSignal} cooldowns={COOLDOWNS} />
+      {!isMobileDevice && <button onClick={onExit}>Edit Mode</button>}
     </div>
-  );
-};
+
+    {/* MOBILE CONTROLS - MOVED OUTSIDE .play-mode, FIXED AT BOTTOM */}
+    {isMobileDevice && (
+      <div className="mobile-controls-bar">
+        <button onClick={onExit} className="mobile-btn">E</button>
+        <div ref={joystickRef} className="joystick-zone" />
+        <button onClick={openInventory} className="mobile-btn">I</button>
+      </div>
+    )}
+  </div>
+);
+}
 
 export default PlayMode;
