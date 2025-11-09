@@ -57,14 +57,6 @@ export const useGameState = () => {
   /* --------------------------------------------------------------
      3. onLevelChange – must be defined *before* anything that uses it
      -------------------------------------------------------------- */
-     // USED THIS CODE BUT PLAYER OBJECT GOT STUCK IN LEVEL CHANGE
-  // const onLevelChange = useCallback((newLevel, customSpawn = null) => {
-  //   const id = String(newLevel);
-  //   if (!levels[id]) return;
-  //   const pos = customSpawn || PORTAL_ENTRY_POINTS[id] || { x: 1, y: 1 };
-  //   updateLevel(id, { playerPos: pos });
-  //   setCurrentLevel(Number(id));
-  // }, [levels, updateLevel]);
 
   // NEW CODE, A BIT STRESS IMPLEMENTED, HELPS WITH PLAYER OBJECT NOT GETTING STUCK
   const onLevelChange = useCallback((newLevel, customSpawn = null) => {
@@ -95,10 +87,10 @@ export const useGameState = () => {
   cleanedLevels[id] = {
     ...cleanedLevels[id],
     playerPos: pos,
-    objects: {
-      ...cleanedLevels[id].objects,
-      [newKey]: 'player'
-    }
+    // objects: {
+    //   ...cleanedLevels[id].objects,
+    //   [newKey]: 'player'
+    // }
   };
 
   // STEP 3: Update state
@@ -225,12 +217,12 @@ const onInventoryChange = useCallback((updater) => {
 
   // ---- 4. Commit --------------------------------------------------
   updateLevel(levelId, {
-    objects: newObjs,
+    // objects: newObjs,
     playerPos: finalPos,
     pendingPickup: pickupItem
   });
   
-}, [currentLevel, levels, updateLevel, playerPosRef]); // ← ADD playerPos!
+}, [currentLevel, levels, updateLevel, playerPosRef]);
 
 /* --------------------------------------------------------------
    6. Helper: clear pendingPickup after UI finishes
@@ -713,7 +705,7 @@ useEffect(() => {
     setLastDamageTime,
 
     monsterData: MONSTER_DATA, // For setting different healths on different monsters
-PORTAL_ENTRY_POINTS,
+    PORTAL_ENTRY_POINTS, // For artificially setting a spawn point for player, to only press Play button to start (without having to click tile and type 'Player' in edit mode)
     setCurrentLevel,
     onLevelChange,
     onObjectsChange,

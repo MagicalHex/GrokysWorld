@@ -230,9 +230,9 @@ useEffect(() => {
           >
             PLAY
           </button>
-          {isDev && (
+          {/* {isDev && (
             <button onClick={() => setPlayMode(true)}>PLAY 🎮</button>
-          )}
+          )} */}
           <span>Mode: {mode}</span>
         </div>
       </header>

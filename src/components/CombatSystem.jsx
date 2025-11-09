@@ -182,12 +182,12 @@ useEffect(() => {
 // Inside your CombatSystem component (attack loop/tick)
 useEffect(() => {
   // Log ONCE when equipment changes
-  console.log('🎮 COMBAT SYSTEM - Equipment:', equipment);
+  // console.log('🎮 COMBAT SYSTEM - Equipment:', equipment);
   const weaponStats = getWeaponStats(equipment);
   const armorDefense = getArmorDefense(equipment);
   
-  console.log('⚔️  WEAPON STATS:', weaponStats);
-  console.log('🛡️  ARMOR DEFENSE:', armorDefense);
+  // console.log('⚔️  WEAPON STATS:', weaponStats);
+  // console.log('🛡️  ARMOR DEFENSE:', armorDefense);
 }, [equipment]); // Re-run when equipment changes
   // === MAIN COMBAT LOOP (via gameLoop) ===
 useEffect(() => {
@@ -270,7 +270,7 @@ if (!attackedThisTick &&
     ? dmgMax * 2                     // Crit: double max
     : randInt(dmgMin, dmgMax);       // Normal: random in range
 
-  console.log(`Player ${isCrit ? 'CRITICAL!' : ''} → ${dmg} dmg`);
+  // console.log(`Player ${isCrit ? 'CRITICAL!' : ''} → ${dmg} dmg`);
 
   const curHealth = globalMonsterHealths[objId] ?? 100;
   const newHealth = Math.max(0, curHealth - dmg);
@@ -359,7 +359,7 @@ if (d <= monsterRange && now - (lastMonsterAttack[objId] ?? 0) >= MONSTER_COOLDO
   const armorDefense = getArmorDefense(equipment);
   const finalDmg = Math.max(1, rawDmg - armorDefense);
 
-  console.log(`Monster ${type}: ${rawDmg} - ${armorDefense} = ${finalDmg} dmg → player`);
+  // console.log(`Monster ${type}: ${rawDmg} - ${armorDefense} = ${finalDmg} dmg → player`);
 
   onPlayerHealthChange(prev => {
     const newHealth = Math.max(0, prev - finalDmg);

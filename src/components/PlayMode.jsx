@@ -1,5 +1,5 @@
 // src/components/PlayMode.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, useReducer } from 'react';
 import { OBJECTS } from './Objects';
 import PlayerMovement from './PlayerMovement';
 import MonsterMovement from './MonsterMovement';
@@ -16,6 +16,8 @@ import { PickupPopup } from './PickupPopup'; // Pickup popup  on player (when mo
 import { DamagePopup } from './DamagePopup'; // Damage popups on monster or player
 import { useEquipment } from './hooks/useEquipment'; // For using equipment
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
+
+import PlayerLayer from './PlayerLayer'; // Player layer
 
 // Add these imports
 import nipplejs from 'nipplejs';
@@ -71,12 +73,17 @@ const PlayMode = ({
   /* --------------------------------------------------------------
      DEBUG AREA
      -------------------------------------------------------------- */
-useEffect(() => {
-  console.log('[PlayMode] current level updated:', currentLevel);
-}, [currentLevel]);
-useEffect(() => {
-    console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
-  }, [globalMonsterHealths]);
+     // TEMP - Add to PlayMode
+const renderCount = useRef(0);
+renderCount.current++;
+console.log(`[RENDERS] ${renderCount.current}`); // Put at top of component
+
+// useEffect(() => {
+//   console.log('[PlayMode] current level updated:', currentLevel);
+// }, [currentLevel]);
+// useEffect(() => {
+//     console.log('[PlayMode] globalMonsterHealths updated:', globalMonsterHealths);
+//   }, [globalMonsterHealths]);
 
   // ── Display Name ─────────────────────────────────────────────────────
   // e.g. "Town Mines level 2"
@@ -99,7 +106,14 @@ const addPopup = useCallback((popup) => {
   const [activeQuests, setActiveQuests] = useState({});
   // ── Movement ─────────────────────────────────────────────────────
   // Tell .player class which direction class to render 
-  const [moveDirection, setMoveDirection] = useState(null);
+  // const [moveDirection, setMoveDirection] = useState(null);
+  const moveDirectionRef = useRef(null);
+const [, forcePlayerUpdate] = useReducer(x => x + 1, 0); // Only for PlayerLayer
+// Update in PlayerMovement and joystick:
+const setMoveDirection = (dir) => {
+  moveDirectionRef.current = dir;
+  forcePlayerUpdate(); // Only re-renders PlayerLayer
+};
   // console.log('[PlayMode] current moveDirection →', moveDirection);
     // ── Inventory ─────────────────────────────────────────────────────
   const [showInventory, setShowInventory] = useState(false);
@@ -111,16 +125,16 @@ const addPopup = useCallback((popup) => {
   // ---- ONE place that knows what is equipped ----
   const { equipment, inventory } = useEquipment(globalInventory);
   // Equip useffect
-  useEffect(() => {
-    console.log('EQUIPPED:', equipment);
-  }, [equipment]); // ← Re-run when equipment changes
+  // useEffect(() => {
+  //   console.log('EQUIPPED:', equipment);
+  // }, [equipment]);
   // ── Battle System ─────────────────────────────────────────────────────
   // Stand still in same area as monsters to start loading range combat
 const [cooldownSignal, setCooldownSignal] = useState({ active: false, type: null });
 
-useEffect(() => {
-  console.log('[STATE] cooldownSignal changed:', cooldownSignal);
-}, [cooldownSignal]);
+// useEffect(() => {
+//   console.log('[STATE] cooldownSignal changed:', cooldownSignal);
+// }, [cooldownSignal]);
 
 // === TIMER: Auto-reset. Helper for CooldownBar to reset. ===
 useEffect(() => {
@@ -130,10 +144,10 @@ useEffect(() => {
     ? COOLDOWNS.RANGED 
     : COOLDOWNS.MELEE;
 
-  console.log(`[TIMER] Set timeout ${duration}ms for ${cooldownSignal.type}`);
+  // console.log(`[TIMER] Set timeout ${duration}ms for ${cooldownSignal.type}`);
 
   const timer = setTimeout(() => {
-    console.log(`[TIMER] Reset ${cooldownSignal.type} cooldown`);
+    // console.log(`[TIMER] Reset ${cooldownSignal.type} cooldown`);
     setCooldownSignal({ active: false, type: null });
   }, duration);
 
@@ -219,6 +233,13 @@ const removePickupPopup = useCallback((id) => {
     setDroppedItems(newDropped);
   }, [objects]);
 
+  // Add this useEffect
+const [, forceTileUpdate] = useReducer(x => x + 1, 0);
+
+useEffect(() => {
+  forceTileUpdate(); // Rebuild memoizedTiles when these change
+}, [grid, objects, activeQuests, globalInventory]);
+
   /* --------------------------------------------------------------
    MOBILE JOYSTICK — CLEAN, SAFE, NO FREEZE
    -------------------------------------------------------------- */
@@ -239,34 +260,61 @@ useEffect(() => {
     restOpacity: 0.6,
   });
 
-  manager.on('move', (evt, data) => {
-    if (!data.direction || !playerPos) return;  // ← ADD playerPos check
+// In PlayMode.jsx → joystick useEffect
+manager.on('move', (evt, data) => {
+  if (!data.direction || !playerPos) return;
 
-    const now = Date.now();
-    if (now - lastMoveTime.current < moveDelay) return;
-    lastMoveTime.current = now;
+  const dir = data.direction.angle;
+  let dx = 0, dy = 0;
+  if (dir === 'up')    dy = -1;
+  if (dir === 'down')  dy = 1;
+  if (dir === 'left')  dx = -1;
+  if (dir === 'right') dx = 1;
 
-    const dir = data.direction.angle;
-    let dx = 0, dy = 0;
-    if (dir === 'up')    dy = -1;
-    if (dir === 'down')  dy = 1;
-    if (dir === 'left')  dx = -1;
-    if (dir === 'right') dx = 1;
+  // CALL setMoveDirection IMMEDIATELY
+setMoveDirection(dir); // ← Immediate animation
 
-    // 🔥 FIX: Convert dx,dy → newPos (SAME AS KEYBOARD)
-    const newPos = { 
-      x: playerPos.x + dx, 
-      y: playerPos.y + dy 
-    };
+  // Only move every 300ms
+  const now = Date.now();
+  if (now - lastMoveTime.current < 300) return;
+  lastMoveTime.current = now;
 
-    console.log('[JOYSTICK] Moving to:', newPos);  // ← LOGGING
-
-    onPlayerMoveAttempt(newPos);  // ← NOW PERFECT MATCH
-  });
+  const newPos = { x: playerPos.x + dx, y: playerPos.y + dy };
+  onPlayerMoveAttempt(newPos);
+});
 
   return () => manager.destroy();
 }, [isMobileDevice, onPlayerMoveAttempt, playerPos]);  // ← ADD playerPos dep
 
+  // ── Memorize the grid ─────────────────────────────────────────────────────
+// Memoize the ENTIRE tile computation
+const memoizedTiles = useMemo(() => {
+  return grid.map((row, y) =>
+    row.map((terrain, x) => {
+      const key = `${x},${y}`;
+      const obj = objects[key];
+
+      // Compute marker for campfireshaman
+      const isShaman = obj === 'campfireshaman';
+      const marker = isShaman ? getQuestMarker(activeQuests, globalInventory) : null;
+
+      return { key, x, y, terrain, obj, isShaman, marker };
+    })
+  );
+  }, []);  // ← NEVER RE-COMPUTE
+// }, [grid, objects, activeQuests, globalInventory]);  // Only re-compute when THESE change
+
+     // TOP OF PlayMode
+useEffect(() => {
+  console.log('[RENDER TRIGGERS]', {
+    playerPos: playerPos?.x + ',' + playerPos?.y,
+    moveDirection: moveDirectionRef.current,
+    objectsChanged: !!objects,
+    gridChanged: !!grid,
+    popups: popups.length,
+    pickupPopups: pickupPopups.length,
+  });
+}, [playerPos, objects, grid, popups, pickupPopups]);
   /* --------------------------------------------------------------
      3. Render
      -------------------------------------------------------------- */
@@ -379,34 +427,25 @@ useEffect(() => {
   className="play-grid"
   style={{
     gridTemplateColumns: `repeat(${columns}, ${tileSize}px)`,
-    '--tile-size': `${tileSize}px`,   // ← 03-11-2025 Remove this if problems
+    '--tile-size': `${tileSize}px`,
   }}
 >
-{grid.map((row, y) =>
-  row.map((terrain, x) => {
-    const key = `${x},${y}`;
-    const obj = objects[key];
-
-    // Compute marker for campfireshaman
-    const isShaman = obj === 'campfireshaman';
-    const marker = isShaman ? getQuestMarker(activeQuests, globalInventory) : null;
-
-    return (
+  {memoizedTiles.map((row, rowY) =>
+    row.map(({ key, x, y, terrain, obj, isShaman, marker }) => (
       <div
         key={key}
         className={`tile ${terrain}`}
-        // style={{ width: tileSize, height: tileSize, position: 'relative' }} 03-11-2025 Add this again if problems
       >
-{obj && (
-  <div
-    className={`
-      object ${monsterTypes[obj] || obj}
-      ${droppedItems.has(key) ? 'dropped-item' : ''}
-      ${isShaman && marker ? 'has-quest-marker' : ''}
-    `.trim()}
-    data-marker={marker}
-  >
-    {OBJECTS[monsterTypes[obj] || obj]}
+        {obj && (
+          <div
+            className={`
+              object ${monsterTypes[obj] || obj}
+              ${droppedItems.has(key) ? 'dropped-item' : ''}
+              ${isShaman && marker ? 'has-quest-marker' : ''}
+            `.trim()}
+            data-marker={marker}
+          >
+            {OBJECTS[monsterTypes[obj] || obj]}
 
 {/* Health Bar for monsters */}
 {isMonster(monsterTypes[obj]) && (
@@ -435,7 +474,7 @@ useEffect(() => {
       </div>
     )}
           
-{playerPos?.x === x && playerPos?.y === y && (
+{/* {playerPos?.x === x && playerPos?.y === y && (
   <div
     key={`player-${playerPos.x}-${playerPos.y}`}
     className={`object player ${
@@ -454,7 +493,7 @@ useEffect(() => {
     />
 
   </div>
-)}
+)} */}
 
               {/* PICKUP POPUP — NOW INSIDE TILE */}
                 {pickupPopups
@@ -480,13 +519,22 @@ useEffect(() => {
                       isCrit={p.isCrit}
                       onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
                     />
-                  ))}
-
-              </div>
-            );
-          })
-        )}
+))}
       </div>
+    ))
+  )}
+</div>
+
+{/* PLAYER (absolute) */}
+  <PlayerLayer
+    playerPos={playerPos}
+    // moveDirection={moveDirection}
+    moveDirectionRef={moveDirectionRef}
+    globalPlayerHealth={globalPlayerHealth}
+    currentAction={currentAction}
+    choppingProgress={choppingProgress}
+    tileSize={tileSize}
+  />
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem
