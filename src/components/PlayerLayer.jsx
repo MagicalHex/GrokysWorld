@@ -1,5 +1,6 @@
 // src/components/PlayerLayer.jsx
 import React from 'react';
+import './PlayerLayer.css';
 import ActionBar from './ActionBar';
 
 const PlayerLayer = React.memo(({
@@ -14,28 +15,29 @@ const PlayerLayer = React.memo(({
 
   return (
     <div
-      className={`player-layer object player ${
-        direction ? `enter-from-${direction}` : 'standing'
-      }`}
+      className="player-layer"
       style={{
-        position: 'absolute',
-        left: `${playerPos.x * tileSize}px`,
-        top: `${playerPos.y * tileSize}px`,
+left: `${(playerPos.x + 1) * tileSize}px`,
+top: `${(playerPos.y + 1) * tileSize}px`,
         width: `${tileSize}px`,
         height: `${tileSize}px`,
-        zIndex: 1000,
-        pointerEvents: 'none'  // Don't block tile clicks
       }}
-      onAnimationStart={() => console.log('[ANIM] Starting:', moveDirectionRef)}
-      onAnimationEnd={() => console.log('[ANIM] Ended:', moveDirectionRef)}
     >
-      <ActionBar
-        type={currentAction}
-        value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
-        color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
-      />
-</div>
+      <div
+        className={`player-container ${
+          direction ? `enter-from-${direction}` : 'standing'
+        }`}
+        onAnimationStart={() => console.log('[ANIM] Starting:', direction)}
+        onAnimationEnd={() => console.log('[ANIM] Ended:', direction)}
+      >
+        <ActionBar
+          type={currentAction}
+          value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
+          color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
+        />
+      </div>
+    </div>
   );
 });
 
-export default React.memo(PlayerLayer);
+export default PlayerLayer;

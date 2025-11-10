@@ -5,8 +5,15 @@ import MONSTER_DATA from '../../public/data/monsters.json';
 import { MONSTER_TYPES, isMonster } from '../utils/monsterRegistry';
 import { ITEMS } from '../components/Items.jsx';
 
-const ROWS = 16;
-const COLS = 24;
+// OLD
+// const ROWS = 16;
+// const COLS = 24;
+
+// NEW 
+const COLS = 50;  // was probably 20–30
+const ROWS = 50;
+const TILE_SIZE = 48;
+
 const PORTAL_ENTRY_POINTS = { 
   1: { x: 11, y: 8 }, // Town
   2: { x: 1, y: 2 }, // Wilderness
@@ -619,61 +626,96 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
      8. Load maps + initialise monster health
      -------------------------------------------------------------- */
 useEffect(() => {
-  loadMaps().then(loaded => {
-    const restricted = {};
-    const initialized = {};
+  // Generate Level 1: Flat grass + bricks wall
+  const generateTown = () => {
+    const grid = Array(ROWS).fill().map(() => Array(COLS).fill('grass'));
+    
+    // Bricks wall at (5,5) to (7,5) — next to each other!
+    // grid[5][5] = 'brick';
+    // grid[5][6] = 'brick';
+    // grid[5][7] = 'brick';
+    
+    const objects = {};
+    // Add a tree for fun
+    objects['15,8'] = 'treeobject';
+        objects['5,5'] = 'bricks';
+                objects['5,6'] = 'bricks';
+    
+    return {
+      name: 'Town',
+      grid,
+      objects,
+      originalSpawns: objects,
+      respawnQueue: [],
+      playerPos: PORTAL_ENTRY_POINTS[1] // {x:10, y:10}
+    };
+  };
 
-    Object.entries(loaded).forEach(([id, data]) => {
-      /* ---------- restricted tiles ---------- */
-      const restrictedTiles = new Set();
-      data.grid.forEach((row, y) => {
-        row.forEach((tile, x) => {
-          if (RESTRICTED_TERRAIN.has(tile)) restrictedTiles.add(`${x},${y}`);
-        });
-      });
-      restricted[id] = restrictedTiles;
-
-      /* ---------- objects → monster IDs ---------- */
-      const objects = { ...data.objects || {} };
-      Object.entries(data.objects || {}).forEach(([key, type]) => {
-        if (isMonster(type)) {
-          const [x, y] = key.split(',').map(Number);
-          const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
-          objects[key] = monsterId;
-
-          setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
-          // ── use base health from monsterData ──
-          setGlobalMonsterHealths(prev => ({
-            ...prev,
-            [monsterId]: MONSTER_DATA[type]?.hp ?? 100
-          }));
-
-        }
-      });
-
-      /* ---------- keep the *original* spawn map ---------- */
-      const originalSpawns = data.originalSpawns || data.objects || {};
-
-      initialized[id] = {
-        ...data,
-        objects,
-        originalSpawns,               // <-- stored per level
-        respawnQueue: []              // initialise queue
-      };
-
-      /* ---------- ONE global copy (optional) ---------- */
-      setOriginalSpawns(prev => ({
-        ...prev,
-        [id]: originalSpawns
-      }));
-    });
-
-    setRestrictedTilesByLevel(restricted);
-    setLevels(initialized);
-    setCurrentLevel(1);
-    setIsLoading(false);
-  });
+  const level1 = generateTown();
+  
+  // Init states (your existing logic)
+  setLevels({ 1: level1 });
+  setRestrictedTilesByLevel({ 1: new Set() }); // No walls yet
+  setCurrentLevel(1);
+  setIsLoading(false);
 }, []);
+
+// useEffect(() => {
+//   loadMaps().then(loaded => {
+//     const restricted = {};
+//     const initialized = {};
+
+//     Object.entries(loaded).forEach(([id, data]) => {
+//       /* ---------- restricted tiles ---------- */
+//       const restrictedTiles = new Set();
+//       data.grid.forEach((row, y) => {
+//         row.forEach((tile, x) => {
+//           if (RESTRICTED_TERRAIN.has(tile)) restrictedTiles.add(`${x},${y}`);
+//         });
+//       });
+//       restricted[id] = restrictedTiles;
+
+//       /* ---------- objects → monster IDs ---------- */
+//       const objects = { ...data.objects || {} };
+//       Object.entries(data.objects || {}).forEach(([key, type]) => {
+//         if (isMonster(type)) {
+//           const [x, y] = key.split(',').map(Number);
+//           const monsterId = `${type}_${id}_${x}_${y}`;   // spider_2_21_2
+//           objects[key] = monsterId;
+
+//           setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
+//           // ── use base health from monsterData ──
+//           setGlobalMonsterHealths(prev => ({
+//             ...prev,
+//             [monsterId]: MONSTER_DATA[type]?.hp ?? 100
+//           }));
+
+//         }
+//       });
+
+//       /* ---------- keep the *original* spawn map ---------- */
+//       const originalSpawns = data.originalSpawns || data.objects || {};
+
+//       initialized[id] = {
+//         ...data,
+//         objects,
+//         originalSpawns,               // <-- stored per level
+//         respawnQueue: []              // initialise queue
+//       };
+
+//       /* ---------- ONE global copy (optional) ---------- */
+//       setOriginalSpawns(prev => ({
+//         ...prev,
+//         [id]: originalSpawns
+//       }));
+//     });
+
+//     setRestrictedTilesByLevel(restricted);
+//     setLevels(initialized);
+//     setCurrentLevel(1);
+//     setIsLoading(false);
+//   });
+// }, []);
 
   /* --------------------------------------------------------------
      9. Derived values
@@ -691,6 +733,7 @@ useEffect(() => {
     restrictedTiles,
     rows: ROWS,
     columns: COLS,
+    TILE_SIZE: TILE_SIZE,
     isLoading,
     globalPlayerHealth,
     globalInventory,

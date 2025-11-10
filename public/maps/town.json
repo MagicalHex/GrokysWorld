@@ -19,7 +19,8 @@
     ["soilbrown", "soilbrown", "soilbrown", "soilbrown", "soilbrown", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "lightgrass", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground", "mudground"]
   ],
   "objects": {
-    "0,0": "treeobject",
+    "0,0": "brickwall",
+        "0,1": "window",
     "1,0": "treeobject",
     "8,1": "farmer001",
     "4,1": "mechanic001",

@@ -18,6 +18,7 @@ import { useEquipment } from './hooks/useEquipment'; // For using equipment
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To render Monster health bars
 
 import PlayerLayer from './PlayerLayer'; // Player layer
+import CanvasGrid from './CanvasGrid'; // Player layer
 
 // Add these imports
 import nipplejs from 'nipplejs';
@@ -423,107 +424,25 @@ useEffect(() => {
       )}
 
       {/* ---------- GRID ---------- */}
-<div
-  className="play-grid"
-  style={{
-    gridTemplateColumns: `repeat(${columns}, ${tileSize}px)`,
-    '--tile-size': `${tileSize}px`,
-  }}
->
-  {memoizedTiles.map((row, rowY) =>
-    row.map(({ key, x, y, terrain, obj, isShaman, marker }) => (
-      <div
-        key={key}
-        className={`tile ${terrain}`}
-      >
-        {obj && (
-          <div
-            className={`
-              object ${monsterTypes[obj] || obj}
-              ${droppedItems.has(key) ? 'dropped-item' : ''}
-              ${isShaman && marker ? 'has-quest-marker' : ''}
-            `.trim()}
-            data-marker={marker}
-          >
-            {OBJECTS[monsterTypes[obj] || obj]}
-
-{/* Health Bar for monsters */}
-{isMonster(monsterTypes[obj]) && (
-  <div className="monster-health-container">
-    <div className="monster-name">
-      {getMonsterData(monsterTypes[obj])?.name}
-    </div>
-    <HealthBar
-      key={`${key}-${globalMonsterHealths[obj]}`}
-      health={globalMonsterHealths[obj] ?? 0}
-      max={getMonsterData(monsterTypes[obj])?.hp}
-      color="#FF9800"
-    />
-  </div>
-)}
-
-    {/* NPC Name Label (const NPC_NAMES) */}
-    {NPC_NAMES[obj] && (
-      <div className="npc-name-label">
-        {obj === 'farmer001' && 'Farmer '}
-        {NPC_NAMES[obj]}
-        {obj === 'mechanic001' && ' the Blacksmith'}
-        {obj === 'oldandwise' && ' the Wise'}
-      </div>
-    )}
-      </div>
-    )}
-          
-{/* {playerPos?.x === x && playerPos?.y === y && (
-  <div
-    key={`player-${playerPos.x}-${playerPos.y}`}
-    className={`object player ${
-      moveDirection 
-        ? `enter-from-${moveDirection}`      // moving
-        : 'standing'                         // standing (NEW!)
-    }`}
-    onAnimationStart={() => console.log('[ANIM] Starting:', moveDirection)}
-    onAnimationEnd={() => console.log('[ANIM] Ended:', moveDirection)}
-  >
-    
-    <ActionBar
-      type={currentAction}
-      value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
-      color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
-    />
-
-  </div>
-)} */}
-
-              {/* PICKUP POPUP — NOW INSIDE TILE */}
-                {pickupPopups
-                  .filter(p => p.x === x && p.y === y)
-                  .map(p => (
-                    <PickupPopup
-                      key={p.id}
-                      item={p.item}
-                      onFinish={() => removePickupPopup(p.id)}
-                    />
-                  ))}
-
-                  {/* DAMAGE POPUPS — NOW INSIDE TILE */}
-                {popups
-                  .filter(p => p.x === x && p.y === y)
-                  .map(p => (
-                    <DamagePopup
-                      key={p.id}
-                      damage={p.dmg}
-                      isPlayer={p.isPlayer}
-                      isHeal={p.isHeal}
-                      isXP={p.isXP}
-                      isCrit={p.isCrit}
-                      onFinish={() => setPopups(prev => prev.filter(x => x.id !== p.id))}
-                    />
-))}
-      </div>
-    ))
-  )}
-</div>
+<CanvasGrid
+  grid={grid}
+  objects={objects}
+  playerPos={playerPos}
+  tileSize={tileSize}
+  columns={columns}
+  rows={rows}
+  monsterTypes={monsterTypes}
+  globalMonsterHealths={globalMonsterHealths}
+  pickupPopups={pickupPopups}
+  popups={popups}
+  removePickupPopup={removePickupPopup}
+  setPopups={setPopups}
+  droppedItems={droppedItems}
+  activeQuests={activeQuests}
+  globalInventory={globalInventory}
+  NPC_NAMES={NPC_NAMES}
+  getQuestMarker={getQuestMarker}
+/>
 
 {/* PLAYER (absolute) */}
   <PlayerLayer

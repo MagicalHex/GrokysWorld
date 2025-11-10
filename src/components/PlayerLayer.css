@@ -1,0 +1,117 @@
+/* src/components/PlayerLayer.css */
+
+/* .player and .player-standing helps with showing a player initially. Then .player becomes .player-container and .player-container.enter-from-left etc. */
+.player {
+opacity: 0;
+  font-size: 35px; 
+  animation: npc-bob 2.5s ease-in-out infinite;
+  background: url('/ownemojis/player-image.webp') center/contain no-repeat;
+  width: 180%;
+  height: 180%;
+  filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
+    position: absolute;
+      text-shadow: 1px 1px 6px black;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.player.standing {
+  opacity: 1;
+}
+
+.player-layer {
+  position: absolute;
+  /* width: 100%;
+  height: 100%; */
+  pointer-events: none;
+  z-index: 1000;
+  /* Remove any inherited .object styles */
+}
+
+.player-container {
+  position: absolute;
+  top: 100%;
+  left: 70%;
+  width: 150%;
+  height: 150%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  font-size: 35px;
+  animation: npc-bob 2.5s ease-in-out infinite;
+  background: url('/ownemojis/player-image.webp') center/contain no-repeat;
+  filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
+  text-shadow: 1px 1px 6px black;
+}
+
+/* Standing state */
+.player-container.standing {
+  opacity: 1;
+  animation: npc-bob 2.5s ease-in-out infinite;
+}
+
+/* Directional entry animations */
+.player-container.enter-from-left {
+  animation: enterFromLeft 0.28s ease-out forwards;
+}
+
+.player-container.enter-from-right {
+  animation: enterFromRight 0.28s ease-out forwards;
+}
+
+.player-container.enter-from-down {
+  animation: enterFromTop 0.28s ease-out forwards;
+}
+
+.player-container.enter-from-up {
+  animation: enterFromBottom 0.28s ease-out forwards;
+}
+
+/* Keyframes */
+@keyframes enterFromLeft {
+  from {
+    opacity: 0.8;
+    transform: translate(calc(-50% + 40px), -50%) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromRight {
+  from {
+    opacity: 0.8;
+    transform: translate(calc(-50% - 40px), -50%) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromTop {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, calc(-50% - 40px)) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes enterFromBottom {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, calc(-50% + 40px)) scale(1.0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+}
+
+@keyframes npc-bob {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-6px); }
+}

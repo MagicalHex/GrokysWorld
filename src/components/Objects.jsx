@@ -1,6 +1,6 @@
 export const OBJECTS = {
   // HEROES
-  player: '🧙',
+  player: '',
   knight: '⚔️',
   warrior: '🗡️',
   archer: '🏹',

@@ -66,6 +66,7 @@ function App() {
     rows,
     columns,
     restrictedTiles,
+    TILE_SIZE,
     onPlayerPosChange,
     onObjectsChange,
     onLevelChange,
@@ -149,7 +150,7 @@ useEffect(() => {
         levelName={currentLevelData.name || `Level ${currentLevel}`}
         playerPos={currentLevelData.playerPos}
         onExit={() => setPlayMode(false)}
-        tileSize={40}
+        tileSize={TILE_SIZE}
         rows={rows}
         columns={columns}
         onObjectsChange={onObjectsChange}
