@@ -90,7 +90,8 @@ function App() {
     onHealPopupFinish,
     lastDamageTime,
     setLastDamageTime,
-    PORTAL_ENTRY_POINTS
+    PORTAL_ENTRY_POINTS,
+    camera
   } = game;
 
 // ------------------------------------------------------------------ //
@@ -149,13 +150,13 @@ useEffect(() => {
         objects={currentLevelData.objects}
         levelName={currentLevelData.name || `Level ${currentLevel}`}
         playerPos={currentLevelData.playerPos}
+        currentLevel={currentLevel}
         onExit={() => setPlayMode(false)}
         tileSize={TILE_SIZE}
         rows={rows}
         columns={columns}
         onObjectsChange={onObjectsChange}
         restrictedTiles={restrictedTiles}
-        currentLevel={currentLevel}
         onLevelChange={onLevelChange}
         onQueueRespawn={onQueueRespawn}
         originalSpawns={getOriginalSpawns()}
@@ -179,6 +180,7 @@ useEffect(() => {
         onHealPopupFinish={onHealPopupFinish}
         lastDamageTime={lastDamageTime}
         setLastDamageTime={setLastDamageTime}
+        camera={camera}
       />
     );
   }

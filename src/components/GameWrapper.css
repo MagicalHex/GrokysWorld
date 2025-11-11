@@ -1,0 +1,11 @@
+/* src/components/GameWrapper.css */
+.game-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  /* 45° rotation – makes the diamond grid behave like a square grid */
+  transform: rotate(45deg);
+  transform-origin: center;
+}

@@ -69,7 +69,8 @@ const PlayMode = ({
   onHealPopup,
   onHealPopupFinish,
   lastDamageTime,
-  setLastDamageTime
+  setLastDamageTime,
+  camera
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -319,6 +320,17 @@ useEffect(() => {
   /* --------------------------------------------------------------
      3. Render
      -------------------------------------------------------------- */
+
+     // using it for player position (playerlayer)
+     const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
+     // set camera to move map instead of player
+//      const [camera, setCamera] = useState({ x: 0, y: 0 });
+// useEffect(() => {
+//   if (playerPos) {
+//     setCamera({ x: playerPos.x, y: playerPos.y });
+//   }
+// }, [playerPos]);
+
   return (
     <div className="play-mode">
 
@@ -442,6 +454,8 @@ useEffect(() => {
   globalInventory={globalInventory}
   NPC_NAMES={NPC_NAMES}
   getQuestMarker={getQuestMarker}
+  canvasSize={canvasSize}
+  camera={camera}
 />
 
 {/* PLAYER (absolute) */}
@@ -453,6 +467,7 @@ useEffect(() => {
     currentAction={currentAction}
     choppingProgress={choppingProgress}
     tileSize={tileSize}
+canvasHeight={canvasSize.h}
   />
 
       {/* ---------- INTERACTION UI ---------- */}

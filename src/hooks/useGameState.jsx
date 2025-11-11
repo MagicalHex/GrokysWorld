@@ -10,12 +10,12 @@ import { ITEMS } from '../components/Items.jsx';
 // const COLS = 24;
 
 // NEW 
-const COLS = 50;  // was probably 20–30
+const COLS = 50;
 const ROWS = 50;
 const TILE_SIZE = 48;
 
 const PORTAL_ENTRY_POINTS = { 
-  1: { x: 11, y: 8 }, // Town
+  1: { x: 1, y: 1 }, // Town
   2: { x: 1, y: 2 }, // Wilderness
   3: { x: 1, y: 2 }, // Slimecave
   4: { x: 4, y: 4 }, // StoneCave
@@ -637,9 +637,11 @@ useEffect(() => {
     
     const objects = {};
     // Add a tree for fun
-    objects['15,8'] = 'treeobject';
-        objects['5,5'] = 'bricks';
-                objects['5,6'] = 'bricks';
+        objects['7,7'] = 'treeobject';
+    objects['2,2'] = { type: 'treeobject' };
+objects['5,5'] = { type: 'bricks', height: 3 }; // 2 tiles tall
+objects['15,8'] = { type: 'treeobject', height: 2 };
+objects['4,6'] = 'bricks';
     
     return {
       name: 'Town',
@@ -659,6 +661,9 @@ useEffect(() => {
   setCurrentLevel(1);
   setIsLoading(false);
 }, []);
+
+// **NEW: Camera state for CanvasGrid**
+const [camera, setCamera] = useState({ x: 0, y: 0 });
 
 // useEffect(() => {
 //   loadMaps().then(loaded => {
@@ -723,6 +728,16 @@ useEffect(() => {
   const currentLevelData = levels[currentLevel] || {};
   const restrictedTiles = restrictedTilesByLevel[currentLevel] || new Set();
 
+  // **SYNC camera with playerPos**
+useEffect(() => {
+  if (currentLevelData?.playerPos) {
+    setCamera({
+      x: currentLevelData.playerPos.x,
+      y: currentLevelData.playerPos.y,
+    });
+  }
+}, [currentLevelData?.playerPos?.x, currentLevelData?.playerPos?.y]); // Re-run when player moves
+
   /* --------------------------------------------------------------
      10. Return everything (including the NEW callback)
      -------------------------------------------------------------- */
@@ -746,6 +761,8 @@ useEffect(() => {
     onHealPopupFinish,
     // lastDamageTime, NOTE THAT THIS IS COMMENTED OUT. It works at this level but blocks HealthRegen component for some reason
     setLastDamageTime,
+
+    camera,
 
     monsterData: MONSTER_DATA, // For setting different healths on different monsters
     PORTAL_ENTRY_POINTS, // For artificially setting a spawn point for player, to only press Play button to start (without having to click tile and type 'Player' in edit mode)
