@@ -53,19 +53,19 @@ opacity: 0;
 
 /* Directional entry animations */
 .player-container.enter-from-left {
-  animation: enterFromLeft 0.28s ease-out forwards;
+  /* animation: enterFromLeft 0.28s ease-out forwards; */
 }
 
 .player-container.enter-from-right {
-  animation: enterFromRight 0.28s ease-out forwards;
+  /* animation: enterFromRight 0.28s ease-out forwards; */
 }
 
 .player-container.enter-from-down {
-  animation: enterFromTop 0.28s ease-out forwards;
+  /* animation: enterFromTop 0.28s ease-out forwards; */
 }
 
 .player-container.enter-from-up {
-  animation: enterFromBottom 0.28s ease-out forwards;
+  /* animation: enterFromBottom 0.28s ease-out forwards; */
 }
 
 /* Keyframes */

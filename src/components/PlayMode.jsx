@@ -110,11 +110,13 @@ const addPopup = useCallback((popup) => {
   // Tell .player class which direction class to render 
   // const [moveDirection, setMoveDirection] = useState(null);
   const moveDirectionRef = useRef(null);
+  const moveTriggerRef = useRef(0); // count amounts of triggers (to trigger direction image)
 const [, forcePlayerUpdate] = useReducer(x => x + 1, 0); // Only for PlayerLayer
 // Update in PlayerMovement and joystick:
 const setMoveDirection = (dir) => {
   moveDirectionRef.current = dir;
-  forcePlayerUpdate(); // Only re-renders PlayerLayer
+  moveTriggerRef.current += 1; // Increment on every move!
+  forcePlayerUpdate(); // Re-renders PlayerLayer
 };
   // console.log('[PlayMode] current moveDirection →', moveDirection);
     // ── Inventory ─────────────────────────────────────────────────────
@@ -463,6 +465,7 @@ useEffect(() => {
     playerPos={playerPos}
     // moveDirection={moveDirection}
     moveDirectionRef={moveDirectionRef}
+    moveTrigger={moveTriggerRef.current}
     globalPlayerHealth={globalPlayerHealth}
     currentAction={currentAction}
     choppingProgress={choppingProgress}

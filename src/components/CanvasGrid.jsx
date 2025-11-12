@@ -13,8 +13,25 @@ const CanvasGrid = memo(
   }) => {
     const canvasRef = useRef(null);
     const ctxRef = useRef(null);
+          // const cameraRef = useRef(camera);
+const cameraRef = useRef({ x: 0, y: 0 }); // ← FIXED: empty initial
     const { worldToScreen, worldToScreen3D, isoW, isoH } =
       useIsoProjection(tileSize);
+
+// Sync ref with latest camera
+useEffect(() => {
+  cameraRef.current = camera;
+}, [camera]);
+
+useEffect(() => {
+  if (!camera) return;
+
+  console.log('CAMERA CHANGED:', {
+    x: camera.x,
+    y: camera.y,
+    source: 'useEffect'
+  });
+}, [camera]);
 
     // ---- canvas resize (run once) ----
     // Gets the canvas DOM element from the ref.
@@ -38,13 +55,23 @@ const CanvasGrid = memo(
     // Declares raf to hold the requestAnimationFrame ID.
     // Gets ctx from ref.
     useEffect(() => {
+      let lastLog = 0; // For log
       let raf;
       const ctx = ctxRef.current;
       if (!ctx || !grid) return;
 
+      // SMOOTH CAMERA STATE
+  let smoothCam = { x: cameraRef.current.x, y: cameraRef.current.y };
+  const lerpFactor = 0.1; // 0.1 = smooth, 1.0 = instant
+
       // Defines a render function for the animation loop.
       // Clears the entire canvas before each frame to erase previous drawings.
       const render = () => {
+        // Update smooth camera
+    const target = cameraRef.current;
+    smoothCam.x += (target.x - smoothCam.x) * lerpFactor;
+    smoothCam.y += (target.y - smoothCam.y) * lerpFactor;
+
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
         // Calculates the canvas center. Used for translating the context to center the view on the player.
@@ -63,16 +90,17 @@ const tilesAcross = Math.ceil(canvasRef.current.width / tileSize) + 2;
         ctx.translate(centerX, centerY);
 
         // Translate opposite player/camera (world moves)**
-        const camScreen = worldToScreen(camera.x, camera.y);
-        ctx.translate(-camScreen.x, -camScreen.y);  // Offset: player renders at screen center
+// USE SMOOTHED CAMERA
+    const camScreen = worldToScreen(smoothCam.x, smoothCam.y);
+    ctx.translate(-camScreen.x, -camScreen.y);  // Offset: player renders at screen center
 
 
         // Gets player position, defaulting to grid center if playerPos is null/undefined
         //  (using optional chaining ?. and nullish coalescing ??).
         // const playerX = playerPos?.x ?? columns / 2;
         // const playerY = playerPos?.y ?? rows / 2;
-const playerX = camera.x;  // Use camera.x/y
-const playerY = camera.y;
+const playerX = smoothCam.x;
+    const playerY = smoothCam.y;
 
         // Computes the visible grid bounds centered on the player.
         // Clamps to grid edges (0 to columns-1, etc.) to avoid out-of-bounds.
@@ -82,16 +110,20 @@ const playerY = camera.y;
         const startY = Math.max(0, Math.floor(playerY - tilesDown / 2));
         const endY = Math.min(rows - 1, Math.floor(playerY + tilesDown / 2));
 
-        // **DIAGNOSTIC LOGS - REMOVE LATER**
-console.log('=== RENDER FRAME ===');
-console.log('playerPos:', playerPos);
-console.log('camera:', camera);
-console.log('camScreen:', camScreen);
-console.log('canvas size:', canvasRef.current.width, 'x', canvasRef.current.height);
-console.log('isoW/isoH:', isoW, isoH);
-console.log('tilesAcross/Down:', tilesAcross, tilesDown);
-console.log('cull bounds:', {startX, endX, startY, endY});
-console.log('===================');
+// THROTTLED LOGS
+    const now = performance.now();
+    if (now - lastLog > 5000) {
+      console.log('=== RENDER FRAME ===');
+      console.log('playerPos:', playerPos);
+      console.log('camera (target):', target);
+      console.log('smoothCam:', { x: smoothCam.x.toFixed(2), y: smoothCam.y.toFixed(2) });
+      console.log('camScreen:', camScreen);
+      console.log('canvas size:', canvasRef.current.width, 'x', canvasRef.current.height);
+      console.log('tilesAcross/Down:', tilesAcross, tilesDown);
+      console.log('cull bounds:', { startX, endX, startY, endY });
+      console.log('===================');
+      lastLog = now;
+    }
 
         // Collects visible tiles into an array.
         // For each (x,y), computes screen position with worldToScreen.
@@ -168,6 +200,7 @@ console.log('===================');
       worldToScreen3D,
       isoW,
       isoH,
+      // camera
     ]);
 
     return (
