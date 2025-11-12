@@ -94,6 +94,7 @@ console.log(`[RENDERS] ${renderCount.current}`); // Put at top of component
   // Switch been health and progressbar depending on what Player is doing
   const [currentAction, setCurrentAction] = useState('health');
   const [choppingProgress, setChoppingProgress] = useState(0);
+  
   // ── Combat Popups ─────────────────────────────────────────────────────
   // Set popup to display e.g. damagePopup (holds healing popup as well)
   const [popups, setPopups] = useState([]);
@@ -441,6 +442,7 @@ useEffect(() => {
 <CanvasGrid
   grid={grid}
   objects={objects}
+  currentLevel={currentLevel}
   playerPos={playerPos}
   tileSize={tileSize}
   columns={columns}

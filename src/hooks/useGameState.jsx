@@ -626,38 +626,53 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
      8. Load maps + initialise monster health
      -------------------------------------------------------------- */
 useEffect(() => {
-  // Generate Level 1: Flat grass + bricks wall
   const generateTown = () => {
     const grid = Array(ROWS).fill().map(() => Array(COLS).fill('grass'));
     
-    // Bricks wall at (5,5) to (7,5) — next to each other!
-    // grid[5][5] = 'brick';
-    // grid[5][6] = 'brick';
-    // grid[5][7] = 'brick';
+    // === ORIGINAL SPAWNS (for respawning) ===
+    const originalSpawns = {
+      '7,7': 'treeobject',
+      '6,7': 'treeobject', 
+      '5,7': 'treeobject',
+      '5,5': 'cavespider'  // ← string type for respawn
+    };
+
+    // === LIVE OBJECTS (with monster IDs) ===
+    const objects = { ...originalSpawns }; // copy
     
-    const objects = {};
-    // Add a tree for fun
-        objects['7,7'] = 'treeobject';
-    objects['2,2'] = { type: 'treeobject' };
-objects['5,5'] = { type: 'bricks', height: 3 }; // 2 tiles tall
-objects['15,8'] = { type: 'treeobject', height: 2 };
-objects['4,6'] = 'bricks';
-    
+    // 🔥 SPAWN MONSTERS → Create IDs + set health
+    Object.entries(originalSpawns).forEach(([key, type]) => {
+      if (isMonster(type)) {
+        const [x, y] = key.split(',').map(Number);
+        const monsterId = `${type}_1_${x}_${y}`;  // level 1
+        
+        // REPLACE string with ID in objects
+        objects[key] = monsterId;
+        
+        // SET HEALTH & TYPE (matches your old code)
+        setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
+        setGlobalMonsterHealths(prev => ({
+          ...prev,
+          [monsterId]: MONSTER_DATA[type]?.hp ?? 100  // 500 for spider
+        }));
+        
+        console.log('🕷️ Spawned:', monsterId, 'HP:', MONSTER_DATA[type]?.hp);
+      }
+    });
+
     return {
       name: 'Town',
       grid,
-      objects,
-      originalSpawns: objects,
+      objects,           // ← NOW has monster IDs!
+      originalSpawns,    // ← strings (for respawn)
       respawnQueue: [],
-      playerPos: PORTAL_ENTRY_POINTS[1] // {x:10, y:10}
+      playerPos: PORTAL_ENTRY_POINTS[1]
     };
   };
 
   const level1 = generateTown();
-  
-  // Init states (your existing logic)
   setLevels({ 1: level1 });
-  setRestrictedTilesByLevel({ 1: new Set() }); // No walls yet
+  setRestrictedTilesByLevel({ 1: new Set() });
   setCurrentLevel(1);
   setIsLoading(false);
 }, []);
