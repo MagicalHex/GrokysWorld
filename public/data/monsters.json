@@ -50,6 +50,7 @@
   "cavespider": { 
     "hp": 500, 
     "name": "CAVE SPIDER",
+    "image": "/ownemojis/cavespider.webp",
     "xp": [120, 180],
     "damage": { "min": 0, "max": 30 },
     "range": 1,

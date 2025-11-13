@@ -19,6 +19,7 @@ import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To rend
 
 import PlayerLayer from './PlayerLayer'; // Player layer
 import CanvasGrid from './CanvasGrid'; // Player layer
+import MonsterLayer from './MonsterLayer'; // Player layer
 
 // Add these imports
 import nipplejs from 'nipplejs';
@@ -324,15 +325,6 @@ useEffect(() => {
      3. Render
      -------------------------------------------------------------- */
 
-     // using it for player position (playerlayer)
-     const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
-     // set camera to move map instead of player
-//      const [camera, setCamera] = useState({ x: 0, y: 0 });
-// useEffect(() => {
-//   if (playerPos) {
-//     setCamera({ x: playerPos.x, y: playerPos.y });
-//   }
-// }, [playerPos]);
 
   return (
     <div className="play-mode">
@@ -448,6 +440,7 @@ useEffect(() => {
   columns={columns}
   rows={rows}
   monsterTypes={monsterTypes}
+  monsterData={monsterData}
   globalMonsterHealths={globalMonsterHealths}
   pickupPopups={pickupPopups}
   popups={popups}
@@ -458,7 +451,6 @@ useEffect(() => {
   globalInventory={globalInventory}
   NPC_NAMES={NPC_NAMES}
   getQuestMarker={getQuestMarker}
-  canvasSize={canvasSize}
   camera={camera}
 />
 
@@ -472,8 +464,17 @@ useEffect(() => {
     currentAction={currentAction}
     choppingProgress={choppingProgress}
     tileSize={tileSize}
-canvasHeight={canvasSize.h}
   />
+
+  {/* MONSTERS */}
+<MonsterLayer
+  objects={objects}
+  globalMonsterHealths={globalMonsterHealths}
+  monsterData={monsterData}
+  monsterTypes={monsterTypes}
+  tileSize={tileSize}
+  camera={camera}
+/>
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem

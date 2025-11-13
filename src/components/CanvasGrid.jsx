@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
 import { useIsoProjection } from '../hooks/useIsoProjection';
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // ← ADD THIS
 import HealthBar from './HealthBar';
+import MonsterHealthBar from './MonsterHealthBar';  // New component
 
 const CanvasGrid = memo(
   ({
@@ -13,6 +14,7 @@ const CanvasGrid = memo(
     columns,
     rows,
     monsterTypes,
+    monsterData,
     globalMonsterHealths,
     pickupPopups,
     popups,
@@ -23,7 +25,6 @@ const CanvasGrid = memo(
     globalInventory,
     NPC_NAMES,
     getQuestMarker,
-    canvasSize,
     camera,
   }) => {
     const canvasRef = useRef(null);
@@ -36,12 +37,16 @@ const cameraRef = useRef({ x: 0, y: 0 }); // ← FIXED: empty initial
       // NEW: DOM health-bars
     const [monsterBars, setMonsterBars] = useState([]);
 
+    const monsterImages = useRef({});
+
+    const [visibleMonsters, setVisibleMonsters] = useState([]);
+
       // FOR IMAGES
-      const caveSpiderImg = useMemo(() => {
-  const img = new Image();
-  img.src = '/ownemojis/cavespider.webp';
-  return img;
-}, []);
+//       const caveSpiderImg = useMemo(() => {
+//   const img = new Image();
+//   img.src = '/ownemojis/cavespider.webp';
+//   return img;
+// }, []);
 
 // Sync ref with latest camera
 useEffect(() => {
@@ -205,137 +210,120 @@ const playerX = smoothCam.x;
           ctx.restore();
         });
 
-        const objList = [];
-Object.entries(objects).forEach(([key, objData]) => {
-  // === FIX: CORRECT KEY PARSING ===
-const [xStr, yStr] = key.split(',');  // ✅ '5,5' → xStr='5', yStr='5'
-const x = Number(xStr);               // x=5
-const y = Number(yStr);               // y=5
-  // const [yStr, xStr] = key.split(',');
-  // const x = Number(xStr);
-  // const y = Number(yStr);
-  if (x < startX || x > endX || y < startY || y > endY) return;
+// === OBJECTS LIST ===
+    const objList = [];
+    Object.entries(objects).forEach(([key, objData]) => {
+      const [xStr, yStr] = key.split(',');
+      const x = Number(xStr);
+      const y = Number(yStr);
+      if (x < startX || x > endX || y < startY || y > endY) return;
 
-  const baseScreen = worldToScreen(x, y);
+      const baseScreen = worldToScreen(x, y);
+      const isString = typeof objData === 'string';
+      const rawValue = isString ? objData : objData.type;
+      const objType = monsterTypes[rawValue] || rawValue;
 
-  // === NEW: objData is either:
-  // - 'treeobject' (string)
-  // - 'cavespider_1_5_5' (monster ID string)
-  // - { type: 'treeobject' } (object, rare)
-  const isString = typeof objData === 'string';
-  const rawValue = isString ? objData : objData.type;
+      let monsterId = null, currentHp = null, maxHp = null, monsterName = null, imageSrc = null;
+      // if (isMonster(objType)) {
+      //   monsterId = isString ? objData : objData.id || objData;
+      //   const data = monsterData[objType];
+      //   if (data) {
+      //     maxHp = data.hp || 100;
+      //     monsterName = data.name || objType.toUpperCase();
+      //     imageSrc = data.image || null;
+      //   }
+      //   currentHp = globalMonsterHealths[monsterId] ?? maxHp;
+      // }
 
-  // === FINAL: objType is the *actual type* ('cavespider', 'treeobject')
-  const objType = monsterTypes[rawValue] || rawValue;
+      objList.push({
+        x, y, objType, baseScreen, depth: x + y,
+        monsterId, currentHp, maxHp, monsterName, imageSrc
+      });
+    });
+    objList.sort((a, b) => a.depth - b.depth);
 
-  // === MONSTER ENRICHMENT (ONLY if it's a monster) ===
-  let monsterId = null;
-  let currentHp = null;
-  let maxHp = null;
-  let monsterName = null;
+    // === RENDER OBJECTS (FIXED: INSIDE render()) ===
+    objList.forEach(({
+      baseScreen, objType,
+      monsterId, currentHp, maxHp, monsterName, imageSrc
+    }) => {
+      if (isMonster(objType)) return;  // ← SKIP MONSTERS
+      ctx.save();
 
-  if (isMonster(objType)) {
-    // The object in `objects` IS the monsterId (e.g. 'cavespider_1_5_5')
-    monsterId = isString ? objData : objData.id || objData; // ← safe fallback
-    currentHp = globalMonsterHealths[monsterId] ?? 0;
-    const data = getMonsterData(objType);
-    maxHp = data?.hp ?? 100;
-    monsterName = data?.name ?? objType.toUpperCase();
-  }
+      // === MONSTER IMAGE + HEALTH BAR ===
+      // if (imageSrc) {
+      //   let img = monsterImages.current[objType];
+      //   if (!img || !img.complete) {
+      //     img = new Image();
+      //     img.src = imageSrc;
+      //     monsterImages.current[objType] = img;
+      //   }
 
-  objList.push({
-    x, y, objType, baseScreen, depth: x + y,
-    monsterId, currentHp, maxHp, monsterName
-  });
-});
-objList.sort((a, b) => a.depth - b.depth);
+      //   ctx.translate(
+      //     baseScreen.x + tileSize / 2 + tileSize * 0.05,
+      //     baseScreen.y + tileSize / 2 + tileSize * 0.7
+      //   );
+      //   ctx.drawImage(img, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
 
-    // -------------------------------------------------
-    //  NEW: Build DOM health-bar data (runs every frame)
-    // -------------------------------------------------
-    const visibleBars = [];
-    objList.forEach(
-      ({
-        x,
-        y,
-        monsterId,
-        currentHp,
-        maxHp,
-        monsterName,
-      }) => {
-        if (!monsterId || currentHp <= 0) return;
+      //   // HEALTH BAR
+      //   // if (monsterId && currentHp > 0 && maxHp > 0) {
+      //   //   const ratio = currentHp / maxHp;
+      //   //   ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      //   //   ctx.fillRect(-tileSize * 0.4, -tileSize * 0.65, tileSize * 0.8, 10);
+      //   //   ctx.fillStyle = `hsl(${120 * ratio}, 100%, 45%)`;
+      //   //   ctx.fillRect(-tileSize * 0.4, -tileSize * 0.65 + 1, tileSize * 0.8 * ratio, 8);
+      //   //   ctx.fillStyle = '#fff';
+      //   //   ctx.font = `${Math.floor(tileSize * 0.16)}px Arial`;
+      //   //   ctx.textAlign = 'center';
+      //   //   ctx.textBaseline = 'middle';
+      //   //   ctx.fillText(monsterName, 0, -tileSize * 0.75);
+      //   // }
+      //   ctx.restore();
+      //   return;
+      // }
 
-        const screen = worldToScreen(x, y);
-
-        visibleBars.push({
-          id: monsterId,
-          screenX: screen.x + tileSize / 2,          // centre of tile
-          screenY: screen.y - tileSize * 0.2,         // a bit above the sprite
-          name: monsterName,
-          current: currentHp,
-          max: maxHp,
-        });
-      }
-    );
-    setMonsterBars(visibleBars);
-
-// ---- RENDER EMOJIS (EXACTLY like your old working version) ----
-objList.forEach(({
-  baseScreen, objType, x, y,
-  monsterId, currentHp, maxHp, monsterName
-}) => {
-  // === CUSTOM IMAGE: cavespider ===
-// --- CUSTOM IMAGE: cavespider ---
-if (objType === 'cavespider') {
-  ctx.save();
-  ctx.translate(
-    baseScreen.x + tileSize / 2 + tileSize * 0.05,
-    baseScreen.y + tileSize / 2 + tileSize * 0.7
-  );
-  ctx.drawImage(caveSpiderImg, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
-  ctx.restore();
-  return;
-}
-
-  // EMOJIS
-  const emojiMap = {
-    bricks: '🧱',
-    treeobject: '🌳',
-    evergreenobject: '🌲',
-    spider: '🕷️',
-    farmer001: '👨‍🌾'
-  };
-  const emoji = emojiMap[objType] || 'unknown';
-
-// GLOBAL OFFSET: All objects get this (trees + everything else)
-  const offsetX = tileSize * 0.05;  // ~3px right
-  const offsetY = tileSize * 0.35;  // ~22px down
-
-  ctx.save();
-  ctx.translate(
-    baseScreen.x + tileSize / 2 + offsetX,
-    baseScreen.y + tileSize / 2 + offsetY
-  );
-
-  ctx.font = `${tileSize}px 'Segoe UI Emoji', Arial, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  ctx.fillText(emoji, 0, 0);
-  ctx.restore();
-
-});
-
-//         Restores the main context (undoes the center translate).
-// Schedules the next frame with requestAnimationFrame, creating a loop (~60 FPS).
-        ctx.restore();
-        raf = requestAnimationFrame(render);
+      // === EMOJI FALLBACK ===
+      const emojiMap = {
+        bricks: '🧱',
+        treeobject: '🌳',
+        evergreenobject: '🌲',
+        farmer001: '👨‍🌾'
       };
-// Starts the loop immediately.
-// Cleanup: Cancels the animation frame on unmount or deps change.
-      render();
-      return () => cancelAnimationFrame(raf);
-    }, [
+      const emoji = emojiMap[objType] || '❓';
+
+      ctx.translate(
+        baseScreen.x + tileSize / 2 + tileSize * 0.05,
+        baseScreen.y + tileSize / 2 + tileSize * 0.35
+      );
+      ctx.font = `${tileSize}px 'Segoe UI Emoji', Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(emoji, 0, 0);
+      ctx.restore();
+    });
+    // Collect monster bars for DOM overlay
+// const visibleBars = [];
+// objList.forEach(({ baseScreen, monsterId, currentHp, maxHp, monsterName }) => {
+//   if (!monsterId || currentHp <= 0) return;
+  
+//   visibleBars.push({
+//     id: monsterId,
+//     screenX: baseScreen.x + tileSize / 2,
+//     screenY: baseScreen.y - tileSize * 0.8,  // Above head
+//     current: currentHp,
+//     max: maxHp,
+//     name: monsterName,
+//   });
+// });
+// setMonsterBars(visibleBars);
+
+    ctx.restore();
+    raf = requestAnimationFrame(render);
+  };
+
+  render();
+  return () => cancelAnimationFrame(raf);
+}, [
       grid,
       objects,
       playerPos,
@@ -347,61 +335,64 @@ if (objType === 'cavespider') {
       isoW,
       isoH,
       // camera
+      globalMonsterHealths,  // ← ADDED: HP updates NOW
+  monsterData,           // ← ADDED: images/data
+  monsterTypes
     ]);
 
     return (
       <div style={{ position: 'relative', width: '100%', height: '85vh' }}>
         {/* ---------- CANVAS ---------- */}
-        <canvas
-          ref={canvasRef}
-          className="play-canvas"
+  <canvas
+    ref={canvasRef}
+    className="play-canvas"
+    style={{
+      width: '100%',
+      height: '85vh',
+      maxWidth: '1200px',
+      display: 'block',
+      margin: '0 auto',
+      background:
+        'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
+    }}
+  />
+{/* GLOWING MONSTER BARS */}
+    {/* {monsterBars.map((bar) => {
+      const centerX = canvasRef.current?.width / 2 || 0;
+      const centerY = canvasRef.current?.height / 2 || 0;
+      const camX = cameraRef.current.x * isoW;
+      const camY = cameraRef.current.y * isoH;
+      
+      const finalX = centerX + bar.screenX - camX;
+      const finalY = centerY + bar.screenY - camY;
+
+      // Dynamic color: green → red
+      const ratio = bar.current / bar.max;
+      const hue = Math.max(0, 120 * ratio);  // 120=green, 0=red
+      const color = `hsl(${hue}, 100%, 45%)`;
+
+      return (
+        <div
+          key={bar.id}
           style={{
-            width: '100%',
-            height: '100%',
-            maxWidth: '1200px',
-            display: 'block',
-            margin: '0 auto',
-            background:
-              'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
+            position: 'absolute',
+            left: -115,
+            top: -30,
+            transform: `translate(${finalX}px, ${finalY}px)`,
+            width: `${tileSize * 0.8}px`,
+            pointerEvents: 'none',
+            zIndex: 20,
           }}
-        />
-
-        {/* ---------- HEALTH BARS (DOM) ---------- */}
-        {monsterBars.map(bar => {
-          // Canvas centre (same as in the render loop)
-          const centerX = canvasRef.current?.width / 2 || 0;
-          const centerY = canvasRef.current?.height / 2 || 0;
-
-          // Apply the *same* camera offset the canvas uses
-          const camX = cameraRef.current.x * isoW;
-          const camY = cameraRef.current.y * isoH;
-
-          const finalX = centerX + bar.screenX - camX;
-          const finalY = centerY + bar.screenY - camY;
-
-          return (
-            <div
-              key={bar.id}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                transform: `translate(${finalX}px, ${finalY}px) translate(-50%, -100%)`,
-                pointerEvents: 'none',   // clicks go through to canvas
-                zIndex: 10,
-              }}
-            >
-              <HealthBar
-                name={bar.name}
-                current={bar.current}
-                max={bar.max}
-                width={tileSize * 0.8}
-                height={10}
-              />
-            </div>
-          );
-        })}
-      </div>
+        >
+          <MonsterHealthBar
+            value={bar.current}
+            max={bar.max}
+            color={color}
+          />
+        </div>
+      );
+    })} */}
+  </div>
     );
   }
 );
