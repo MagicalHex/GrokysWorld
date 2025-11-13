@@ -5,7 +5,11 @@ import { useIsoProjection } from '../hooks/useIsoProjection';
 import { isMonster } from '../utils/monsterRegistry';
 
 // MonsterLayer.jsx — Renders monsters with buttery-smooth positioning + culling
-// MonsterLayer.jsx — Renders monsters with buttery-smooth positioning + culling
+// 1. useMemo → Stable monster list (culling + data)
+// 2. useRef → Track DOM elements
+// 3. useLayoutEffect → Live transform updates (60fps)
+// 4. ref callback → Map IDs to elements
+// 5. CSS transition/animation → Smoothness + fade-in
 
 const MonsterLayer = memo(({
   objects,                    // All world objects { 'x,y': monsterType }

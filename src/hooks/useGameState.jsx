@@ -634,7 +634,8 @@ useEffect(() => {
       '7,7': 'treeobject',
       '6,7': 'treeobject', 
       '5,7': 'treeobject',
-      '5,5': 'cavespider'  // ← string type for respawn
+      '5,5': 'skeleton1',
+      '10,10': 'cavespider'  // ← string type for respawn
     };
 
     // === LIVE OBJECTS (with monster IDs) ===

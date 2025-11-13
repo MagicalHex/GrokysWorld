@@ -38,6 +38,7 @@
     ),
     url('/ownemojis/townbg.jpg') center / cover no-repeat;
 }
+/* FOR MONSTERS, USED IN MonsterLayer */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
