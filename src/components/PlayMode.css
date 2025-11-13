@@ -38,7 +38,10 @@
     ),
     url('/ownemojis/townbg.jpg') center / cover no-repeat;
 }
-
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 /* Desktop padding */
 @media (min-width: 768px) {
   .play-mode {
