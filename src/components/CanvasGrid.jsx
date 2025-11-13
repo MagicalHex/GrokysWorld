@@ -154,6 +154,7 @@ const playerX = smoothCam.x;
     //   console.log('===================');
     //   lastLog = now;
     // }
+    
 
         // Collects visible tiles into an array.
         // For each (x,y), computes screen position with worldToScreen.
@@ -172,43 +173,55 @@ const playerX = smoothCam.x;
         // Loops over sorted tiles.
         // Gets terrain type from grid (defaults to 'grass' if missing).
         // Skips if not 'grass'
-        groundTiles.forEach(({ screen, x, y }) => {
-          const terrain = grid[y]?.[x] || 'grass';
-          if (terrain !== 'grass') return;
+// ---- draw grass (with VIGNETTE FADE) ----
+groundTiles.forEach(({ screen, x, y }) => {
+  const terrain = grid[y]?.[x] || 'grass';
+  if (terrain !== 'grass') return;
 
-          // Saves context.
-          // Translates to the tile's screen position, plus tileSize vertically 
-          // (likely to align the diamond shape properly; the grass is drawn as a diamond/iso tile).
-          ctx.save();
-          ctx.translate(screen.x, screen.y + tileSize);
+  ctx.save();
+  ctx.translate(screen.x, screen.y + tileSize);
 
-          // Draws a path for the base layer of the grass tile (a diamond-like shape).
-          ctx.fillStyle = '#2E8B57';
-          ctx.beginPath();
-          ctx.moveTo(0, tileSize * 0.3);
-          ctx.lineTo(tileSize * 0.5, 0);
-          ctx.lineTo(tileSize, tileSize * 0.3);
-          ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
-          ctx.closePath();
-          ctx.fill();
+  // ────── VIGNETTE (more centre colour + wider view) ──────
+  const distFromCenterX = Math.abs(x - playerX);
+  const distFromCenterY = Math.abs(y - playerY);
+  const distFromCenter = Math.sqrt(distFromCenterX ** 2 + distFromCenterY ** 2);
 
-          // Draws a more complex path (octagon-like) for the top layer, adding texture/detail to the grass.
-          ctx.fillStyle = '#32CD32';
-          ctx.beginPath();
-          ctx.moveTo(0, tileSize * 0.3);
-          ctx.lineTo(tileSize * 0.25, tileSize * 0.15);
-          ctx.lineTo(tileSize * 0.5, 0);
-          ctx.lineTo(tileSize * 0.75, tileSize * 0.15);
-          ctx.lineTo(tileSize, tileSize * 0.3);
-          ctx.lineTo(tileSize * 0.75, tileSize * 0.45);
-          ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
-          ctx.lineTo(tileSize * 0.25, tileSize * 0.45);
-          ctx.closePath();
-          ctx.fill();
+  // ← start fading **later** → see ~1-2 extra tiles on each side
+  const maxDist = tilesAcross / 2 * 0.98;          // was 0.9
 
-          // Restores the context (undoes the translate for this tile).
-          ctx.restore();
-        });
+  // smooth-step (same ease-out, but we’ll bias it a little)
+  let t = Math.max(0, 1 - distFromCenter / maxDist);   // 0 … 1
+  const fade = t * t * (3 - 2 * t);                    // smooth-step
+
+  // ────── Base layer (darker on edges) ──────
+  // Boost centre opacity a touch (0.7 → 0.8)
+  ctx.fillStyle = `rgba(46, 139, 87, ${fade * 0.8})`; // #2E8B57
+  ctx.beginPath();
+  ctx.moveTo(0, tileSize * 0.3);
+  ctx.lineTo(tileSize * 0.5, 0);
+  ctx.lineTo(tileSize, tileSize * 0.3);
+  ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+  ctx.closePath();
+  ctx.fill();
+
+  // ────── Top layer (brighter green, stays full longer) ──────
+  // Full-green centre (fade * 1.1) and clamp so we never exceed 1
+  const topAlpha = Math.min(1, fade * 1.1);
+  ctx.fillStyle = `rgba(50, 205, 50, ${topAlpha})`;   // #32CD32
+  ctx.beginPath();
+  ctx.moveTo(0, tileSize * 0.3);
+  ctx.lineTo(tileSize * 0.25, tileSize * 0.15);
+  ctx.lineTo(tileSize * 0.5, 0);
+  ctx.lineTo(tileSize * 0.75, tileSize * 0.15);
+  ctx.lineTo(tileSize, tileSize * 0.3);
+  ctx.lineTo(tileSize * 0.75, tileSize * 0.45);
+  ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+  ctx.lineTo(tileSize * 0.25, tileSize * 0.45);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+});
 
 // === OBJECTS LIST ===
     const objList = [];
@@ -352,8 +365,8 @@ const playerX = smoothCam.x;
       maxWidth: '1200px',
       display: 'block',
       margin: '0 auto',
-      background:
-        'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
+      // background:
+      //   'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
     }}
   />
 {/* GLOWING MONSTER BARS */}

@@ -69,6 +69,6 @@
 /* FOR MONSTERS */
 .action-bar-fill.health {
   box-shadow: 
-    0 0 8px rgba(76, 175, 80, 0.8),
+    0 0 8px rgba(255, 187, 0, 0.8),
     inset 0 0 4px rgba(255, 255, 255, 0.3);
 }

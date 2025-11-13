@@ -19,12 +19,24 @@
   width: 100%;
   max-width: 1200px;
   height: 80vh;
-  aspect-ratio: 4 / 3; /* Perfect isometric */
+  aspect-ratio: 4 / 3;
   border: 3px solid #333;
   border-radius: 12px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   display: block;
   margin: 0 auto;
+  image-rendering: pixelated;
+
+  /* MAGIC: Dark fade from bottom → full image at top */
+  background: 
+    linear-gradient(
+      to top,
+      black 0%,
+      rgba(0, 0, 0, 0.8) 30%,
+      rgba(0, 0, 0, 0.4) 50%,
+      transparent 70%
+    ),
+    url('/ownemojis/townbg.jpg') center / cover no-repeat;
 }
 
 /* Desktop padding */
