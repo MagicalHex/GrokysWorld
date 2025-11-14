@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
 import { useIsoProjection } from '../hooks/useIsoProjection';
 import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // ← ADD THIS
-import HealthBar from './HealthBar';
-import MonsterHealthBar from './MonsterHealthBar';  // New component
 
 const CanvasGrid = memo(
   ({
@@ -33,20 +31,6 @@ const CanvasGrid = memo(
 const cameraRef = useRef({ x: 0, y: 0 }); // ← FIXED: empty initial
     const { worldToScreen, worldToScreen3D, isoW, isoH } =
       useIsoProjection(tileSize);
-
-      // NEW: DOM health-bars
-    const [monsterBars, setMonsterBars] = useState([]);
-
-    const monsterImages = useRef({});
-
-    const [visibleMonsters, setVisibleMonsters] = useState([]);
-
-      // FOR IMAGES
-//       const caveSpiderImg = useMemo(() => {
-//   const img = new Image();
-//   img.src = '/ownemojis/cavespider.webp';
-//   return img;
-// }, []);
 
 // Sync ref with latest camera
 useEffect(() => {
@@ -237,16 +221,6 @@ groundTiles.forEach(({ screen, x, y }) => {
       const objType = monsterTypes[rawValue] || rawValue;
 
       let monsterId = null, currentHp = null, maxHp = null, monsterName = null, imageSrc = null;
-      // if (isMonster(objType)) {
-      //   monsterId = isString ? objData : objData.id || objData;
-      //   const data = monsterData[objType];
-      //   if (data) {
-      //     maxHp = data.hp || 100;
-      //     monsterName = data.name || objType.toUpperCase();
-      //     imageSrc = data.image || null;
-      //   }
-      //   currentHp = globalMonsterHealths[monsterId] ?? maxHp;
-      // }
 
       objList.push({
         x, y, objType, baseScreen, depth: x + y,
@@ -262,38 +236,6 @@ groundTiles.forEach(({ screen, x, y }) => {
     }) => {
       if (isMonster(objType)) return;  // ← SKIP MONSTERS
       ctx.save();
-
-      // === MONSTER IMAGE + HEALTH BAR ===
-      // if (imageSrc) {
-      //   let img = monsterImages.current[objType];
-      //   if (!img || !img.complete) {
-      //     img = new Image();
-      //     img.src = imageSrc;
-      //     monsterImages.current[objType] = img;
-      //   }
-
-      //   ctx.translate(
-      //     baseScreen.x + tileSize / 2 + tileSize * 0.05,
-      //     baseScreen.y + tileSize / 2 + tileSize * 0.7
-      //   );
-      //   ctx.drawImage(img, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
-
-      //   // HEALTH BAR
-      //   // if (monsterId && currentHp > 0 && maxHp > 0) {
-      //   //   const ratio = currentHp / maxHp;
-      //   //   ctx.fillStyle = 'rgba(0,0,0,0.8)';
-      //   //   ctx.fillRect(-tileSize * 0.4, -tileSize * 0.65, tileSize * 0.8, 10);
-      //   //   ctx.fillStyle = `hsl(${120 * ratio}, 100%, 45%)`;
-      //   //   ctx.fillRect(-tileSize * 0.4, -tileSize * 0.65 + 1, tileSize * 0.8 * ratio, 8);
-      //   //   ctx.fillStyle = '#fff';
-      //   //   ctx.font = `${Math.floor(tileSize * 0.16)}px Arial`;
-      //   //   ctx.textAlign = 'center';
-      //   //   ctx.textBaseline = 'middle';
-      //   //   ctx.fillText(monsterName, 0, -tileSize * 0.75);
-      //   // }
-      //   ctx.restore();
-      //   return;
-      // }
 
       // === EMOJI FALLBACK ===
       const emojiMap = {
@@ -314,21 +256,6 @@ groundTiles.forEach(({ screen, x, y }) => {
       ctx.fillText(emoji, 0, 0);
       ctx.restore();
     });
-    // Collect monster bars for DOM overlay
-// const visibleBars = [];
-// objList.forEach(({ baseScreen, monsterId, currentHp, maxHp, monsterName }) => {
-//   if (!monsterId || currentHp <= 0) return;
-  
-//   visibleBars.push({
-//     id: monsterId,
-//     screenX: baseScreen.x + tileSize / 2,
-//     screenY: baseScreen.y - tileSize * 0.8,  // Above head
-//     current: currentHp,
-//     max: maxHp,
-//     name: monsterName,
-//   });
-// });
-// setMonsterBars(visibleBars);
 
     ctx.restore();
     raf = requestAnimationFrame(render);
@@ -369,42 +296,7 @@ groundTiles.forEach(({ screen, x, y }) => {
       //   'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
     }}
   />
-{/* GLOWING MONSTER BARS */}
-    {/* {monsterBars.map((bar) => {
-      const centerX = canvasRef.current?.width / 2 || 0;
-      const centerY = canvasRef.current?.height / 2 || 0;
-      const camX = cameraRef.current.x * isoW;
-      const camY = cameraRef.current.y * isoH;
-      
-      const finalX = centerX + bar.screenX - camX;
-      const finalY = centerY + bar.screenY - camY;
 
-      // Dynamic color: green → red
-      const ratio = bar.current / bar.max;
-      const hue = Math.max(0, 120 * ratio);  // 120=green, 0=red
-      const color = `hsl(${hue}, 100%, 45%)`;
-
-      return (
-        <div
-          key={bar.id}
-          style={{
-            position: 'absolute',
-            left: -115,
-            top: -30,
-            transform: `translate(${finalX}px, ${finalY}px)`,
-            width: `${tileSize * 0.8}px`,
-            pointerEvents: 'none',
-            zIndex: 20,
-          }}
-        >
-          <MonsterHealthBar
-            value={bar.current}
-            max={bar.max}
-            color={color}
-          />
-        </div>
-      );
-    })} */}
   </div>
     );
   }

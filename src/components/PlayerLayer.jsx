@@ -1,18 +1,29 @@
-import React, { memo, useState, useEffect, useRef } from 'react';
+import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
+import { DamagePopup } from './DamagePopup'; // ← ADD
+import { PickupPopup } from './PickupPopup';  // ← ADD THIS
 import { useIsoProjection } from '../hooks/useIsoProjection';
 import ActionBar from './ActionBar';
 import './PlayerLayer.css';
 
-const PlayerLayer = memo(
-  ({
-    moveDirectionRef,
-    moveTrigger,
-    globalPlayerHealth,
-    currentAction,
-    choppingProgress,
-    tileSize,
-  }) => {
+const PlayerLayer = memo(({ 
+  moveDirectionRef, 
+  moveTrigger, 
+  globalPlayerHealth, 
+  currentAction, 
+  choppingProgress, 
+  tileSize, 
+  popups,           // ← NEW
+  addPopup,          // ← NEW  
+  setPopups,   // ← NEW: to remove when done
+  pickupPopups,        // ← NEW
+  removePickupPopup,   // ← NEW
+}) => {
     const direction = moveDirectionRef.current;
+
+    // === PROPER DEBUG LOGGING: Only when popups change ===
+  useEffect(() => {
+    console.log('PlayerLayer - popups updated:', popups);
+  }, [popups]);
 
     // State
     const [displayImage, setDisplayImage] = useState('/ownemojis/player-image.webp'); // standing by default
@@ -84,6 +95,32 @@ const PlayerLayer = memo(
             value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
             color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
           />
+
+          {/* POPUPS: Render all player popups here */}
+{/* POPUPS: Only player popups */}
+{popups
+  .filter(popup => popup.isPlayer || popup.isHeal || popup.isXP)  // ← Player-only
+  .map((popup) => (
+    <DamagePopup
+      key={popup.id}
+      damage={popup.dmg}
+      isPlayer={popup.isPlayer}
+      isHeal={popup.isHeal}
+      isXP={popup.isXP}
+      isCrit={popup.isCrit}
+      onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}
+    />
+  ))}
+
+  {/* PICKUP POPUPS (NEW) - Render ALL pickups above player */}
+        {pickupPopups.map(popup => (
+          <PickupPopup
+            key={popup.id}
+            item={popup.item}
+            onFinish={() => removePickupPopup(popup.id)}
+          />
+        ))}
+
         </div>
       </div>
     );

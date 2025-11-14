@@ -122,9 +122,6 @@ export default function CombatSystem({
   equipment
   ]);
 
-  // === DAMAGE POPUPS ===
-  // const [popups, setPopups] = useState([]);
-
     // === PLAYER DEATH → DOVE ===
   useEffect(() => {
     if (playerHealth > 0 || !isDead) return;
@@ -137,11 +134,6 @@ export default function CombatSystem({
       onObjectsChange(newObjects);
     }
   }, [playerHealth, isDead]);
-
-  // const addPopup = (x, y, dmg, isPlayer = false, isHeal = false) => {
-  //   const id = `${Date.now()}-${Math.random()}`;
-  //   setPopups(prev => [...prev, { id, x, y, dmg, isPlayer, isHeal }]);
-  // };
 
   // Assign addPopup to refs
   refs.current.addPopup = addPopup;
@@ -169,7 +161,8 @@ useEffect(() => {
     x: healPopup.x,
     y: healPopup.y,
     dmg: healPopup.damage,
-    isHeal: true
+    isHeal: true,
+    isPlayer: true
   });
 
   const timer = setTimeout(() => {
@@ -223,7 +216,7 @@ useEffect(() => {
     if (isDead) return;
 
     let attackedThisTick = false; // Reset every frame
-let attackCooldownType = null;
+    let attackCooldownType = null;
 
     const newObjects = { ...objects };
     let objectsChanged = false;
@@ -281,6 +274,7 @@ if (!attackedThisTick &&
     y: mPos.y,
     dmg,
     isCrit,
+    monsterId: objId,
   });
 
   // 2. Apply damage
@@ -296,19 +290,24 @@ if (newHealth <= 0) {
   }
 
   // 1. Handle XP
-  setTimeout(() => {
+setTimeout(() => {
   const xpRange = monster.xp || [0, 0];
   const xpGained = Math.floor(Math.random() * (xpRange[1] - xpRange[0] + 1)) + xpRange[0];
   if (xpGained > 0) {
-    addPopup({
-      x: playerPos.x,
-      y: playerPos.y,
-      dmg: xpGained,
-      isXP: true
+    // Use refs.current.addPopup (safer inside timeout)
+    if (refs.current.addPopup) {
+      refs.current.addPopup({
+        dmg: xpGained,
+        isXP: true,
+        isPlayer: true  // ← ADD THIS (for PlayerLayer filter)
       });
-      // Add to give player XP here
+    } else {
+      console.error('addPopup NOT AVAILABLE in refs!');
     }
-  }, 300);      // <-- 300 ms delay (tweak as you like)
+  } else {
+    console.log('NO XP GAINED (xpGained <= 0)');
+  }
+}, 300);
 
 
   // 2. Handle loot drops

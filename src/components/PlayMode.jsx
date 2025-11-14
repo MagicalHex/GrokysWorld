@@ -464,6 +464,11 @@ useEffect(() => {
     currentAction={currentAction}
     choppingProgress={choppingProgress}
     tileSize={tileSize}
+    popups={popups.filter(p => p.isPlayer)}  // ← only player popups
+  addPopup={addPopup}                      // ← for new ones
+  setPopups={setPopups}
+  pickupPopups={pickupPopups}      // ← ADD
+  removePickupPopup={removePickupPopup}  // ← ADD
   />
 
   {/* MONSTERS */}
@@ -474,6 +479,9 @@ useEffect(() => {
   monsterTypes={monsterTypes}
   tileSize={tileSize}
   camera={camera}
+  popups={popups.filter(p => !p.isPlayer)} // ← only monster popups
+  addPopup={addPopup}
+  setPopups={setPopups}
 />
 
       {/* ---------- INTERACTION UI ---------- */}

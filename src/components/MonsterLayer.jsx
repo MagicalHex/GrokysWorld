@@ -3,6 +3,7 @@ import React, { memo, useMemo, useRef, useLayoutEffect } from 'react';
 import Monster from './Monster';
 import { useIsoProjection } from '../hooks/useIsoProjection';
 import { isMonster } from '../utils/monsterRegistry';
+import { DamagePopup } from './DamagePopup'; // ← ADD
 
 // MonsterLayer.jsx — Renders monsters with buttery-smooth positioning + culling
 // 1. useMemo → Stable monster list (culling + data)
@@ -18,6 +19,9 @@ const MonsterLayer = memo(({
   monsterTypes,               // Type mappings
   tileSize,                   // Pixel size of tiles
   camera,                     // { x, y } — player/camera world position
+  popups, 
+  addPopups,
+  setPopups,
 }) => {
   // Gets isometric world→screen projection function
   const { worldToScreen } = useIsoProjection(tileSize);
@@ -151,6 +155,19 @@ const MonsterLayer = memo(({
             tileSize={tileSize}
             imageSrc={monster.imageSrc}
           />
+{/* === POPUPS FOR THIS MONSTER ONLY === */}
+{popups
+  .filter(popup => popup.monsterId === monster.monsterId)  // ← CRITICAL: Only this monster
+  .map(popup => (
+    <DamagePopup
+      key={popup.id}
+      damage={popup.dmg}
+      isCrit={popup.isCrit}                    // ← Monster: just crit + damage
+      isHeal={popup.isHeal}                    // ← Will be false for monsters  
+      onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}
+    />
+  ))}
+
         </div>
       ))}
     </div>
