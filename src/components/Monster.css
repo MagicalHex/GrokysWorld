@@ -28,7 +28,7 @@
 /* === HORIZONTAL (NEW) === */
 .monster-ui.left   { left: 20%; }
 .monster-ui.center { left: 50%; transform: translateX(-50%); }
-.monster-ui.right  { left: 65%; }
+.monster-ui.right  { left: 70%; }
 
 /* === GAP (your existing) === */
 .monster-ui.high   { gap: 0.06em; }

@@ -81,11 +81,11 @@ const defaultColor = isMonster
           }}
         />
 
-        {isProgress && (
+        {/* {isProgress && (
           <div className="action-icon">
             {type === 'chop' ? 'Axe' : 'Pickaxe'}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
