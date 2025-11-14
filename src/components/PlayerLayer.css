@@ -18,6 +18,19 @@ opacity: 0;
 .player.standing {
   opacity: 1;
 }
+.player-ui {
+  position: absolute;
+  left: 50%;
+  bottom: 110%;                     /* ← HIGH ABOVE HEAD */
+  transform: translateX(-50%);
+  width: 100%;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.08em;                   /* name to bar gap */
+}
 
 .player-layer {
   position: absolute;

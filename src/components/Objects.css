@@ -1163,7 +1163,7 @@ ease-in-out infinite; */
 .object.skeleton1 {
   background: url('/ownemojis/skeleton1.webp') center/contain no-repeat;
   width: 180%;
-  height: 180%;
+  height: 100%;
   animation: skeleton-rattle 1s ease-in-out infinite;
   filter: drop-shadow(0 0 3px red);
 }

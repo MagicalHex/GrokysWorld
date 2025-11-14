@@ -11,20 +11,7 @@
       { "id": "short-sword", "chance": 0.5 }
     ]
   },
-  "skeleton1": { 
-    "hp": 200, 
-    "name": "SKELETON",
-    "image": "/ownemojis/skeleton1.webp",
-    "xp": [35, 55],
-    "damage": { "min": 10, "max": 15 },
-    "range": 1,
-    "loot": [
-      { "id": "bow", "chance": 0.8 },
-      { "id": "knights-armor", "chance": 0.5 },
-      { "id": "short-sword", "chance": 0.5 }
-    ]
-  },
-  "spider": { 
+    "spider": { 
     "hp": 200, 
     "name": "SPIDER",
     "xp": [25, 45],
@@ -36,9 +23,32 @@
       { "id": "short-sword", "chance": 0.6 }
     ]
   },
-  "littlespider": { 
+  
+  "skeleton1": { 
+    "hp": 200, 
+    "name": "SKELETON",
+    "size": "medium",
+    "image": "/ownemojis/skeleton1.webp",
+    "scale": 0.9,
+    "nameHeightPosition": "high",
+        "nameWidthPosition": "center",
+    "xp": [35, 55],
+    "damage": { "min": 10, "max": 15 },
+    "range": 1,
+    "loot": [
+      { "id": "bow", "chance": 0.8 },
+      { "id": "knights-armor", "chance": 0.5 },
+      { "id": "short-sword", "chance": 0.5 }
+    ]
+  },
+  "tarantula": { 
     "hp": 300, 
-    "name": "ARACHNID",
+    "name": "TARANTULA",
+    "size": "medium",
+    "image": "/ownemojis/tarantula.webp",
+    "scale": 1.0,
+    "nameHeightPosition": "medium",
+        "nameWidthPosition": "center",
     "xp": [50, 80],
     "damage": { "min": 0, "max": 10 },
     "range": 1,
@@ -51,7 +61,11 @@
   "cavespider": { 
     "hp": 500, 
     "name": "CAVE SPIDER",
+    "size": "large",
     "image": "/ownemojis/cavespider.webp",
+    "scale": 1.3,
+    "nameHeightPosition": "medium",
+        "nameWidthPosition": "right",
     "xp": [120, 180],
     "damage": { "min": 0, "max": 30 },
     "range": 1,

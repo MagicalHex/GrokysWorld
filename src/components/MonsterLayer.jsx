@@ -21,7 +21,7 @@ const MonsterLayer = memo(({
   camera,                     // { x, y } — player/camera world position
   popups, 
   addPopups,
-  setPopups,
+  setPopups
 }) => {
   // Gets isometric world→screen projection function
   const { worldToScreen } = useIsoProjection(tileSize);
@@ -64,6 +64,10 @@ const MonsterLayer = memo(({
         const data = monsterData[objType];
         const maxHp = data?.hp || 100;                            // Max health from template
         const currentHp = globalMonsterHealths[monsterId] ?? maxHp; // Current health (or full)
+        const size = data?.size || 'medium';  // ← ADD: default medium
+        const scale = data?.scale || 1.0;  // ← ADD
+const nameHeightPosition = data?.nameHeightPosition || 'medium';  // ← NEW
+const nameWidthPosition = data?.nameWidthPosition || 'center';    // ← NEW
 
         // Return stable monster data (world pos + stats)
         return {
@@ -73,6 +77,11 @@ const MonsterLayer = memo(({
           maxHp,            // Max HP
           monsterName: data?.name || objType.toUpperCase(),  // Display name
           imageSrc: data?.image,  // Sprite image
+          size,  // ← ADD
+          type: objType,
+          scale,
+nameHeightPosition,  // ← NEW
+  nameWidthPosition,   // ← NEW
         };
       })
       // Remove nulls (culled/non-monsters)
@@ -154,6 +163,11 @@ const MonsterLayer = memo(({
             monsterName={monster.monsterName}
             tileSize={tileSize}
             imageSrc={monster.imageSrc}
+            size={monster.size}  // ← ADD
+            type={monster.type}
+            scale={monster.scale}
+            nameHeightPosition={monster.nameHeightPosition}
+                        nameWidthPosition={monster.nameWidthPosition}
           />
 {/* === POPUPS FOR THIS MONSTER ONLY === */}
 {popups

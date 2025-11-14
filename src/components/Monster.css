@@ -1,0 +1,84 @@
+/* monsters.css — Import in Monster.jsx */
+/* Monster.css — CLEAN, REUSABLE, SEXY */
+
+.monster-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* === UI CONTAINER: high | medium | low === */
+.monster-ui {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === VERTICAL (your existing) === */
+.monster-ui.high   { bottom: 100%; }
+.monster-ui.medium { bottom: 50%; }
+.monster-ui.low    { top: 65%; }
+
+/* === HORIZONTAL (NEW) === */
+.monster-ui.left   { left: 20%; }
+.monster-ui.center { left: 50%; transform: translateX(-50%); }
+.monster-ui.right  { left: 65%; }
+
+/* === GAP (your existing) === */
+.monster-ui.high   { gap: 0.06em; }
+.monster-ui.medium { gap: 0.04em; }
+.monster-ui.low    { gap: 0.03em; }
+
+/* === MONSTER NAME === */
+.monster-name {
+  font-family: 'Orbitron', 'Rajdhani', 'Arial Black', sans-serif;
+  font-weight: 900;
+  background: linear-gradient(135deg, #00ff9d, #00b8ff, #ff00ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 
+    0 0 4px rgba(0, 255, 150, 0.6),
+    0 0 8px rgba(0, 184, 255, 0.5),
+    0 0 12px rgba(255, 0, 255, 0.4);
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  filter: drop-shadow(0 1px 1px #000);
+}
+
+/* === HEALTHBAR WRAPPER === */
+.monster-hp {
+  width: 100%;
+}
+
+.monster-container.skeleton1 {
+  filter: drop-shadow(0 0 3px black);
+  animation: skeleton-rattles 2s ease-in-out infinite;
+}
+
+.monster-container.cavespider {
+  filter: drop-shadow(0 0 3px red);
+  animation: skeleton-rattles 1.2s ease-in-out infinite;
+  bottom: 50%;
+  left: 0%;
+}
+
+/* ANIMATIONS */
+@keyframes skeleton-rattles {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.02);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+}

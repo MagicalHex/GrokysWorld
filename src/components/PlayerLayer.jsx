@@ -69,61 +69,63 @@ const PlayerLayer = memo(({
       };
     }, [direction, moveTrigger]);
 
-    return (
-      <div
-        className="player-layer"
-        style={{
-          left: '50.5%',
-          top: '50.5%',
-          width: `${tileSize}px`,
-          height: `${tileSize}px`,
-          position: 'absolute',
-          pointerEvents: 'none',
-          zIndex: 1000,
-        }}
-      >
-        <div
-          className={`player-container standing ${
-            direction ? `enter-from-${direction}` : ''
-          }`}
-          style={{
-            backgroundImage: `url(${displayImage})`,
-          }}
-        >
-          <ActionBar
-            type={currentAction}
-            value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
-            color={globalPlayerHealth > 50 ? '#169b1fff' : '#f44336'}
-          />
+    // PlayerLayer.jsx (only the return part)
 
-          {/* POPUPS: Render all player popups here */}
-{/* POPUPS: Only player popups */}
-{popups
-  .filter(popup => popup.isPlayer || popup.isHeal || popup.isXP)  // ← Player-only
-  .map((popup) => (
-    <DamagePopup
-      key={popup.id}
-      damage={popup.dmg}
-      isPlayer={popup.isPlayer}
-      isHeal={popup.isHeal}
-      isXP={popup.isXP}
-      isCrit={popup.isCrit}
-      onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}
-    />
-  ))}
+return (
+  <div
+    className="player-layer"
+    style={{
+      left: '50.5%',
+      top: '50.5%',
+      width: `${tileSize}px`,
+      height: `${tileSize}px`,
+      position: 'absolute',
+      pointerEvents: 'none',
+      zIndex: 1000,
+    }}
+  >
+    <div
+      className={`player-container standing ${direction ? `enter-from-${direction}` : ''}`}
+      style={{
+        backgroundImage: `url(${displayImage})`,
+      }}
+    >
+      {/* === PLAYER UI: NAME + HEALTH BAR === */}
+      <div className="player-ui">
+        <ActionBar
+          type={currentAction}
+          value={currentAction === 'health' ? globalPlayerHealth : choppingProgress}
+          max={100}
+          // no name → defaults to "Player"
+          // no isMonster → green bar + tiny name
+        />
+      </div>
 
-  {/* PICKUP POPUPS (NEW) - Render ALL pickups above player */}
-        {pickupPopups.map(popup => (
-          <PickupPopup
+      {/* POPUPS */}
+      {popups
+        .filter(p => p.isPlayer || p.isHeal || p.isXP)
+        .map(popup => (
+          <DamagePopup
             key={popup.id}
-            item={popup.item}
-            onFinish={() => removePickupPopup(popup.id)}
+            damage={popup.dmg}
+            isPlayer={popup.isPlayer}
+            isHeal={popup.isHeal}
+            isXP={popup.isXP}
+            isCrit={popup.isCrit}
+            onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}
           />
         ))}
 
-        </div>
-      </div>
-    );
+      {pickupPopups.map(popup => (
+        <PickupPopup
+          key={popup.id}
+          item={popup.item}
+          onFinish={() => removePickupPopup(popup.id)}
+        />
+      ))}
+    </div>
+  </div>
+);
   }
 );
 
