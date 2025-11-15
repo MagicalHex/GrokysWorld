@@ -1,33 +1,51 @@
 /* MobileControls.css */
 .mobile-controls-bar {
+  /* NOT fixed – it lives inside .play-mode */
   height: 80px;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between;   /* pushes children to edges */
   align-items: center;
   padding: 0 20px;
+  width: 100%;                       /* full width of parent */
+  box-sizing: border-box;
   z-index: 1000;
-  pointer-events: none; /* Let touches pass through */
+
+  /* let touches pass through the bar itself */
+  pointer-events: none;
 }
 
+/* Buttons & joystick must still receive touches */
+.mobile-control-btn,
+.mobile-joystick-zone {
+  pointer-events: auto;
+}
+
+/* Buttons */
 .mobile-control-btn {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.2);
   color: white;
   font-weight: bold;
   font-size: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  pointer-events: auto;
+  border: 2px solid rgba(255,255,255,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Joystick zone */
 .mobile-joystick-zone {
   width: 120px;
   height: 120px;
-  pointer-events: auto;
   position: relative;
+}
+
+/* Keep joystick centred */
+.mobile-joystick-wrapper {
+  flex: 0 0 120px;           /* fixed slot */
+  display: flex;
+  justify-content: center;
 }

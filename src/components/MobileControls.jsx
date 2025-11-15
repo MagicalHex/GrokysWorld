@@ -1,15 +1,22 @@
-// src/components/MobileControls.jsx
+// MobileControls.jsx
 import React from 'react';
 import './MobileControls.css';
 
 const MobileControls = ({ onExit, openInventory, joystickRef }) => {
   return (
     <div className="mobile-controls-bar">
-      <button onClick={onExit} className="mobile-control-btn mobile-edit-btn">
+      {/* LEFT BUTTON */}
+      <button onClick={onExit} className="mobile-control-btn">
         E
       </button>
-      <div ref={joystickRef} className="mobile-joystick-zone" />
-      <button onClick={openInventory} className="mobile-control-btn mobile-inventory-btn">
+
+      {/* CENTER – joystick stays in the middle */}
+      <div className="mobile-joystick-wrapper">
+        <div ref={joystickRef} className="mobile-joystick-zone" />
+      </div>
+
+      {/* RIGHT BUTTON */}
+      <button onClick={openInventory} className="mobile-control-btn">
         I
       </button>
     </div>
