@@ -259,14 +259,10 @@ useEffect(() => {
    MOBILE JOYSTICK — CLEAN, SAFE, NO FREEZE
    -------------------------------------------------------------- */
 /* --------------------------------------------------------------
-   MOBILE JOYSTICK — DRAGGABLE + REPEAT MOVES!
+   MOBILE JOYSTICK — SIMPLE & WORKING (No restrictions!)
    -------------------------------------------------------------- */
 const isMobileDevice = isMobile();
 const joystickRef = useRef(null);
-const lastMoveTime = useRef(0);
-const moveDelay = 150; // ← FASTER: 150ms (feels responsive)
-const repeatTimer = useRef(null); // NEW: Auto-repeat
-const currentDirRef = useRef(null); // NEW: Track active direction
 
 useEffect(() => {
   if (!isMobileDevice || !joystickRef.current) return;
@@ -276,75 +272,36 @@ useEffect(() => {
     mode: 'static',
     position: { left: '50%', top: '50%' },
     color: 'rgba(255, 255, 255, 0.7)',
-    size: 120, // ← BIGGER: easier thumb drag
+    size: 120,
     restOpacity: 0.6,
   });
 
-  // === DIRECTION MAPPING ===
-  const getDirection = (data) => {
-    if (!data.direction) return null;
-    const angle = data.direction.angle;
-    return angle; // 'up', 'down', 'left', 'right'
-  };
-
-  // === REPEAT MOVE FUNCTION ===
-  const repeatMove = () => {
-    if (!currentDirRef.current || !playerPos) return;
-
-    const dir = currentDirRef.current;
-    let dx = 0, dy = 0;
-    if (dir === 'up')    dy = -1;
-    if (dir === 'down')  dy = 1;
-    if (dir === 'left')  dx = -1;
-    if (dir === 'right') dx = 1;
-
-    const now = Date.now();
-    if (now - lastMoveTime.current < moveDelay) return;
-    lastMoveTime.current = now;
-
-    const newPos = { x: playerPos.x + dx, y: playerPos.y + dy };
-    onPlayerMoveAttempt(newPos);
-  };
-
-  // === START DRAG: Begin repeating ===
-  manager.on('start', () => {
-    console.log('🎮 Joystick START');
-  });
-
-  // === MOVE: Update direction + start repeat ===
+  // === SIMPLE: move = move! (worked before)
   manager.on('move', (evt, data) => {
-    const dir = getDirection(data);
-    if (!dir || !playerPos) return;
+    if (!data.direction || !playerPos) return;
 
-    // IMMEDIATE ANIMATION
-    setMoveDirection(dir);
+    const dir = data.direction.angle;
+    let dx = 0, dy = 0;
+    if (dir === 'up')    { dy = -1; setMoveDirection('up'); }
+    if (dir === 'down')  { dy = 1;  setMoveDirection('down'); }
+    if (dir === 'left')  { dx = -1; setMoveDirection('left'); }
+    if (dir === 'right') { dx = 1;  setMoveDirection('right'); }
 
-    // UPDATE DIR + START REPEAT
-    currentDirRef.current = dir;
-    if (!repeatTimer.current) {
-      repeatTimer.current = setInterval(repeatMove, moveDelay);
-    }
+    const newPos = { 
+      x: playerPos.x + dx, 
+      y: playerPos.y + dy 
+    };
+    
+    onPlayerMoveAttempt(newPos); // ← PlayerMovement handles ALL limits
   });
 
-  // === END DRAG: Stop repeat ===
+  // Reset animation on end
   manager.on('end', () => {
-    console.log('🎮 Joystick END');
-    currentDirRef.current = null;
-    if (repeatTimer.current) {
-      clearInterval(repeatTimer.current);
-      repeatTimer.current = null;
-    }
-    setMoveDirection(null); // Reset animation
+    setMoveDirection(null);
   });
 
-  // === CLEANUP ===
-  return () => {
-    manager.destroy();
-    if (repeatTimer.current) {
-      clearInterval(repeatTimer.current);
-    }
-  };
-}, [isMobileDevice, onPlayerMoveAttempt, playerPos, moveDelay, setMoveDirection]);
+  return () => manager.destroy();
+}, [isMobileDevice, playerPos, onPlayerMoveAttempt, setMoveDirection]);
 
   // ── Memorize the grid ─────────────────────────────────────────────────────
 // Memoize the ENTIRE tile computation
