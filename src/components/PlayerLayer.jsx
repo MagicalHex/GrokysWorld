@@ -74,14 +74,16 @@ const PlayerLayer = memo(({
 return (
   <div
     className="player-layer"
-    style={{
+data-player="true"            // 🔥 Alternative selector
+  style={{ 
+    position: 'absolute',
       left: '50.5%',
       top: '50.5%',
       width: `${tileSize}px`,
       height: `${tileSize}px`,
       position: 'absolute',
       pointerEvents: 'none',
-      zIndex: 1000,
+      // zIndex: 1000,
     }}
   >
     <div

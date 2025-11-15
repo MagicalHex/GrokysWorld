@@ -42,7 +42,7 @@ const Monster = memo(({
             height: `${100 * scale}%`,
             imageRendering: 'pixelated',
             display: 'block',
-            transform: `translate(${offsetX}, ${offsetY})`,
+            // transform: `translate(${offsetX}, ${offsetY})`,
             filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
           }}
           alt=""

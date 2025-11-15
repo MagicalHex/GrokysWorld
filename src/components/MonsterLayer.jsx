@@ -122,28 +122,17 @@ nameHeightPosition,  // ← NEW
 
   // Render stable monster DOM (never remounts!)
   return (
-    <div
-      // Container centered on screen (like canvas center)
-      style={{
-        position: 'absolute',
-        left: '50%',        // Anchor to screen center X
-        top: '50%',         // Anchor to screen center Y
-        width: 0,           // Zero size (children positioned absolutely)
-        height: 0,
-        pointerEvents: 'none',  // Don't block canvas clicks
-        zIndex: 15,         // Above tiles, below player/UI
-        transform: 'translate(-50%, -50%)',  // Offset for true center
-      }}
-    >
+    <div className="monster-layer">
       {/* Render one wrapper div per monster */}
-      {monsterDataList.map((monster) => (
-        <div
-          key={monster.monsterId}  // Stable React key = no remounts!
-          // REF CALLBACK: Store/delete DOM element in Map
-          ref={(el) => {
-            if (el) monsterRefs.current.set(monster.monsterId, el);     // New: store
-            else monsterRefs.current.delete(monster.monsterId);          // Gone: cleanup
-          }}
+{monsterDataList.map((monster) => (
+  <div
+    key={monster.monsterId}
+    data-monster={monster.monsterId}  // 🔥 ADD THIS LINE
+    // REF CALLBACK: Store/delete DOM element in Map
+    ref={(el) => {
+      if (el) monsterRefs.current.set(monster.monsterId, el);
+      else monsterRefs.current.delete(monster.monsterId);
+    }}
           // Wrapper styles for smooth positioning
           style={{
             position: 'absolute',     // Position relative to container center

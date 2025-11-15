@@ -185,7 +185,7 @@ opacity: 0;
   transform: translateX(-50%);
   font-size: 32px;
   font-weight: bold;
-  z-index: 12;
+  /* z-index: 12; */
   pointer-events: none;
   animation: bigPulse 2s infinite;
 }

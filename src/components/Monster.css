@@ -1,6 +1,16 @@
 /* monsters.css — Import in Monster.jsx */
 /* Monster.css — CLEAN, REUSABLE, SEXY */
 
+.monster-layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  /* transform: translate(-50%, -50%); */
+}
+
 .monster-container {
   position: relative;
   width: 100%;
@@ -14,7 +24,7 @@
   transform: translateX(-50%);
   width: 100%;
   pointer-events: none;
-  z-index: 2;
+  /* z-index: 2; */
   display: flex;
   flex-direction: column;
   align-items: center;

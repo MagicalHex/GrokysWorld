@@ -20,6 +20,10 @@ import { isMonster, getMonsterData } from '../utils/monsterRegistry'; // To rend
 import PlayerLayer from './PlayerLayer'; // Player layer
 import CanvasGrid from './CanvasGrid'; // Player layer
 import MonsterLayer from './MonsterLayer'; // Player layer
+import ZIndexManager from './ZIndexManager'; // Z index manager
+import FlatEntityLayer from './FlatEntityLayer'; // Z index manager
+
+import { useIsoProjection } from '../hooks/useIsoProjection';
 
 // Add these imports
 import nipplejs from 'nipplejs';
@@ -151,7 +155,6 @@ useEffect(() => {
     : COOLDOWNS.MELEE;
 
   // console.log(`[TIMER] Set timeout ${duration}ms for ${cooldownSignal.type}`);
-
   const timer = setTimeout(() => {
     // console.log(`[TIMER] Reset ${cooldownSignal.type} cooldown`);
     setCooldownSignal({ active: false, type: null });
@@ -159,6 +162,11 @@ useEffect(() => {
 
   return () => clearTimeout(timer);
 }, [cooldownSignal]);
+
+/* --- For Z Index Manager ----- */
+// 🔥 ADD THIS HOOK CALL (near your other hooks)
+const { worldToScreen } = useIsoProjection(tileSize);
+/* ------------------------ */
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -453,36 +461,38 @@ useEffect(() => {
   getQuestMarker={getQuestMarker}
   camera={camera}
 />
-
-{/* PLAYER (absolute) */}
-  <PlayerLayer
+{/* 🔥 ONE CHILD: FlatEntityLayer */}
+<ZIndexManager
+  playerPos={playerPos}
+  objects={objects}
+  monsterTypes={monsterTypes}
+  camera={camera}
+  tileSize={tileSize}
+  columns={columns}
+  rows={rows}
+>
+  {/* 🔥 FLATENTITYLAYER INSIDE ZINDEXMANAGER ← THIS WAS MISSING!! */}
+  <FlatEntityLayer
     playerPos={playerPos}
-    // moveDirection={moveDirection}
     moveDirectionRef={moveDirectionRef}
     moveTrigger={moveTriggerRef.current}
     globalPlayerHealth={globalPlayerHealth}
     currentAction={currentAction}
     choppingProgress={choppingProgress}
     tileSize={tileSize}
-    popups={popups.filter(p => p.isPlayer)}  // ← only player popups
-  addPopup={addPopup}                      // ← for new ones
-  setPopups={setPopups}
-  pickupPopups={pickupPopups}      // ← ADD
-  removePickupPopup={removePickupPopup}  // ← ADD
+    popups={popups}
+    addPopup={addPopup}
+    setPopups={setPopups}
+    pickupPopups={pickupPopups}
+    removePickupPopup={removePickupPopup}
+    objects={objects}
+    globalMonsterHealths={globalMonsterHealths}
+    monsterData={monsterData}
+    monsterTypes={monsterTypes}
+    camera={camera}
+    worldToScreen={worldToScreen}
   />
-
-  {/* MONSTERS */}
-<MonsterLayer
-  objects={objects}
-  globalMonsterHealths={globalMonsterHealths}
-  monsterData={monsterData}
-  monsterTypes={monsterTypes}
-  tileSize={tileSize}
-  camera={camera}
-  popups={popups.filter(p => !p.isPlayer)} // ← only monster popups
-  addPopup={addPopup}
-  setPopups={setPopups}
-/>
+</ZIndexManager>
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem
