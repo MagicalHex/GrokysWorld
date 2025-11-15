@@ -208,54 +208,54 @@ groundTiles.forEach(({ screen, x, y }) => {
 });
 
 // === OBJECTS LIST ===
-    const objList = [];
-    Object.entries(objects).forEach(([key, objData]) => {
-      const [xStr, yStr] = key.split(',');
-      const x = Number(xStr);
-      const y = Number(yStr);
-      if (x < startX || x > endX || y < startY || y > endY) return;
+    // const objList = [];
+    // Object.entries(objects).forEach(([key, objData]) => {
+    //   const [xStr, yStr] = key.split(',');
+    //   const x = Number(xStr);
+    //   const y = Number(yStr);
+    //   if (x < startX || x > endX || y < startY || y > endY) return;
 
-      const baseScreen = worldToScreen(x, y);
-      const isString = typeof objData === 'string';
-      const rawValue = isString ? objData : objData.type;
-      const objType = monsterTypes[rawValue] || rawValue;
+    //   const baseScreen = worldToScreen(x, y);
+    //   const isString = typeof objData === 'string';
+    //   const rawValue = isString ? objData : objData.type;
+    //   const objType = monsterTypes[rawValue] || rawValue;
 
-      let monsterId = null, currentHp = null, maxHp = null, monsterName = null, imageSrc = null;
+    //   let monsterId = null, currentHp = null, maxHp = null, monsterName = null, imageSrc = null;
 
-      objList.push({
-        x, y, objType, baseScreen, depth: x + y,
-        monsterId, currentHp, maxHp, monsterName, imageSrc
-      });
-    });
-    objList.sort((a, b) => a.depth - b.depth);
+    //   objList.push({
+    //     x, y, objType, baseScreen, depth: x + y,
+    //     monsterId, currentHp, maxHp, monsterName, imageSrc
+    //   });
+    // });
+    // objList.sort((a, b) => a.depth - b.depth);
 
-    // === RENDER OBJECTS (FIXED: INSIDE render()) ===
-    objList.forEach(({
-      baseScreen, objType,
-      monsterId, currentHp, maxHp, monsterName, imageSrc
-    }) => {
-      if (isMonster(objType)) return;  // ← SKIP MONSTERS
-      ctx.save();
+    // // === RENDER OBJECTS (FIXED: INSIDE render()) ===
+    // objList.forEach(({
+    //   baseScreen, objType,
+    //   monsterId, currentHp, maxHp, monsterName, imageSrc
+    // }) => {
+    //   if (isMonster(objType)) return;  // ← SKIP MONSTERS
+    //   ctx.save();
 
-      // === EMOJI FALLBACK ===
-      const emojiMap = {
-        bricks: '🧱',
-        treeobject: '🌳',
-        evergreenobject: '🌲',
-        farmer001: '👨‍🌾'
-      };
-      const emoji = emojiMap[objType] || '❓';
+    //   // === EMOJI FALLBACK ===
+    //   const emojiMap = {
+    //     bricks: '🧱',
+    //     treeobject: '🌳',
+    //     evergreenobject: '🌲',
+    //     farmer001: '👨‍🌾'
+    //   };
+    //   const emoji = emojiMap[objType] || '❓';
 
-      ctx.translate(
-        baseScreen.x + tileSize / 2 + tileSize * 0.05,
-        baseScreen.y + tileSize / 2 + tileSize * 0.35
-      );
-      ctx.font = `${tileSize}px 'Segoe UI Emoji', Arial, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(emoji, 0, 0);
-      ctx.restore();
-    });
+    //   ctx.translate(
+    //     baseScreen.x + tileSize / 2 + tileSize * 0.05,
+    //     baseScreen.y + tileSize / 2 + tileSize * 0.35
+    //   );
+    //   ctx.font = `${tileSize}px 'Segoe UI Emoji', Arial, sans-serif`;
+    //   ctx.textAlign = 'center';
+    //   ctx.textBaseline = 'middle';
+    //   ctx.fillText(emoji, 0, 0);
+    //   ctx.restore();
+    // });
 
     ctx.restore();
     raf = requestAnimationFrame(render);

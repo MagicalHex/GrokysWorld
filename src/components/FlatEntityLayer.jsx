@@ -2,12 +2,13 @@
 import React from 'react';
 import PlayerLayer from './PlayerLayer';
 import MonsterLayer from './MonsterLayer';
+import StaticObjectLayer from './StaticObjectLayer';
 
 const FlatEntityLayer = ({
   playerPos, moveDirectionRef, moveTrigger, globalPlayerHealth, currentAction, 
   choppingProgress, tileSize, popups, addPopup, setPopups, pickupPopups, 
   removePickupPopup, objects, globalMonsterHealths, monsterData, monsterTypes, 
-  camera, worldToScreen // from useIsoProjection
+  camera, worldToScreen, objectTypes // from useIsoProjection
 }) => {
   return (
     <>
@@ -41,6 +42,13 @@ const FlatEntityLayer = ({
         setPopups={setPopups}
         worldToScreen={worldToScreen} // Pass if needed for positioning
       />
+      {/* 🔥 OBJECTS — Direct siblings of Player */}
+      <StaticObjectLayer
+    objects={objects}
+    objectTypes={objectTypes}
+    tileSize={tileSize}
+    camera={camera}
+  />
     </>
   );
 };

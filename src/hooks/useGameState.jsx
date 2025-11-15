@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadMaps } from '../data/loadMaps';
 import MONSTER_DATA from '../../public/data/monsters.json';
+import { OBJECT_DATA } from '../data/objectRegistry';
 import { MONSTER_TYPES, isMonster } from '../utils/monsterRegistry';
 import { ITEMS } from '../components/Items.jsx';
 
@@ -50,6 +51,10 @@ export const useGameState = () => {
   // Derive monster types directly from JSON
   const MONSTER_TYPES = Object.keys(MONSTER_DATA);
   const isMonster = (type) => MONSTER_TYPES.includes(type);
+// -------------------------------------------------
+// 1. Static object registry (shared by every level)
+// -------------------------------------------------
+  const [objectTypes] = useState(OBJECT_DATA);   // immutable – never changes
 
   /* --------------------------------------------------------------
      2. Helper: update a single level (must be defined first)
@@ -634,7 +639,7 @@ useEffect(() => {
       '7,7': 'treeobject',
       '6,7': 'treeobject', 
       '5,7': 'treeobject',
-      '5,5': 'skeleton1',
+      '4,7': 'skeleton1',
       '10,10': 'cavespider'  // ← string type for respawn
     };
 
@@ -667,7 +672,8 @@ useEffect(() => {
       objects,           // ← NOW has monster IDs!
       originalSpawns,    // ← strings (for respawn)
       respawnQueue: [],
-      playerPos: PORTAL_ENTRY_POINTS[1]
+      playerPos: PORTAL_ENTRY_POINTS[1],
+      objectTypes: OBJECT_DATA,
     };
   };
 
@@ -715,6 +721,7 @@ useEffect(() => {
     setIsDead,
     globalMonsterHealths,
     monsterTypes,
+    objectTypes,
     healPopup,
     onHealPopup,
     onHealPopupFinish,

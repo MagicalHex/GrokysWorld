@@ -4,7 +4,7 @@ import { isMonster } from '../utils/monsterRegistry';
 
 const ZIndexManager = memo(({ 
   playerPos, objects, monsterTypes, camera, tileSize, columns, rows, 
-  children 
+  children, objectTypes
 }) => {
   const containerRef = useRef(null);
 
@@ -48,6 +48,24 @@ const ZIndexManager = memo(({
         if (el) {
           const depth = x + y;
           entities.push({ el, depth, id: objId });
+        }
+      });
+
+      // 🔥 STATIC OBJECTS (trees, walls, houses)
+      Object.entries(objects).forEach(([key, objId]) => {
+        const [xStr, yStr] = key.split(',');
+        const x = Number(xStr), y = Number(yStr);
+
+        if (x < startX || x > endX || y < startY || y > endY) return;
+
+        // 🔥 ANY NON-MONSTER = Static object (tree/wall)
+        const type = objectTypes[objId];  // NEW: objectTypes prop
+        if (!isMonster(monsterTypes[objId])) {  // Tree/wall
+          const el = container.querySelector(`[data-object="${key}"]`);  // 'x,y' key
+          if (el) {
+            const depth = x + y;  // + height offset if needed
+            entities.push({ el, depth, id: `OBJ_${key}` });
+          }
         }
       });
 

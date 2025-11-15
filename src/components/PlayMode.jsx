@@ -70,6 +70,7 @@ const PlayMode = ({
   pendingPickup,    
   clearPendingPickup,
   monsterTypes,
+  objectTypes,
   healPopup,
   onHealPopup,
   onHealPopupFinish,
@@ -466,6 +467,7 @@ useEffect(() => {
   playerPos={playerPos}
   objects={objects}
   monsterTypes={monsterTypes}
+  objectTypes={objectTypes}
   camera={camera}
   tileSize={tileSize}
   columns={columns}
@@ -491,6 +493,7 @@ useEffect(() => {
     monsterTypes={monsterTypes}
     camera={camera}
     worldToScreen={worldToScreen}
+  objectTypes={objectTypes}  // ← NEW: tree/wall data
   />
 </ZIndexManager>
 

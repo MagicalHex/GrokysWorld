@@ -85,6 +85,7 @@ function App() {
     setIsDead,
     respawnPlayer,
     monsterTypes,
+    objectTypes,
     healPopup,
     onHealPopup,
     onHealPopupFinish,
@@ -175,6 +176,7 @@ useEffect(() => {
         pendingPickup={game.pendingPickup}
         clearPendingPickup={game.clearPendingPickup}
         monsterTypes={monsterTypes}
+        objectTypes={objectTypes}
         healPopup={healPopup}
         onHealPopup={onHealPopup}
         onHealPopupFinish={onHealPopupFinish}
