@@ -639,7 +639,9 @@ useEffect(() => {
       '7,7': 'treeobject',
       '6,7': 'treeobject', 
       '5,7': 'treeobject',
-      '4,7': 'skeleton1',
+      '5,5': 'treeobject',
+      '5,6': 'treeobject',
+      '10,7': 'skeleton1',
       '10,10': 'cavespider'  // ← string type for respawn
     };
 

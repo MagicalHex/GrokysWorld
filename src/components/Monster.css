@@ -75,8 +75,8 @@
 
 .monster-container.cavespider {
   filter: drop-shadow(0 0 3px red);
-  animation: skeleton-rattles 1.2s ease-in-out infinite;
-  bottom: 50%;
+  animation: skeleton-rattles 1.8s ease-in-out infinite;
+  bottom: 25%;
   left: 0%;
 }
 
