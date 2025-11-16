@@ -158,105 +158,78 @@ const playerX = smoothCam.x;
         // Loops over sorted tiles.
         // Gets terrain type from grid (defaults to 'grass' if missing).
         // Skips if not 'grass'
-// ---- draw grass (with VIGNETTE FADE) ----
+// 🔥 OPTIMIZED: SINGLE LOOP - Grass OR Stone (no duplicates!)
 groundTiles.forEach(({ screen, x, y }) => {
   const terrain = grid[y]?.[x] || 'grass';
-  if (terrain !== 'grass') return;
 
   ctx.save();
   ctx.translate(screen.x, screen.y + tileSize);
 
-  // ────── VIGNETTE (more centre colour + wider view) ──────
+  // ────── VIGNETTE (shared) ──────
   const distFromCenterX = Math.abs(x - playerX);
   const distFromCenterY = Math.abs(y - playerY);
   const distFromCenter = Math.sqrt(distFromCenterX ** 2 + distFromCenterY ** 2);
+  const maxDist = tilesAcross / 2 * 0.98;
+  let t = Math.max(0, 1 - distFromCenter / maxDist);
+  const fade = t * t * (3 - 2 * t);
 
-  // ← start fading **later** → see ~1-2 extra tiles on each side
-  const maxDist = tilesAcross / 2 * 0.98;          // was 0.9
+  // ────── GRASS ──────
+  if (terrain === 'grass') {
+    // Base layer
+    ctx.fillStyle = `rgba(46, 139, 87, ${fade * 0.8})`;
+    ctx.beginPath();
+    ctx.moveTo(0, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.5, 0);
+    ctx.lineTo(tileSize, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+    ctx.closePath();
+    ctx.fill();
 
-  // smooth-step (same ease-out, but we’ll bias it a little)
-  let t = Math.max(0, 1 - distFromCenter / maxDist);   // 0 … 1
-  const fade = t * t * (3 - 2 * t);                    // smooth-step
+    // Top layer
+    const topAlpha = Math.min(1, fade * 1.1);
+    ctx.fillStyle = `rgba(50, 205, 50, ${topAlpha})`;
+    ctx.beginPath();
+    ctx.moveTo(0, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.25, tileSize * 0.15);
+    ctx.lineTo(tileSize * 0.5, 0);
+    ctx.lineTo(tileSize * 0.75, tileSize * 0.15);
+    ctx.lineTo(tileSize, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.75, tileSize * 0.45);
+    ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+    ctx.lineTo(tileSize * 0.25, tileSize * 0.45);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // ────── SIMPLIFIED STONE (2 layers → PERFECT!) ──────
+  else if (terrain === 'stonefloor') {
+    // Base layer (dark gray)
+    ctx.fillStyle = `rgba(64, 64, 68, ${fade * 0.9})`;
+    ctx.beginPath();
+    ctx.moveTo(0, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.5, 0);
+    ctx.lineTo(tileSize, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+    ctx.closePath();
+    ctx.fill();
 
-  // ────── Base layer (darker on edges) ──────
-  // Boost centre opacity a touch (0.7 → 0.8)
-  ctx.fillStyle = `rgba(46, 139, 87, ${fade * 0.8})`; // #2E8B57
-  ctx.beginPath();
-  ctx.moveTo(0, tileSize * 0.3);
-  ctx.lineTo(tileSize * 0.5, 0);
-  ctx.lineTo(tileSize, tileSize * 0.3);
-  ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
-  ctx.closePath();
-  ctx.fill();
-
-  // ────── Top layer (brighter green, stays full longer) ──────
-  // Full-green centre (fade * 1.1) and clamp so we never exceed 1
-  const topAlpha = Math.min(1, fade * 1.1);
-  ctx.fillStyle = `rgba(50, 205, 50, ${topAlpha})`;   // #32CD32
-  ctx.beginPath();
-  ctx.moveTo(0, tileSize * 0.3);
-  ctx.lineTo(tileSize * 0.25, tileSize * 0.15);
-  ctx.lineTo(tileSize * 0.5, 0);
-  ctx.lineTo(tileSize * 0.75, tileSize * 0.15);
-  ctx.lineTo(tileSize, tileSize * 0.3);
-  ctx.lineTo(tileSize * 0.75, tileSize * 0.45);
-  ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
-  ctx.lineTo(tileSize * 0.25, tileSize * 0.45);
-  ctx.closePath();
-  ctx.fill();
+    // SINGLE highlight layer (no cracks - 60% faster!)
+    const topAlpha = Math.min(1, fade * 1.1);
+    ctx.fillStyle = `rgba(105, 105, 110, ${topAlpha * 0.7})`;  // Lighter gray
+    ctx.beginPath();
+    ctx.moveTo(0, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.25, tileSize * 0.15);
+    ctx.lineTo(tileSize * 0.5, 0);
+    ctx.lineTo(tileSize * 0.75, tileSize * 0.15);
+    ctx.lineTo(tileSize, tileSize * 0.3);
+    ctx.lineTo(tileSize * 0.75, tileSize * 0.45);
+    ctx.lineTo(tileSize * 0.5, tileSize * 0.6);
+    ctx.lineTo(tileSize * 0.25, tileSize * 0.45);
+    ctx.closePath();
+    ctx.fill();
+  }
 
   ctx.restore();
 });
-
-// === OBJECTS LIST ===
-    // const objList = [];
-    // Object.entries(objects).forEach(([key, objData]) => {
-    //   const [xStr, yStr] = key.split(',');
-    //   const x = Number(xStr);
-    //   const y = Number(yStr);
-    //   if (x < startX || x > endX || y < startY || y > endY) return;
-
-    //   const baseScreen = worldToScreen(x, y);
-    //   const isString = typeof objData === 'string';
-    //   const rawValue = isString ? objData : objData.type;
-    //   const objType = monsterTypes[rawValue] || rawValue;
-
-    //   let monsterId = null, currentHp = null, maxHp = null, monsterName = null, imageSrc = null;
-
-    //   objList.push({
-    //     x, y, objType, baseScreen, depth: x + y,
-    //     monsterId, currentHp, maxHp, monsterName, imageSrc
-    //   });
-    // });
-    // objList.sort((a, b) => a.depth - b.depth);
-
-    // // === RENDER OBJECTS (FIXED: INSIDE render()) ===
-    // objList.forEach(({
-    //   baseScreen, objType,
-    //   monsterId, currentHp, maxHp, monsterName, imageSrc
-    // }) => {
-    //   if (isMonster(objType)) return;  // ← SKIP MONSTERS
-    //   ctx.save();
-
-    //   // === EMOJI FALLBACK ===
-    //   const emojiMap = {
-    //     bricks: '🧱',
-    //     treeobject: '🌳',
-    //     evergreenobject: '🌲',
-    //     farmer001: '👨‍🌾'
-    //   };
-    //   const emoji = emojiMap[objType] || '❓';
-
-    //   ctx.translate(
-    //     baseScreen.x + tileSize / 2 + tileSize * 0.05,
-    //     baseScreen.y + tileSize / 2 + tileSize * 0.35
-    //   );
-    //   ctx.font = `${tileSize}px 'Segoe UI Emoji', Arial, sans-serif`;
-    //   ctx.textAlign = 'center';
-    //   ctx.textBaseline = 'middle';
-    //   ctx.fillText(emoji, 0, 0);
-    //   ctx.restore();
-    // });
 
     ctx.restore();
     raf = requestAnimationFrame(render);

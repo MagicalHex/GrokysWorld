@@ -704,7 +704,7 @@ useEffect(() => {
     });
 
     return {
-      name: 'Dungeon Survival',
+      name: 'Survival Mode',
       grid,
       objects,
       originalSpawns: survivalSpawns,
