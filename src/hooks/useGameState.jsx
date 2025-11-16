@@ -634,55 +634,100 @@ useEffect(() => {
   const generateTown = () => {
     const grid = Array(ROWS).fill().map(() => Array(COLS).fill('grass'));
     
-    // === ORIGINAL SPAWNS (for respawning) ===
-    const originalSpawns = {
+    // === STORY MODE SPAWNS ===
+    const storySpawns = {
       '7,7': 'treeobject',
       '6,7': 'treeobject', 
       '5,7': 'treeobject',
       '5,5': 'treeobject',
       '5,6': 'treeobject',
       '10,7': 'skeleton1',
-      '10,10': 'cavespider'  // ← string type for respawn
+      '10,10': 'cavespider'
     };
 
-    // === LIVE OBJECTS (with monster IDs) ===
-    const objects = { ...originalSpawns }; // copy
+    const objects = { ...storySpawns };
     
-    // 🔥 SPAWN MONSTERS → Create IDs + set health
-    Object.entries(originalSpawns).forEach(([key, type]) => {
+    // Spawn monsters with IDs
+    Object.entries(storySpawns).forEach(([key, type]) => {
       if (isMonster(type)) {
         const [x, y] = key.split(',').map(Number);
-        const monsterId = `${type}_1_${x}_${y}`;  // level 1
-        
-        // REPLACE string with ID in objects
+        const monsterId = `${type}_story_1_${x}_${y}`;
         objects[key] = monsterId;
-        
-        // SET HEALTH & TYPE (matches your old code)
         setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
         setGlobalMonsterHealths(prev => ({
           ...prev,
-          [monsterId]: MONSTER_DATA[type]?.hp ?? 100  // 500 for spider
+          [monsterId]: MONSTER_DATA[type]?.hp ?? 100
         }));
-        
-        console.log('🕷️ Spawned:', monsterId, 'HP:', MONSTER_DATA[type]?.hp);
       }
     });
 
     return {
       name: 'Town',
       grid,
-      objects,           // ← NOW has monster IDs!
-      originalSpawns,    // ← strings (for respawn)
+      objects,
+      originalSpawns: storySpawns,
       respawnQueue: [],
       playerPos: PORTAL_ENTRY_POINTS[1],
       objectTypes: OBJECT_DATA,
+      background: 'townbgreduced.webp'  // ← NEW: background identifier
     };
   };
 
-  const level1 = generateTown();
-  setLevels({ 1: level1 });
-  setRestrictedTilesByLevel({ 1: new Set() });
-  setCurrentLevel(1);
+  const generateDungeon = () => {
+    const grid = Array(ROWS).fill().map(() => Array(COLS).fill('stonefloor'));
+    
+    // === SURVIVAL MODE SPAWNS (more aggressive) ===
+    const survivalSpawns = {
+      // '3,3': 'treeobject',
+      // '4,4': 'treeobject',
+      // '15,15': 'treeobject',
+      // '16,16': 'treeobject',
+      '3,3': 'skeleton1',
+      '4,4': 'skeleton1',
+      '5,15': 'skeleton1',
+    };
+
+    const objects = { ...survivalSpawns };
+    
+    // Spawn monsters with IDs (level 1 for survival balance)
+    Object.entries(survivalSpawns).forEach(([key, type]) => {
+      if (isMonster(type)) {
+        const [x, y] = key.split(',').map(Number);
+        const monsterId = `${type}_survival_1_${x}_${y}`;
+        objects[key] = monsterId;
+        setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
+        setGlobalMonsterHealths(prev => ({
+          ...prev,
+          [monsterId]: MONSTER_DATA[type]?.hp ?? 100
+        }));
+      }
+    });
+
+    return {
+      name: 'Dungeon Survival',
+      grid,
+      objects,
+      originalSpawns: survivalSpawns,
+      respawnQueue: [],
+      playerPos: { x: 11, y: 8 },  // center spawn for survival
+      objectTypes: OBJECT_DATA,
+      background: 'survivalmap.webp'  // ← NEW: dungeon background
+    };
+  };
+
+  // Store both levels
+  const storyLevel = generateTown();
+  const survivalLevel = generateDungeon();
+  
+  setLevels({ 
+    story: storyLevel, 
+    survival: survivalLevel 
+  });
+  setRestrictedTilesByLevel({ 
+    story: new Set(), 
+    survival: new Set() 
+  });
+  setCurrentLevel('story');  // default
   setIsLoading(false);
 }, []);
 

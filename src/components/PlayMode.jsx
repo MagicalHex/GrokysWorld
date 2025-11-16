@@ -45,6 +45,7 @@ const PlayMode = ({
   objects,
   levelName,
   playerPos,
+  background,
   onExit,
   tileSize,
   rows,
@@ -472,6 +473,7 @@ useEffect(() => {
   NPC_NAMES={NPC_NAMES}
   getQuestMarker={getQuestMarker}
   camera={camera}
+  background={background}
 />
 {/* 🔥 Z INDEX */}
 <ZIndexManager

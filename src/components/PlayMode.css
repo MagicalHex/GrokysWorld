@@ -28,7 +28,7 @@
   image-rendering: pixelated;
 
   /* MAGIC: Dark fade from bottom → full image at top */
-  background: 
+  /* background: 
     linear-gradient(
       to top,
       black 0%,
@@ -36,7 +36,7 @@
       rgba(0, 0, 0, 0.4) 50%,
       transparent 70%
     ),
-    url('/ownemojis/townbg.jpg') center / cover no-repeat;
+    url('/ownemojis/townbgreduced.webp') center / cover no-repeat; */
 }
 /* FOR MONSTERS, USED IN MonsterLayer */
 @keyframes fadeIn {

@@ -74,6 +74,7 @@ function App() {
     getOriginalSpawns,
     spawnMonster,
     currentLevel,
+    setCurrentLevel,
     globalPlayerHealth,
     onPlayerHealthChange,
     monsterData,
@@ -152,6 +153,7 @@ useEffect(() => {
         levelName={currentLevelData.name || `Level ${currentLevel}`}
         playerPos={currentLevelData.playerPos}
         currentLevel={currentLevel}
+        background={currentLevelData.background}
         onExit={() => setPlayMode(false)}
         tileSize={TILE_SIZE}
         rows={rows}
@@ -187,60 +189,76 @@ useEffect(() => {
     );
   }
 
-  // ------------------------------------------------------------------ //
-  // 3. PRODUCTION-ONLY WELCOME OVERLAY (only on first load)
-  // ------------------------------------------------------------------ //
-  if (!isDev && !playMode && !hasSeenIntro) {
-    return (
-      <div className="welcome-overlay">
-        <div className="welcome-modal">
-          <h1>Welcome to Groky's World!</h1>
-          <p>
-            <kbd>↑↓←→</kbd> to move around. You will only use the key arrows for everything.<br/><br/>
-            <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them (like IRL)<br/><br/>
-            Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/><br/>
-            Talk to the <strong>mushroom in town</strong> for quests
-          </p>
+// ------------------------------------------------------------------ //
+// 3. PRODUCTION-ONLY WELCOME OVERLAY
+// ------------------------------------------------------------------ //
+if (!isDev && !playMode && !hasSeenIntro) {
+  return (
+    <div className="welcome-overlay">
+      <div className="welcome-modal">
+        <h1>Welcome to Groky's World!</h1>
+        <p>
+          <kbd>↑↓←→</kbd> to move around. You will only use the key arrows for everything.<br/><br/>
+          <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them<br/><br/>
+          Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/><br/>
+          Talk to the <strong>mushroom in town</strong> for quests
+        </p>
+        <div className="mode-buttons">
           <button 
-            className="play-button" 
+            className="mode-button story" 
             onClick={() => {
+              setCurrentLevel('story');
               setPlayMode(true);
               setHasSeenIntro(true);
             }}
           >
-            PLAY
+            🎭 STORY MODE
+          </button>
+          <button 
+            className="mode-button survival" 
+            onClick={() => {
+              setCurrentLevel('survival');
+              setPlayMode(true);
+              setHasSeenIntro(true);
+            }}
+          >
+            ⚔️ SURVIVAL MODE
           </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // ------------------------------------------------------------------ //
   // Normal editor UI (dev or after dismissing overlay)
   // ------------------------------------------------------------------ //
   return (
     <div className="App">
-      <header>
-        <div>
-          <LevelSelector renderSelector={renderSelector} />
-          <button onClick={() => setMode('rpg')}>RPG</button>
-          <button onClick={() => setMode('sports')}>Sports</button>
-          <button onClick={() => setMode('shooter')}>Shooter</button>
-          <button 
-            className="play-button" 
-            onClick={() => {
-              setPlayMode(true);
-              setHasSeenIntro(true);
-            }}
-          >
-            PLAY
-          </button>
-          {/* {isDev && (
-            <button onClick={() => setPlayMode(true)}>PLAY 🎮</button>
-          )} */}
-          <span>Mode: {mode}</span>
-        </div>
-      </header>
+<header>
+  <div>
+    <LevelSelector renderSelector={renderSelector} />
+    <button 
+      className="mode-button story" 
+      onClick={() => {
+        setCurrentLevel('story');
+        setPlayMode(true);
+      }}
+    >
+      🎭 STORY
+    </button>
+    <button 
+      className="mode-button survival" 
+      onClick={() => {
+        setCurrentLevel('survival');
+        setPlayMode(true);
+      }}
+    >
+      ⚔️ SURVIVAL
+    </button>
+    <span>Mode: {mode} | Level: {currentLevel}</span>
+  </div>
+</header>
 
       {window.location.pathname === '/stats' && <Stats />}
 

@@ -7,6 +7,7 @@ const CanvasGrid = memo(
     grid,
     objects,
     currentLevel,
+    background,
     playerPos,
     tileSize,
     columns,
@@ -292,8 +293,11 @@ groundTiles.forEach(({ screen, x, y }) => {
       maxWidth: '1200px',
       display: 'block',
       margin: '0 auto',
-      // background:
-      //   'linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #98FB98 100%)',
+      // dynamic background
+background: `
+          linear-gradient(to top, black 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.4) 50%, transparent 70%),
+          url('/ownemojis/${background}') center / cover no-repeat
+        `.trim()
     }}
   />
 
