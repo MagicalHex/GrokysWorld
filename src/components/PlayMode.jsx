@@ -113,7 +113,7 @@ const addPopup = useCallback((popup) => {
   // ── Quests ─────────────────────────────────────────────────────
   // Tell .player class which direction class to render 
   const [activeQuests, setActiveQuests] = useState({});
-  // ── Movement ─────────────────────────────────────────────────────
+  // ── Player Movement ─────────────────────────────────────────────────────
   // Tell .player class which direction class to render 
   // const [moveDirection, setMoveDirection] = useState(null);
   const moveDirectionRef = useRef(null);
@@ -126,6 +126,11 @@ const setMoveDirection = (dir) => {
   forcePlayerUpdate(); // Re-renders PlayerLayer
 };
   // console.log('[PlayMode] current moveDirection →', moveDirection);
+
+    // ── Monster Movement ─────────────────────────────────────────────────────
+const monsterMoveDirectionRef = useRef({}); // { [monsterId]: 'up' | ... }
+const monsterMoveTriggerRef = useRef(0);
+const [, forceMonsterUpdate] = useReducer(x => x + 1, 0);
     // ── Inventory ─────────────────────────────────────────────────────
   const [showInventory, setShowInventory] = useState(false);
   const openInventory = useCallback(() => {
@@ -377,6 +382,10 @@ useEffect(() => {
         // monsterHealths={monsterHealths}
         globalMonsterHealths={globalMonsterHealths}
         monsterTypes={monsterTypes}
+        // For image switching
+        monsterMoveDirectionRef={monsterMoveDirectionRef}
+        monsterMoveTriggerRef={monsterMoveTriggerRef}
+        forceMonsterUpdate={forceMonsterUpdate}
       />
       <CombatSystem
         playerPos={playerPos}
@@ -464,7 +473,7 @@ useEffect(() => {
   getQuestMarker={getQuestMarker}
   camera={camera}
 />
-{/* 🔥 ONE CHILD: FlatEntityLayer */}
+{/* 🔥 Z INDEX */}
 <ZIndexManager
   playerPos={playerPos}
   objects={objects}
@@ -475,7 +484,7 @@ useEffect(() => {
   columns={columns}
   rows={rows}
 >
-  {/* 🔥 FLATENTITYLAYER INSIDE ZINDEXMANAGER ← THIS WAS MISSING!! */}
+  {/* 🔥 FLATENTITYLAYER */}
   <FlatEntityLayer
     playerPos={playerPos}
     moveDirectionRef={moveDirectionRef}
@@ -495,7 +504,11 @@ useEffect(() => {
     monsterTypes={monsterTypes}
     camera={camera}
     worldToScreen={worldToScreen}
-  objectTypes={objectTypes}  // ← NEW: tree/wall data
+  objectTypes={objectTypes}  // ← tree/wall data
+  // For monster image switching when moving
+  monsterMoveDirectionRef={monsterMoveDirectionRef}
+  monsterMoveTriggerRef={monsterMoveTriggerRef}
+  forceMonsterUpdate={forceMonsterUpdate}
   />
 </ZIndexManager>
 

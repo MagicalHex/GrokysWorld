@@ -28,7 +28,13 @@
     "hp": 200, 
     "name": "SKELETON",
     "size": "medium",
-    "image": "/ownemojis/skeleton1.webp",
+    "image": "/ownemojis/skeletonfront.webp",
+    "images": {
+      "up": "/ownemojis/skeletonback.webp",
+      "down": "/ownemojis/skeletonwalkfront.webp",
+      "left": "/ownemojis/skeletonleft.webp",
+      "right": "/ownemojis/skeletonright.webp"
+    },
     "scale": 0.9,
     "nameHeightPosition": "high",
         "nameWidthPosition": "center",

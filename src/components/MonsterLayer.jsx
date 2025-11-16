@@ -1,180 +1,259 @@
 // MonsterLayer.jsx
-import React, { memo, useMemo, useRef, useLayoutEffect } from 'react';
-import Monster from './Monster';
-import { useIsoProjection } from '../hooks/useIsoProjection';
-import { isMonster } from '../utils/monsterRegistry';
-import { DamagePopup } from './DamagePopup'; // ← ADD
+/**
+ * 🔥 MonsterLayer: Renders ALL monsters with:
+ *  - 60fps smooth isometric positioning (NO React re-renders for movement!)
+ *  - Viewport culling (only visible monsters rendered)
+ *  - Directional sprites (left/right/up/down → 300ms → front)
+ *  - Per-monster damage popups
+ *  - Health bars + names
+ * 
+ * PERFORMANCE SECRETS:
+ * 1. useMemo → stable monster list (culls + computes once)
+ * 2. useRef Map → track DOM elements (no React state for position)
+ * 3. useLayoutEffect → update CSS transform 60fps (before paint)
+ * 4. memo() → prevents unnecessary re-renders
+ */
 
-// MonsterLayer.jsx — Renders monsters with buttery-smooth positioning + culling
-// 1. useMemo → Stable monster list (culling + data)
-// 2. useRef → Track DOM elements
-// 3. useLayoutEffect → Live transform updates (60fps)
-// 4. ref callback → Map IDs to elements
-// 5. CSS transition/animation → Smoothness + fade-in
+import React, {
+  memo,           // 🔥 Prevents parent re-renders from re-rendering ALL monsters
+  useMemo,        // 🔥 Stable monster list (only recomputes when needed)
+  useRef,         // 🔥 Track DOM elements for 60fps positioning
+  useLayoutEffect,// 🔥 Update positions BEFORE browser paints (no jank)
+  useState,       // 🔥 Per-monster directional image state
+  useEffect,      // 🔥 Handle direction changes + timeouts
+} from 'react';
+import Monster from './Monster';                    // Individual monster (image + healthbar)
+import { useIsoProjection } from '../hooks/useIsoProjection'; // World → screen math
+import { isMonster } from '../utils/monsterRegistry';        // Type checker
+import { DamagePopup } from './DamagePopup';                 // Floating damage numbers
 
-const MonsterLayer = memo(({
-  objects,                    // All world objects { 'x,y': monsterType }
-  globalMonsterHealths,       // { monsterId: currentHP }
-  monsterData,                // { type: { hp, name, image } }
-  monsterTypes,               // Type mappings
-  tileSize,                   // Pixel size of tiles
-  camera,                     // { x, y } — player/camera world position
-  popups, 
-  addPopups,
-  setPopups
-}) => {
-  // Gets isometric world→screen projection function
-  const { worldToScreen } = useIsoProjection(tileSize);
+const MonsterLayer = memo(
+  ({
+    objects,                    // { 'x,y': monsterId } — world state
+    globalMonsterHealths,       // { monsterId: currentHP } — live health
+    monsterData,                // { type: { hp, image, images: {left: "..."} } }
+    monsterTypes,               // { rawId: 'goblin' } — ID → type mapping
+    tileSize,                   // px per tile (for sizing + culling)
+    camera,                     // { x, y } — player/world center
+    popups,                     // [{ id, dmg, monsterId, isCrit }]
+    setPopups,                  // () => remove popup
 
-  // 🔥 CULLING: Calculate viewport size in tiles (matches CanvasGrid exactly)
-  const tilesAcross = Math.ceil(window.innerWidth / tileSize) + 4;   // Horizontal tiles visible + padding
-  const tilesDown = Math.ceil(window.innerHeight / tileSize) + 4;    // Vertical tiles visible + padding
+    // ---- DIRECTIONAL SPRITES (NEW!) ---------------------------------
+    monsterMoveDirectionRef,    // { current: { monsterId: 'left'|'up'|... } }
+    monsterMoveTrigger,         // number — increments → triggers direction useEffect
+    // ----------------------------------------------------------------
+  }) => {
+    // 🔥 ISOMETRIC MATH: Convert world (x,y) → screen pixels
+    const { worldToScreen } = useIsoProjection(tileSize);
 
-  // 🔥 1. MONSTER DATA — Stable list (only updates on spawn/die/health change)
-  const monsterDataList = useMemo(() => {
-    // World-space culling bounds (same math as CanvasGrid's tile loop)
-    const startX = Math.max(0, Math.floor(camera.x - tilesAcross / 2));     // Leftmost visible X
-    const endX = Math.min(10000, Math.floor(camera.x + tilesAcross / 2));   // Rightmost visible X
-    const startY = Math.max(0, Math.floor(camera.y - tilesDown / 2));       // Topmost visible Y
-    const endY = Math.min(10000, Math.floor(camera.y + tilesDown / 2));     // Bottommost visible Y
+    // ---------- VIEWPORT CULLING ----------
+    // Calculate how many tiles fit on screen + padding
+    // → Only process/render monsters in this box (saves CPU!)
+    const tilesAcross = Math.ceil(window.innerWidth / tileSize) + 4;
+    const tilesDown = Math.ceil(window.innerHeight / tileSize) + 4;
 
-    // Process all objects → extract monsters within cull bounds
-    return Object.entries(objects)
-      // Convert each 'x,y:objData' entry
-      .map(([key, objData]) => {
-        // Parse world position from key ('123,456' → x=123, y=456)
-        const [xStr, yStr] = key.split(',');
-        const x = Number(xStr);   // World X coord
-        const y = Number(yStr);   // World Y coord
+    // ---------- DIRECTIONAL SPRITE LOGIC ----------
+    // { monsterId: 'left' } — which direction each monster is showing
+    const [displayDir, setDisplayDir] = useState({});
+    // { monsterId: timeoutId } — track timeouts to cancel/revert
+    const timeoutRef = useRef({});
 
-        // 🔥 CHEAP CULL: Skip monsters outside viewport (before expensive checks)
-        if (x < startX || x > endX || y < startY || y > endY) return null;
+    // 🔥 useEffect: React to monster movement (triggered by monsterMoveTrigger++)
+    useEffect(() => {
+      const newDir = { ...displayDir };
+      let changed = false;
 
-        // Get monster type (handles string/object objData)
-        const rawType = typeof objData === 'string' ? objData : objData.type;
-        const objType = monsterTypes[rawType] || rawType;
+      // Check every monster that just moved
+      Object.entries(monsterMoveDirectionRef.current).forEach(([id, dir]) => {
+        // New direction? Show it!
+        if (dir && dir !== displayDir[id]) {
+          newDir[id] = dir;
+          changed = true;
 
-        // Skip non-monsters
-        if (!isMonster(objType)) return null;
+          // Cancel any existing timeout for this monster
+          if (timeoutRef.current[id]) {
+            clearTimeout(timeoutRef.current[id]);
+          }
 
-        // Get unique ID for this monster instance
-        const monsterId = typeof objData === 'string' ? objData : objData.id || objData;
+          // Schedule revert to front image after 300ms
+          timeoutRef.current[id] = setTimeout(() => {
+            setDisplayDir((prev) => {
+              const next = { ...prev };
+              delete next[id]; // ← Clear direction → shows default image
+              return next;
+            });
+            // Cleanup timeout ref
+            delete timeoutRef.current[id];
+          }, 300);
+        }
+      });
 
-        // Monster template data (hp, image, name)
-        const data = monsterData[objType];
-        const maxHp = data?.hp || 100;                            // Max health from template
-        const currentHp = globalMonsterHealths[monsterId] ?? maxHp; // Current health (or full)
-        const size = data?.size || 'medium';  // ← ADD: default medium
-        const scale = data?.scale || 1.0;  // ← ADD
-const nameHeightPosition = data?.nameHeightPosition || 'medium';  // ← NEW
-const nameWidthPosition = data?.nameWidthPosition || 'center';    // ← NEW
+      // Only re-render if a direction actually changed
+      if (changed) setDisplayDir(newDir);
+    }, [monsterMoveTrigger, monsterMoveDirectionRef.current]);
 
-        // Return stable monster data (world pos + stats)
-        return {
-          monsterId,        // Unique key for React/DOM
-          x, y,             // World position (for live positioning)
-          currentHp,        // Live HP
-          maxHp,            // Max HP
-          monsterName: data?.name || objType.toUpperCase(),  // Display name
-          imageSrc: data?.image,  // Sprite image
-          size,  // ← ADD
-          type: objType,
-          scale,
-nameHeightPosition,  // ← NEW
-  nameWidthPosition,   // ← NEW
-        };
-      })
-      // Remove nulls (culled/non-monsters)
-      .filter(Boolean);
-  }, [
-    objects,           // Remap when world changes
-    globalMonsterHealths,  // Remap when health changes
-    monsterData,       // Remap when templates change
-    monsterTypes,      // Remap when mappings change
-    camera.x, camera.y, // Recull when camera moves
-    tileSize           // Recull if tile size changes
-  ]);
+    // 🔥 Cleanup: Clear all timeouts when component unmounts
+    useEffect(() => {
+      return () => {
+        Object.values(timeoutRef.current).forEach(clearTimeout);
+      };
+    }, []);
 
-  // 🔥 2. POSITION REFS — Track DOM elements for smooth updates
-  const monsterRefs = useRef(new Map());  // Map<monsterId, DOM element>
+    // ---------- 🔥 CORE: Build list of VISIBLE monsters ----------
+    const monsterDataList = useMemo(() => {
+      // Calculate world-space bounding box (culling bounds)
+      const startX = Math.max(0, Math.floor(camera.x - tilesAcross / 2));
+      const endX = Math.min(10000, Math.floor(camera.x + tilesAcross / 2));
+      const startY = Math.max(0, Math.floor(camera.y - tilesDown / 2));
+      const endY = Math.min(10000, Math.floor(camera.y + tilesDown / 2));
 
-  // 🔥 3. LIVE POSITIONING — Updates transform every frame (NO React re-renders!)
-  useLayoutEffect(() => {
-    // Convert camera world pos → screen pos
-    const camScreen = worldToScreen(camera.x, camera.y);
+      return Object.entries(objects) // { 'x,y': monsterId }
+        .map(([key, objData]) => {
+          // Parse world position from key
+          const [xStr, yStr] = key.split(',');
+          const x = Number(xStr);
+          const y = Number(yStr);
 
-    // Update position for each visible monster
-    monsterDataList.forEach((monster) => {
-      // Convert monster world pos → screen pos
-      const baseScreen = worldToScreen(monster.x, monster.y);
-      // Relative to camera (0,0 = screen center)
-      const screenX = baseScreen.x - camScreen.x;
-      const screenY = baseScreen.y - camScreen.y;
+          // 🔥 CULL: Skip monsters outside viewport
+          if (x < startX || x > endX || y < startY || y > endY) {
+            return null;
+          }
 
-      // Get the actual DOM element
-      const el = monsterRefs.current.get(monster.monsterId);
-      if (el) {
-        // Smoothly move via CSS transform (60fps butter)
-        el.style.transform = `translate(${screenX}px, ${screenY}px)`;
-      }
-    });
-  }); // Runs synchronously after DOM mutations, before paint
+          // Get monster type (handles string vs object objData)
+          const rawType = typeof objData === 'string' ? objData : objData.type;
+          const objType = monsterTypes[rawType] || rawType;
+          
+          // Skip non-monsters
+          if (!isMonster(objType)) return null;
 
-  // Render stable monster DOM (never remounts!)
-  return (
-    <div className="monster-layer">
-      {/* Render one wrapper div per monster */}
-{monsterDataList.map((monster) => (
-  <div
-    key={monster.monsterId}
-    data-monster={monster.monsterId}  // 🔥 ADD THIS LINE
-    // REF CALLBACK: Store/delete DOM element in Map
-    ref={(el) => {
-      if (el) monsterRefs.current.set(monster.monsterId, el);
-      else monsterRefs.current.delete(monster.monsterId);
-    }}
-          // Wrapper styles for smooth positioning
-          style={{
-            position: 'absolute',     // Position relative to container center
-            width: tileSize,          // Match monster sprite size
-            height: tileSize,
-            // Smooth movement between positions
-            transition: 'transform 0.1s ease-out',
-            // Fade-in animation (prevents pop-in)
-            opacity: 0,
-            animation: 'fadeIn 0.3s ease-out forwards',
-          }}
-        >
-          {/* Actual Monster component (healthbar + image) */}
-          <Monster
-            currentHp={monster.currentHp}
-            maxHp={monster.maxHp}
-            monsterName={monster.monsterName}
-            tileSize={tileSize}
-            imageSrc={monster.imageSrc}
-            size={monster.size}  // ← ADD
-            type={monster.type}
-            scale={monster.scale}
-            nameHeightPosition={monster.nameHeightPosition}
-                        nameWidthPosition={monster.nameWidthPosition}
-          />
-{/* === POPUPS FOR THIS MONSTER ONLY === */}
-{popups
-  .filter(popup => popup.monsterId === monster.monsterId)  // ← CRITICAL: Only this monster
-  .map(popup => (
-    <DamagePopup
-      key={popup.id}
-      damage={popup.dmg}
-      isCrit={popup.isCrit}                    // ← Monster: just crit + damage
-      isHeal={popup.isHeal}                    // ← Will be false for monsters  
-      onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}
-    />
-  ))}
+          // Unique ID for this monster instance
+          const monsterId = typeof objData === 'string' 
+            ? objData 
+            : objData.id || objData;
 
-        </div>
-      ))}
-    </div>
-  );
-});
+          // Template data (hp, images, etc.)
+          const data = monsterData[objType];
+          const maxHp = data?.hp || 100;
+          const currentHp = globalMonsterHealths[monsterId] ?? maxHp;
+
+          // 🔥 DIRECTIONAL IMAGE LOGIC
+          const movingDir = displayDir[monsterId];
+          let imageSrc = data?.image; // Default: front-facing
+
+          // If moving AND has directional image → use it!
+          if (movingDir && data?.images?.[movingDir]) {
+            imageSrc = data.images[movingDir];
+          }
+
+          // Return enriched monster data for rendering
+          return {
+            monsterId,
+            x, y,                           // World position
+            currentHp, maxHp,               // Health
+            monsterName: data?.name || objType.toUpperCase(),
+            imageSrc,                       // Final image (directional or default)
+            size: data?.size || 'medium',
+            type: objType,
+            scale: data?.scale || 1.0,
+            nameHeightPosition: data?.nameHeightPosition || 'medium',
+            nameWidthPosition: data?.nameWidthPosition || 'center',
+          };
+        })
+        .filter(Boolean); // Remove culled/non-monsters
+    }, [
+      objects,
+      globalMonsterHealths,
+      monsterData,
+      monsterTypes,
+      camera.x, camera.y,
+      tileSize,
+      displayDir, // ← Rebuilds when directions change (shows new sprites)
+    ]);
+
+    // ---------- 🔥 PERFORMANCE: Track DOM elements ----------
+    const monsterRefs = useRef(new Map()); // monsterId → DOM element
+
+    // ---------- 🔥 60FPS POSITIONING (NO React re-renders!) ----------
+    useLayoutEffect(() => {
+      // Camera in screen space (center = 0,0)
+      const camScreen = worldToScreen(camera.x, camera.y);
+
+      // Update EVERY visible monster's position
+      monsterDataList.forEach((m) => {
+        // Monster world pos → screen pos → relative to camera
+        const base = worldToScreen(m.x, m.y);
+        const screenX = base.x - camScreen.x;
+        const screenY = base.y - camScreen.y;
+
+        // 🔥 Direct DOM manipulation (bypasses React!)
+        const el = monsterRefs.current.get(m.monsterId);
+        if (el) {
+          el.style.transform = `translate(${screenX}px, ${screenY}px)`;
+        }
+      });
+    }); // Runs AFTER DOM render, BEFORE browser paints
+
+    // ---------- RENDER: One div per monster ----------
+    return (
+      <div className="monster-layer">
+        {monsterDataList.map((monster) => (
+          <div
+            key={monster.monsterId}           // Stable React key
+            data-monster={monster.monsterId}  // Debug selector
+            // 🔥 Ref callback: Store DOM element when mounted/unmounted
+            ref={(el) => {
+              if (el) {
+                monsterRefs.current.set(monster.monsterId, el);
+              } else {
+                monsterRefs.current.delete(monster.monsterId);
+              }
+            }}
+            style={{
+              position: 'absolute',
+              width: tileSize,
+              height: tileSize,
+              // Smooth movement between world positions
+              transition: 'transform 0.1s ease-out',
+              // Fade-in animation (no pop-in)
+              opacity: 0,
+              animation: 'fadeIn 0.3s ease-out forwards',
+            }}
+          >
+            {/* 🔥 Monster: sprite + health bar */}
+            <Monster
+              currentHp={monster.currentHp}
+              maxHp={monster.maxHp}
+              monsterName={monster.monsterName}
+              tileSize={tileSize}
+              imageSrc={monster.imageSrc}       // ← Directional or default!
+              size={monster.size}
+              type={monster.type}
+              scale={monster.scale}
+              nameHeightPosition={monster.nameHeightPosition}
+              nameWidthPosition={monster.nameWidthPosition}
+            />
+
+            {/* 🔥 Damage popups FOR THIS MONSTER ONLY */}
+            {popups
+              .filter((p) => p.monsterId === monster.monsterId)
+              .map((popup) => (
+                <DamagePopup
+                  key={popup.id}
+                  damage={popup.dmg}
+                  isCrit={popup.isCrit}
+                  isHeal={popup.isHeal}
+                  onFinish={() =>
+                    setPopups((prev) =>
+                      prev.filter((p) => p.id !== popup.id)
+                    )
+                  }
+                />
+              ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+);
 
 export default MonsterLayer;

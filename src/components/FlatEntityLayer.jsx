@@ -8,7 +8,7 @@ const FlatEntityLayer = ({
   playerPos, moveDirectionRef, moveTrigger, globalPlayerHealth, currentAction, 
   choppingProgress, tileSize, popups, addPopup, setPopups, pickupPopups, 
   removePickupPopup, objects, globalMonsterHealths, monsterData, monsterTypes, 
-  camera, worldToScreen, objectTypes // from useIsoProjection
+  camera, worldToScreen, objectTypes, monsterMoveDirectionRef, monsterMoveTriggerRef, forceMonsterUpdate
 }) => {
   return (
     <>
@@ -41,6 +41,10 @@ const FlatEntityLayer = ({
         addPopup={addPopup}
         setPopups={setPopups}
         worldToScreen={worldToScreen} // Pass if needed for positioning
+        // For monster image switching when moving
+        monsterMoveDirectionRef={monsterMoveDirectionRef}
+  monsterMoveTrigger={monsterMoveTriggerRef.current}
+  forceMonsterUpdate={forceMonsterUpdate}
       />
       {/* 🔥 OBJECTS — Direct siblings of Player */}
       <StaticObjectLayer
