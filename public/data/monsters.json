@@ -37,7 +37,7 @@
     },
     "scale": 0.9,
     "nameHeightPosition": "high",
-        "nameWidthPosition": "center",
+    "nameWidthPosition": "center",
     "xp": [35, 55],
     "damage": { "min": 10, "max": 15 },
     "range": 1,
@@ -69,6 +69,12 @@
     "name": "CAVE SPIDER",
     "size": "large",
     "image": "/ownemojis/cavespider.webp",
+        "images": {
+      "up": "/ownemojis/cavespiderback.webp",
+      "down": "/ownemojis/cavespiderfrontwalk.webp",
+      "left": "/ownemojis/cavespiderleft.webp",
+      "right": "/ownemojis/cavespiderright.webp"
+    },
     "scale": 1.3,
     "nameHeightPosition": "high",
         "nameWidthPosition": "right",
@@ -84,6 +90,17 @@
   "swamptroll": {
     "hp": 650,
     "name": "SWAMP TROLL",
+    "size": "large",
+    "image": "/ownemojis/swamptrollfront.webp",
+        "images": {
+      "up": "/ownemojis/swamptrollback.webp",
+      "down": "/ownemojis/swamptrollfrontwalk.webp",
+      "left": "/ownemojis/swamptrollleft.webp",
+      "right": "/ownemojis/swamptrollright.webp"
+    },
+    "scale": 1.5,
+    "nameHeightPosition": "high",
+    "nameWidthPosition": "right",
     "xp": [220, 320],
     "damage": { "min": 25, "max": 55 },
     "range": 1,

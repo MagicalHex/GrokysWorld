@@ -19,7 +19,7 @@ const ActionBar = ({
   // -----------------------------------------------------------------
   // 1. NAME
   // -----------------------------------------------------------------
-  const displayName = name ?? (isMonster ? '' : 'Player');
+  const displayName = name ?? (isMonster ? '' : 'Aeylos');
 
   // Monster name uses the font size you already calculated in Monster.jsx
   // Player name is deliberately tiny (fixed 0.9 em)
