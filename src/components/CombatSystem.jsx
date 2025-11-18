@@ -183,6 +183,26 @@ useEffect(() => {
   // console.log('🛡️  ARMOR DEFENSE:', armorDefense);
 }, [equipment]); // Re-run when equipment changes
   // === MAIN COMBAT LOOP (via gameLoop) ===
+  // Throttled logger (once every 3 sec)
+// Put this once at the top of your file
+const logCombat = (() => {
+  let lastBatch = 0;
+  const queue = [];
+
+  const flush = () => {
+    if (queue.length > 0 && Date.now() - lastBatch > 3000) {
+      console.log('%c[COMBAT BATCH]', 'color: #ffaa00; font-weight: bold;');
+      queue.forEach(msg => console.log(`   ${msg}`));
+      queue.length = 0;
+      lastBatch = Date.now();
+    }
+  };
+
+  return (msg) => {
+    queue.push(msg);
+    flush();
+  };
+})();
 useEffect(() => {
   // === Used for both attacks (here) and CooldownBar (PlayMode) to reset. ===
   // const PLAYER_COOLDOWN = 1500;
@@ -222,9 +242,27 @@ useEffect(() => {
     let objectsChanged = false;
     let attacked = false;
 
-    let hasMonsterInRange = false;
-    let nearestRangeType = null; // 'melee' or 'ranged'
+let hasMonsterInRange = false; // Check if monster is in range of any attack
+let nearestRangeType = null; // 'melee', 'ranged' or 'spell'
+let hasManyMonstersInRange = 0;  // count ≥2 for fireball
+let hasMonsterInSpellRange = false;  // any ≤10 tiles
 
+const weaponStats = getWeaponStats(equipment, nearestRangeType);
+let weaponRange = weaponStats.range || 1;
+let isSpell = weaponStats.isAOE ?? false;
+
+// TEMP TEST: FORCE FIREBALL TO PROVE COUNTER WORKS
+// ← Remove these 2 lines after test succeeds
+// weaponRange = 10;
+// isSpell = true;
+
+// THIS IS THE ONLY DEBUG YOU NEED
+logCombat(`WEAPON: ${JSON.stringify({
+  range: weaponRange,
+  isAOE: weaponStats.isAOE,
+  isSpell: isSpell,
+  rawStats: weaponStats
+})}`);
     // === SINGLE PASS: Scan + Attack ===
     for (const [key, objId] of Object.entries(objects)) {
       const [mx, my, mLevelStr] = key.split(',');
@@ -238,105 +276,135 @@ useEffect(() => {
       // if (mLevel !== currentLevel) continue; This breaks it
 
 // 1. PLAYER ATTACK - Updated to use dynamic weapon range/damage
+
 const d = distance(mPos, playerPos);
-// const weapon = getEquippedWeapon(inventory);  // Gets 'bow', 'sword', etc.
-const weaponStats = getWeaponStats(equipment);  // { damage: {min,max}, range }
-const weaponRange = weaponStats.range || 1;
+
 const isInWeaponRange = d <= weaponRange;
 const isAdjacent = d <= 1;
 
 if (isInWeaponRange) {
-  hasMonsterInRange = true;
-  if (isAdjacent) nearestRangeType = 'melee';
-  else if (!nearestRangeType) nearestRangeType = 'ranged';
-}
+    hasMonsterInRange = true;
+    hasManyMonstersInRange++;
 
-// === PLAYER ATTACK — ONLY ONCE PER TICK ===
-if (!attackedThisTick && 
-    isInWeaponRange && 
-    now - lastPlayerAttack >= (isAdjacent ? cooldowns.MELEE : cooldowns.RANGED)) {
-  // 1 in 8 chance to crit (12.5%)
-  const isCrit = Math.random() < 1/8;   // ← 1/8 = 0.125
-
-  const { min: dmgMin, max: dmgMax } = weaponStats.damage;
-  const dmg = isCrit
-    ? dmgMax * 2                     // Crit: double max
-    : randInt(dmgMin, dmgMax);       // Normal: random in range
-
-  // console.log(`Player ${isCrit ? 'CRITICAL!' : ''} → ${dmg} dmg`);
-
-  const curHealth = globalMonsterHealths[objId] ?? 100;
-  const newHealth = Math.max(0, curHealth - dmg);
-
-  // 1. Damage popup (immediate)
-  addPopup({
-    x: mPos.x,
-    y: mPos.y,
-    dmg,
-    isCrit,
-    monsterId: objId,
-  });
-
-  // 2. Apply damage
-  onMonsterHealthChange(objId, newHealth);
-
-if (newHealth <= 0) {
-  const monster = monsterData[type];
-  if (!monster) {
-    console.warn(`No monster data for type: ${type}`);
-    newObjects[key] = 'gold';
-    objectsChanged = true;
-    continue;
+    if (isAdjacent) nearestRangeType = 'melee';
+    else nearestRangeType = isSpell ? 'spell' : 'ranged';
+    
+    logCombat(`IN RANGE! Type: ${nearestRangeType} | hasMany: ${hasManyMonstersInRange}`);
   }
 
-  // 1. Handle XP
-setTimeout(() => {
-  const xpRange = monster.xp || [0, 0];
-  const xpGained = Math.floor(Math.random() * (xpRange[1] - xpRange[0] + 1)) + xpRange[0];
-  if (xpGained > 0) {
-    // Use refs.current.addPopup (safer inside timeout)
-    if (refs.current.addPopup) {
-      refs.current.addPopup({
-        dmg: xpGained,
-        isXP: true,
-        isPlayer: true  // ← ADD THIS (for PlayerLayer filter)
-      });
-    } else {
-      console.error('addPopup NOT AVAILABLE in refs!');
-    }
-  } else {
-    console.log('NO XP GAINED (xpGained <= 0)');
-  }
-}, 300);
+  const weaponStats = getWeaponStats(equipment, nearestRangeType);
+  
+// === PLAYER ATTACK — ONLY ONCE PER TICK (but AOE hits ALL!) ===
+if (!attackedThisTick && hasMonsterInRange) {
+  logCombat(`ATTACK CHECK | attackedThisTick: ${attackedThisTick} | hasMonsterInRange: ${hasMonsterInRange} | nearestRangeType: ${nearestRangeType}`);
+  
+  const isMeleeAttack = nearestRangeType === 'melee';
+  const cooldownKey = isMeleeAttack ? cooldowns.MELEE : cooldowns.RANGED;
 
+  logCombat(`cooldownKey: ${cooldownKey} | now-lastAttack: ${now - lastPlayerAttack}`);
 
-  // 2. Handle loot drops
-  const drops = [];
-  (monster.loot || []).forEach(item => {
-    if (Math.random() < (item.chance || 1.0)) {
-      const amount = item.min !== undefined && item.max !== undefined
-        ? Math.floor(Math.random() * (item.max - item.min + 1)) + item.min
-        : 1;
-      for (let i = 0; i < amount; i++) {
-        drops.push(item.id);
+  if (now - lastPlayerAttack >= cooldownKey) {
+    logCombat(`✅ ATTACK FIRED! isSpell: ${isSpell} | targets collecting...`);
+    
+    // === COLLECT ALL VALID TARGETS ===
+    const targets = [];
+    
+    for (const [key, objId] of Object.entries(objects)) {
+      const [mx, my, mLevelStr] = key.split(',');
+      const mPos = { x: Number(mx), y: Number(my) };
+      
+      const type = monsterTypes[objId];
+      if (!type || !isMonster(type)) continue;
+      if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
+
+      const d = distance(mPos, playerPos);
+      if (d <= weaponRange) {
+        targets.push({ objId, mPos, key, type, distance: d });
       }
     }
-  });
 
-  // 3. Pick one drop (or default to gold)
-  const droppedItem = drops.length > 0 ? drops[Math.floor(Math.random() * drops.length)] : 'gold';
-  newObjects[key] = droppedItem;
-  objectsChanged = true;
-}
+    logCombat(`Found ${targets.length} targets`);
 
-    // === ONE-SHOT: ATTACK DONE ===
+    // === AOE vs SINGLE TARGET ===
+    const hitAll = isSpell; // Fireball = true
+    const finalTargets = hitAll ? targets : [targets[0]]; // Single = first only
+
+    logCombat(`Final targets: ${finalTargets.length} (AOE: ${hitAll})`);
+
+    // === ATTACK ALL FINAL TARGETS ===
+    finalTargets.forEach(({ objId, mPos, key, type }) => {
+      logCombat(`→ Hitting ${objId}`);
+      
+      // 1 in 8 chance to crit (12.5%)
+      const isCrit = Math.random() < 1/8;
+      const { min: dmgMin, max: dmgMax } = weaponStats.damage;
+      const dmg = isCrit ? dmgMax * 2 : randInt(dmgMin, dmgMax);
+
+      const curHealth = globalMonsterHealths[objId] ?? 100;
+      const newHealth = Math.max(0, curHealth - dmg);
+
+      // 1. Damage popup (immediate)
+      addPopup({
+        x: mPos.x,
+        y: mPos.y,
+        dmg,
+        isCrit,
+        monsterId: objId,
+      });
+
+      // 2. Apply damage
+      onMonsterHealthChange(objId, newHealth);
+
+      // 3. Handle death + XP/loot
+      if (newHealth <= 0) {
+        const monster = monsterData[type];
+        if (!monster) {
+          console.warn(`No monster data for type: ${type}`);
+          newObjects[key] = 'gold';
+          objectsChanged = true;
+          return; // continue in forEach
+        }
+
+        // XP (timeout for smooth UI)
+        setTimeout(() => {
+          const xpRange = monster.xp || [0, 0];
+          const xpGained = Math.floor(Math.random() * (xpRange[1] - xpRange[0] + 1)) + xpRange[0];
+          if (xpGained > 0 && refs.current.addPopup) {
+            refs.current.addPopup({
+              dmg: xpGained,
+              isXP: true,
+              isPlayer: true
+            });
+          }
+        }, 300);
+
+        // Loot drops
+        const drops = [];
+        (monster.loot || []).forEach(item => {
+          if (Math.random() < (item.chance || 1.0)) {
+            const amount = item.min !== undefined && item.max !== undefined
+              ? Math.floor(Math.random() * (item.max - item.min + 1)) + item.min
+              : 1;
+            for (let i = 0; i < amount; i++) {
+              drops.push(item.id);
+            }
+          }
+        });
+
+        // Pick one drop (or default gold)
+        const droppedItem = drops.length > 0 ? drops[Math.floor(Math.random() * drops.length)] : 'gold';
+        newObjects[key] = droppedItem;
+        objectsChanged = true;
+      }
+    });
+
+    // === ONE ATTACK ACTION (cooldown triggers once) ===
     lastPlayerAttack = now;
     attackedThisTick = true;
-    attackCooldownType = isAdjacent ? 'melee' : 'ranged';
-
-    // 🔥 CRITICAL: ONE-TIME SIGNAL → BAR OWNS THE REST
+    attackCooldownType = isMeleeAttack ? 'melee' : 'ranged';
     setCooldownSignal({ active: true, type: attackCooldownType });
-      }
+  }
+}
 
 // === MONSTER ATTACK ===
 const monster = monsterData[type];

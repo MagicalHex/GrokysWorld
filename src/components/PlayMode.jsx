@@ -31,7 +31,7 @@ import { isMobile } from '../utils/isMobile';
 import MobileControls from './MobileControls';
 
 // For cool downs (CombatSystem and CooldownBar)
-const COOLDOWNS = { MELEE: 1500, RANGED: 3500, MONSTER: 3000 };
+const COOLDOWNS = { MELEE: 1500, RANGED: 3500, SPELL: 5000, MONSTER: 3000 };
 // Add this near your other constants (e.g. in Objects.js or a new file)
 const NPC_NAMES = {
   farmer001: 'Sam',
@@ -157,13 +157,15 @@ const [cooldownSignal, setCooldownSignal] = useState({ active: false, type: null
 useEffect(() => {
   if (!cooldownSignal.active || !cooldownSignal.type) return;
 
-  const duration = cooldownSignal.type === 'ranged' 
+  const duration = cooldownSignal.type === 'melee' 
+    ? COOLDOWNS.MELEE 
+    : cooldownSignal.type === 'ranged' 
     ? COOLDOWNS.RANGED 
-    : COOLDOWNS.MELEE;
+    : cooldownSignal.type === 'spell' 
+    ? COOLDOWNS.SPELL 
+    : COOLDOWNS.MELEE; // default
 
-  // console.log(`[TIMER] Set timeout ${duration}ms for ${cooldownSignal.type}`);
   const timer = setTimeout(() => {
-    // console.log(`[TIMER] Reset ${cooldownSignal.type} cooldown`);
     setCooldownSignal({ active: false, type: null });
   }, duration);
 
@@ -248,7 +250,7 @@ const removePickupPopup = useCallback((id) => {
     const newDropped = new Set();
     Object.keys(objects).forEach(k => {
       if (objects[k] === 'woodobject' || objects[k] === 'rockobject' || objects[k] === 'spiderweb' || objects[k] === 'knights-armor' 
-        || objects[k] === 'short-sword' || objects[k] === 'wing-armor'
+        || objects[k] === 'short-sword' || objects[k] === 'wing-armor' || objects[k] === 'fireball'
       ) newDropped.add(k);
     });
     setDroppedItems(newDropped);

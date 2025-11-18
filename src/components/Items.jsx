@@ -36,6 +36,18 @@ export const ITEMS = {
   // ──────────────────────────────────────────────────────────────
   // WEAPONS (damage + range)
   // ──────────────────────────────────────────────────────────────
+    fist: {
+    emoji: 'fist',
+    name: 'Fist',
+    description: '12-20 damage',
+    rarity: 'common',
+    stats: { 
+      damage: { min: 50, max: 50 },
+      range: 1,
+      isAOE: false,
+    },
+    sell: { gold: 10 }
+  },
   'short-sword': {
     image: '/ownemojis/short-sword.webp',
     emoji: 'sword',
@@ -44,7 +56,8 @@ export const ITEMS = {
     rarity: 'common',
     stats: { 
       damage: { min: 10, max: 18 },  // ← NEW
-      range: 1 
+      range: 1,
+      isAOE: false,
     },
     cost: { woodobject: 5, gold: 8 },
     sell: { gold: 4 }
@@ -56,7 +69,8 @@ export const ITEMS = {
     rarity: 'common',
     stats: { 
       damage: { min: 12, max: 20 },
-      range: 1 
+      range: 1,
+      isAOE: false,
     },
     sell: { gold: 10 }
   },
@@ -67,7 +81,8 @@ export const ITEMS = {
     rarity: 'uncommon',
     stats: { 
       damage: { min: 18, max: 25 },
-      range: 1 
+      range: 1,
+      isAOE: false,
     },
     sell: { gold: 25 }
   },
@@ -78,7 +93,8 @@ export const ITEMS = {
     rarity: 'rare',
     stats: { 
       damage: { min: 22, max: 32 },
-      range: 1 
+      range: 1,
+      isAOE: false,
     },
     sell: { gold: 40 }
   },
@@ -89,7 +105,8 @@ export const ITEMS = {
     rarity: 'uncommon',
     stats: { 
       damage: { min: 15, max: 28 },
-      range: 5 
+      range: 4,
+      isAOE: false,
     },
     sell: { gold: 20 }
   },
@@ -100,11 +117,29 @@ export const ITEMS = {
     rarity: 'rare',
     stats: { 
       damage: { min: 5, max: 70 },
-      range: 3 
+      range: 3,
+      isAOE: false,
     },
     sell: { gold: 50 }
   },
-
+  // ──────────────────────────────────────────────────────────────
+  // SPELLS
+  // ──────────────────────────────────────────────────────────────
+fireball: {
+  // image: '/ownemojis/fireball.webp',  // ← Add your graphic (animated sprite?)
+  emoji: '🔥',
+  name: 'Fireball',
+  description: '8 AOE dmg (2+ enemies ≤10 tiles)',
+  rarity: 'rare',
+  stats: {
+    damage: { min: 8, max: 8 },  // Fixed 8 dmg per enemy in AOE
+    range: 10,                   // Max flight distance
+    aoeRadius: 2.5,              // Explosion radius
+    isAOE: true,                 // ← Special flag for crowd logic
+  },
+  cost: { gold: 50 },  // Or whatever
+  sell: { gold: 20 }
+},
   // ──────────────────────────────────────────────────────────────
   // NON-EQUIPMENT
   // ──────────────────────────────────────────────────────────────

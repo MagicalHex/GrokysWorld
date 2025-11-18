@@ -5,6 +5,8 @@ const CATEGORY_SET = {
   bow:   new Set(['bow']),
   armor: new Set(['knights-armor','dark-armor','wing-armor']),
   sword: new Set(['dagger','sword','axe','short-sword']),
+// ADD THIS LINE - this is your "ranged magic" or "spell" weapon slot
+  spell:  new Set(['fireball', 'ice-spike', 'lightning-bolt']), // add future spells here
 };
 
 const getStat = (id, type) => ITEMS[id]?.stats?.[type] || 0;
@@ -12,7 +14,7 @@ const getStat = (id, type) => ITEMS[id]?.stats?.[type] || 0;
 export const splitInventory = (raw) => {
   const equip = {};
   const inv = { ...raw };
-  const candidates = { bow: [], armor: [], sword: [] };
+  const candidates = { bow: [], armor: [], sword: [], spell: [] }; // ← add spell here
 
   // Build candidate lists
   for (const id of Object.keys(raw)) {
@@ -22,6 +24,7 @@ export const splitInventory = (raw) => {
     if (CATEGORY_SET.bow.has(id))   for (let i = 0; i < qty; i++) candidates.bow.push(id);
     if (CATEGORY_SET.armor.has(id)) for (let i = 0; i < qty; i++) candidates.armor.push(id);
     if (CATEGORY_SET.sword.has(id)) for (let i = 0; i < qty; i++) candidates.sword.push(id);
+    if (CATEGORY_SET.spell?.has(id)) for (let i = 0; i < qty; i++) candidates.spell.push(id);
   }
 
   const pickBest = (ids, stat) => {
@@ -37,6 +40,13 @@ export const splitInventory = (raw) => {
 
   const bestSword = pickBest(candidates.sword, 'attack');
   if (bestSword) { equip.sword = bestSword; inv[bestSword] = (inv[bestSword] || 0) - 1; }
+
+// FIXED ✅
+const bestSpell = pickBest(candidates.spell, 'attack');
+if (bestSpell) { 
+  equip.fireball = bestSpell;  // ← fireball key = RECOGNIZED!
+  inv[bestSpell]--; 
+}
 
   // Clean up zeros
   Object.keys(inv).forEach(k => {

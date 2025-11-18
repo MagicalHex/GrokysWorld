@@ -42,9 +42,9 @@
     "damage": { "min": 10, "max": 15 },
     "range": 1,
     "loot": [
-      { "id": "bow", "chance": 0.8 },
-      { "id": "knights-armor", "chance": 0.5 },
-      { "id": "short-sword", "chance": 0.5 }
+      { "id": "fireball", "chance": 0.8 },
+      { "id": "knights-armor", "chance": 0.2 },
+      { "id": "short-sword", "chance": 0.1 }
     ]
   },
   "tarantula": { 

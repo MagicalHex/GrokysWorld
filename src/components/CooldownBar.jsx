@@ -20,11 +20,13 @@ const CooldownBar = ({ signal, setCooldownSignal, cooldowns }) => {
     }
 
     // USE PROP: cooldowns.MELEE or cooldowns.RANGED
-    const duration = type === 'melee' 
-      ? cooldowns.MELEE 
-      : type === 'ranged' 
-        ? cooldowns.RANGED 
-        : 1500;
+const duration = type === 'melee' 
+  ? cooldowns.MELEE 
+  : type === 'ranged' 
+    ? cooldowns.RANGED 
+    : type === 'spell' 
+      ? cooldowns.SPELL 
+      : 1500;  // fallback
 
     let cycleStart = performance.now();
 
