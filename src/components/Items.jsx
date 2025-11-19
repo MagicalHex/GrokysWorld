@@ -126,7 +126,6 @@ export const ITEMS = {
   // SPELLS
   // ──────────────────────────────────────────────────────────────
 fireball: {
-  // image: '/ownemojis/fireball.webp',  // ← Add your graphic (animated sprite?)
   emoji: '🔥',
   name: 'Fireball',
   description: '8 AOE dmg (2+ enemies ≤10 tiles)',
