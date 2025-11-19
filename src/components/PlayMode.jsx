@@ -23,6 +23,8 @@ import MonsterLayer from './MonsterLayer'; // Player layer
 import ZIndexManager from './ZIndexManager'; // Z index manager
 import FlatEntityLayer from './FlatEntityLayer'; // Z index manager
 
+import EffectsLayer from './EffectsLayer'; // For effects (spells, etc.)
+
 import { useIsoProjection } from '../hooks/useIsoProjection';
 
 // Add these imports
@@ -172,10 +174,12 @@ useEffect(() => {
   return () => clearTimeout(timer);
 }, [cooldownSignal]);
 
-/* --- For Z Index Manager ----- */
+  // ── For Z Index Manager ─────────────────────────────────────────────────────
 // 🔥 ADD THIS HOOK CALL (near your other hooks)
 const { worldToScreen } = useIsoProjection(tileSize);
-/* ------------------------ */
+  // ── For shooting fireball graphics ─────────────────────────────────────────────────────
+const [fireballCastTrigger, setFireballCastTrigger] = useState(0);
+
   /* --------------------------------------------------------------
      UI-only animation state (pickup flash)
      -------------------------------------------------------------- */
@@ -420,6 +424,8 @@ useEffect(() => {
         // playerXp={player.xp}
         // setPlayerXp={setPlayerXp}
         equipment={equipment}
+        // for fire ball
+        onFireballCast={() => setFireballCastTrigger(prev => prev + 1)}
       />
       <HealthRegenSystem
         playerHealth={globalPlayerHealth}
@@ -515,6 +521,14 @@ useEffect(() => {
   forceMonsterUpdate={forceMonsterUpdate}
   />
 </ZIndexManager>
+
+<EffectsLayer
+      playerPos={playerPos}
+      tileSize={tileSize}
+      camera={camera}
+      worldToScreen={worldToScreen}
+fireballCastTrigger={fireballCastTrigger}
+    />
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem

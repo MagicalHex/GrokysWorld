@@ -53,7 +53,8 @@ export default function CombatSystem({
   monsterData,
   playerXp,
   setPlayerXp,
-  equipment
+  equipment,
+onFireballCast,
 }) {
   // const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
   const distance = (p1, p2) => {
@@ -62,65 +63,43 @@ export default function CombatSystem({
   return Math.max(dx, dy); // CHEBYSHEV DISTANCE!
 };
 
-  // === REFS TO HOLD LATEST VALUES ===
-  const refs = useRef({
-    playerPos,
-    playerHealth,
-    objects,
-    globalMonsterHealths,
-    monsterTypes,
-    onPlayerHealthChange,
-    onMonsterHealthChange,
-    onObjectsChange,
-    isDead,
-    setIsDead,
-    inventory,
-    addPopup: null, // will be set below
-      cooldownSignal,
-  setCooldownSignal,
-  currentLevel,
-  equipment
-  });
+const refs = useRef({});
 
-  // Update refs on every render
-  useEffect(() => {
-    refs.current = {
-      playerPos,
-      playerHealth,
-      objects,
-      globalMonsterHealths,
-      monsterTypes,
-      onPlayerHealthChange,
-      onMonsterHealthChange,
-      onObjectsChange,
-      isDead,
-      setIsDead,
-      inventory,
-      addPopup: refs.current.addPopup, // preserve function
-        cooldownSignal,
-  setCooldownSignal,
-  currentLevel,
-  equipment
-    };
-  }, [
+useEffect(() => {
+  refs.current = {
     playerPos,
-    playerHealth,
     objects,
     globalMonsterHealths,
     monsterTypes,
-    onPlayerHealthChange,
     onMonsterHealthChange,
     onObjectsChange,
+    onPlayerHealthChange,
     isDead,
     setIsDead,
     inventory,
-    setPopups,
-    popups,
-      cooldownSignal,
+    addPopup,
+    setCooldownSignal,
+    currentLevel,
+    equipment,
+    onFireballCast,        // NEW
+  };
+}, [
+  playerPos,
+  objects,
+  globalMonsterHealths,
+  monsterTypes,
+  onMonsterHealthChange,
+  onObjectsChange,
+  onPlayerHealthChange,
+  isDead,
+  setIsDead,
+  inventory,
+  addPopup,
   setCooldownSignal,
   currentLevel,
-  equipment
-  ]);
+  equipment,
+  onFireballCast,
+]);
 
     // === PLAYER DEATH → DOVE ===
   useEffect(() => {
@@ -322,6 +301,11 @@ useEffect(() => {
         if (finalTargets.length === 0) return; // ← this single line kills the crash forever
 
         logCombat(`Final targets: ${finalTargets.length} (AOE: ${hitAll})`);
+
+        // for spell effect
+if (isSpell && refs.current.onFireballCast) {
+  refs.current.onFireballCast(); // TRIGGERS EFFECTS
+}
 
         // === ATTACK ALL FINAL TARGETS ===
         finalTargets.forEach(({ objId, mPos, key, type }) => {
