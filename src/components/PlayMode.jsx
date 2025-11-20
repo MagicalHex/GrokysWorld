@@ -519,16 +519,17 @@ useEffect(() => {
   monsterMoveDirectionRef={monsterMoveDirectionRef}
   monsterMoveTriggerRef={monsterMoveTriggerRef}
   forceMonsterUpdate={forceMonsterUpdate}
+  fireballCastTrigger={fireballCastTrigger}
   />
 </ZIndexManager>
 
-<EffectsLayer
+{/* <EffectsLayer
       playerPos={playerPos}
       tileSize={tileSize}
       camera={camera}
       worldToScreen={worldToScreen}
 fireballCastTrigger={fireballCastTrigger}
-    />
+    /> */}
 
       {/* ---------- INTERACTION UI ---------- */}
       <InteractionSystem

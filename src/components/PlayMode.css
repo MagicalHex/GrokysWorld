@@ -38,6 +38,28 @@
     ),
     url('/ownemojis/townbgreduced.webp') center / cover no-repeat; */
 }
+/* This makes the canvas behave EXACTLY like monster-layer / player-layer */
+/* Exactly the same trick that makes monsters perfectly centered */
+/* This is the ONE TRUE WAY — used everywhere else in your game */
+.effects-layer-anchor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1901;
+}
+
+.effects-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);   /* ← this makes (0,0) = exact screen center */
+  pointer-events: none;
+}
 /* FOR MONSTERS, USED IN MonsterLayer */
 @keyframes fadeIn {
   from { opacity: 0; }

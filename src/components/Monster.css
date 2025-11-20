@@ -30,17 +30,17 @@
   align-items: center;
 }
 
-/* === VERTICAL (your existing) === */
+/* === VERTICAL EXTRA ALIGNMENT (DONE IN MONSTER.JSON) === */
 .monster-ui.high   { bottom: 100%; }
 .monster-ui.medium { bottom: 50%; }
 .monster-ui.low    { top: 65%; }
 
-/* === HORIZONTAL (NEW) === */
+/* === HORIZONTAL EXTRA ALIGNMENT (DONE IN MONSTER.JSON) === */
 .monster-ui.left   { left: 20%; }
 .monster-ui.center { left: 50%; transform: translateX(-50%); }
 .monster-ui.right  { left: 70%; }
 
-/* === GAP (your existing) === */
+/* === GAP EXTRA ALIGNMENT (DONE IN MONSTER.JSON) === */
 .monster-ui.high   { gap: 0.06em; }
 .monster-ui.medium { gap: 0.04em; }
 .monster-ui.low    { gap: 0.03em; }

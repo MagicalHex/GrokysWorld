@@ -48,6 +48,30 @@ useEffect(() => {
   });
 }, [camera]);
 
+// At top with other refs
+const aoeRef = useRef({
+  active: false,
+  x: 0,
+  y: 0,
+  frame: 0,
+  radius: 0
+});
+
+// Expose trigger via ref so CombatSystem can call it
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    window.triggerPlayerAOE = () => {
+      aoeRef.current = {
+        active: true,
+        x: playerPos.x,  // or smoothCam.x
+        y: playerPos.y,
+        frame: 0,
+        radius: 20
+      };
+    };
+  }
+}, [playerPos]);
+
     // ---- canvas resize (run once) ----
     // Gets the canvas DOM element from the ref.
     // Early return if canvas isn't available (e.g., component not mounted yet).
@@ -230,6 +254,75 @@ groundTiles.forEach(({ screen, x, y }) => {
 
   ctx.restore();
 });
+// ——— ISOMETRIC AOE RING (PLAYER) ———
+// ——— EPIC ISOMETRIC AOE RING (PLAYER) ———
+// ——— FLATTER ISOMETRIC AOE RING (PLAYER) ——— v2: Laying Down Edition
+if (aoeRef.current.active) {
+  const aoe = aoeRef.current;
+  const screen = worldToScreen(aoe.x, aoe.y);
+
+  aoe.radius += 11;  // ← Slightly slower for tighter fit
+  aoe.frame++;
+
+  if (aoe.frame < 42) {  // ← +2 frames for smoother fade
+    const progress = aoe.frame / 42;
+    const alpha = 1 - progress;
+    const pulse = 1 + Math.sin(progress * Math.PI * 3.5) * 0.15;  // Subtle pulse
+
+    ctx.save();
+    
+    // 🔥 KEY FIX #1: Match EXACT tile Y-offset for "ground level"
+    ctx.translate(screen.x, screen.y + tileSize * 0.85);  // ← 0.85 = lays flatter (tune 0.8-1.0)
+    
+    // 🔥 KEY FIX #2: Gentler isometric shear (less diagonal raise)
+ctx.transform(1, 0.1, -0.5, 2.0, 0, 0);  // ← positive X-skew = correct orientation  // ← Reduced skewY/skewX for flatter angle
+
+    // 🌟 GLOW LAYERS: 3 rings (thinner for flat look)
+    for (let i = 0; i < 3; i++) {
+      const glowAlpha = alpha * (0.25 + i * 0.18);
+      const glowOffset = i * 2.5;
+      const glowWidth = 16 - i * 3.5;
+
+      ctx.strokeStyle = `rgba(255, 120, 20, ${glowAlpha})`;  // Warmer orange
+      ctx.lineWidth = glowWidth;
+      ctx.shadowBlur = 35 + i * 18;  // Softer glow
+      ctx.shadowColor = `rgba(255, 100, 0, ${glowAlpha * 0.7})`;
+
+      ctx.beginPath();
+      // 🔥 KEY FIX #3: Much flatter ellipse (0.28 height = hugs ground)
+      ctx.ellipse(0, 0, (aoe.radius + glowOffset) * 1.05 * pulse, (aoe.radius + glowOffset) * 0.28 * pulse, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 💫 FLAT INNER GLOW (no raise)
+    ctx.globalAlpha = alpha * 0.35;
+    ctx.fillStyle = `rgba(255, 160, 40, 0.5)`;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = '#ff8800';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, aoe.radius * 0.55 * pulse, aoe.radius * 0.22 * pulse, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // ✨ MICRO-SPARKLES (flat orbit)
+    ctx.fillStyle = `rgba(255, 255, 150, ${alpha * 0.9})`;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#ffff77';
+    for (let s = 0; s < 6; s++) {
+      const sparkleAngle = (progress * 8 + s * 1.1) % (Math.PI * 2);
+      const sparkleDist = aoe.radius * 0.65;
+      const sx = Math.cos(sparkleAngle) * sparkleDist;
+      const sy = Math.sin(sparkleAngle) * sparkleDist * 0.5;  // ← Flatter orbit
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.5 + Math.sin(aoe.frame * 0.25 + s) * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  } else {
+    aoeRef.current.active = false;
+  }
+}
 
     ctx.restore();
     raf = requestAnimationFrame(render);
