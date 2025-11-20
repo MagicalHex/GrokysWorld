@@ -242,6 +242,7 @@ const MonsterLayer = memo(
                   damage={popup.dmg}
                   isCrit={popup.isCrit}
                   isHeal={popup.isHeal}
+                  element={popup.element}
                   onFinish={() =>
                     setPopups((prev) =>
                       prev.filter((p) => p.id !== popup.id)

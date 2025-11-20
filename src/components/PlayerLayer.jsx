@@ -112,6 +112,7 @@ data-player="true"            // 🔥 Alternative selector
             damage={popup.dmg}
             isPlayer={popup.isPlayer}
             isHeal={popup.isHeal}
+            element={popup.element}
             isXP={popup.isXP}
             isCrit={popup.isCrit}
             onFinish={() => setPopups(prev => prev.filter(p => p.id !== popup.id))}

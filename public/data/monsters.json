@@ -42,7 +42,7 @@
     "damage": { "min": 10, "max": 15 },
     "range": 1,
     "loot": [
-      { "id": "fireball", "chance": 1.0 },
+      { "id": "fireball", "chance": 0.5 },
             { "id": "iceball", "chance": 1.0 },
                   { "id": "windball", "chance": 1.0 },
       { "id": "knights-armor", "chance": 0.2 },

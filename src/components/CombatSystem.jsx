@@ -321,6 +321,11 @@ if (isSpell && refs.current.onFireballCast) {
           const curHealth = globalMonsterHealths[objId] ?? 100;
           const newHealth = Math.max(0, curHealth - dmg);
 
+          // 🔥 THIS IS THE FIX 🔥
+  const element = isSpell 
+    ? (refs.current.lastAOEElement || weaponStats.element || 'fire')
+    : null;
+    
           // 1. Damage popup (immediate)
           addPopup({
             x: mPos.x,
@@ -328,6 +333,7 @@ if (isSpell && refs.current.onFireballCast) {
             dmg,
             isCrit,
             monsterId: objId,
+            element,
           });
 
           // 2. Apply damage
