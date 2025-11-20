@@ -304,8 +304,9 @@ useEffect(() => {
 
         // for spell effect
 if (isSpell && refs.current.onFireballCast) {
-  refs.current.onFireballCast(); // old visual
-  window.triggerPlayerAOE();    // ← NEW: perfect isometric ring
+  refs.current.onFireballCast();
+  window.triggerPlayerAOE(weaponStats.element || 'fire');
+  refs.current.lastAOEElement = weaponStats.element || 'fire';
 }
 
         // === ATTACK ALL FINAL TARGETS ===

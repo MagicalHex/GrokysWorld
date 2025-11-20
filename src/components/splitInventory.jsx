@@ -6,7 +6,7 @@ const CATEGORY_SET = {
   armor: new Set(['knights-armor','dark-armor','wing-armor']),
   sword: new Set(['dagger','sword','axe','short-sword']),
 // ADD THIS LINE - this is your "ranged magic" or "spell" weapon slot
-  spell:  new Set(['fireball', 'ice-spike', 'lightning-bolt']), // add future spells here
+  spell:  new Set(['fireball', 'iceball', 'windball']), // add future spells here
 };
 
 const getStat = (id, type) => ITEMS[id]?.stats?.[type] || 0;
@@ -41,7 +41,6 @@ export const splitInventory = (raw) => {
   const bestSword = pickBest(candidates.sword, 'attack');
   if (bestSword) { equip.sword = bestSword; inv[bestSword] = (inv[bestSword] || 0) - 1; }
 
-// FIXED ✅
 const bestSpell = pickBest(candidates.spell, 'attack');
 if (bestSpell) { 
   equip.fireball = bestSpell;  // ← fireball key = RECOGNIZED!

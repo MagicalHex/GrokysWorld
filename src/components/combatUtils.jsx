@@ -53,11 +53,12 @@ export const getWeaponStats = (equipment, rangeType = 'auto') => {
   }
   
   const stats = ITEMS[id]?.stats ?? {};
-  return {
+return {
     damage: stats.damage ?? { min: 5, max: 10 },
     range: stats.range ?? 1,
     aoeRadius: stats.aoeRadius || 0,
     isAOE: !!stats.isAOE,
+    element: stats.element || null,  // ← THIS IS GOLD
   };
 };
 

@@ -48,29 +48,121 @@ useEffect(() => {
   });
 }, [camera]);
 
-// At top with other refs
-const aoeRef = useRef({
-  active: false,
-  x: 0,
-  y: 0,
-  frame: 0,
-  radius: 0
-});
+// 1. AT THE TOP — Replace your old aoeRef with this (supports multiple + type)
+const aoesRef = useRef([]);  // ← NOW AN ARRAY! Supports multiple AOEs
 
-// Expose trigger via ref so CombatSystem can call it
+// 2. REPLACE THE ENTIRE OLD window.triggerPlayerAOE WITH THIS:
 useEffect(() => {
   if (typeof window !== 'undefined') {
-    window.triggerPlayerAOE = () => {
-      aoeRef.current = {
-        active: true,
-        x: playerPos.x,  // or smoothCam.x
+    window.triggerPlayerAOE = (type = 'fire') => {
+      aoesRef.current.push({
+        x: playerPos.x,
         y: playerPos.y,
+        type,               // 'fire' | 'ice' | 'wind'
+        radius: 0,
         frame: 0,
-        radius: 20
-      };
+        active: true,
+        speed: type === 'wind' ? 12 : 10,
+        pulseFreq: type === 'ice' ? 4 : type === 'wind' ? 6 : 3.5,
+        pulseIntensity: type === 'ice' ? 0.12 : type === 'wind' ? 0.22 : 0.15,
+      });
     };
   }
 }, [playerPos]);
+
+const drawElementalAOE = (ctx, aoe, progress, alpha, pulse) => {
+  const screen = worldToScreen(aoe.x, aoe.y);
+
+  const config = {
+    fire: {
+      rings: ["rgba(255,120,20,", "rgba(255,180,40,", "rgba(255,80,0,"],
+      shadow: "rgba(255,80,0,",
+      core: ["rgba(255,220,100,", "rgba(255,120,20,", "rgba(255,40,0,"],
+      innerCore: "rgba(255,250,200,",
+      sparkles: { count: 6, color: "rgba(255,255,150,", shadow: "#ffff77" }
+    },
+    ice: {
+      rings: ["rgba(100,200,255,", "rgba(140,220,255,", "rgba(80,180,255,"],
+      shadow: "rgba(120,220,255,",
+      core: ["rgba(220,240,255,", "rgba(100,200,255,", "rgba(60,140,240,"],
+      innerCore: "rgba(255,255,255,",
+      sparkles: { count: 9, color: "#ccffff", shadow: "#ccffff", square: true }
+    },
+    wind: {
+      rings: ["rgba(200,210,230,", "rgba(220,230,240,", "rgba(180,200,220,"],
+      shadow: "rgba(200,220,240,",
+      core: ["rgba(240,245,255,", "rgba(190,210,230,", "rgba(140,160,190,"],
+      innerCore: "rgba(255,255,255,",
+      sparkles: { count: 12, color: "rgba(230,240,255,", shadow: "#ffffff", lines: true }
+    }
+  }[aoe.type];
+
+  ctx.save();
+  ctx.translate(screen.x, screen.y + tileSize * 0.85);
+  ctx.transform(1, 0.1, -0.5, 2.0, 0, 0);  // ← Still untouched!
+
+  // Outer glow rings
+  config.rings.forEach((colorBase, i) => {
+    const glowAlpha = alpha * (0.25 + i * 0.18);
+    ctx.strokeStyle = colorBase + glowAlpha + ")";
+    ctx.lineWidth = 16 - i * 3.5;
+    ctx.shadowBlur = 35 + i * 20;
+    ctx.shadowColor = config.shadow + glowAlpha * 0.7 + ")";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, (aoe.radius + i * 3) * 1.05 * pulse, (aoe.radius + i * 3) * 0.28 * pulse, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  // Filled core gradient
+  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, aoe.radius * pulse);
+  config.core.forEach((c, i) => grad.addColorStop(i * 0.5, c + alpha * (1 - i * 0.3) + ")"));
+  grad.addColorStop(1, config.core[2] + "0)");
+  ctx.fillStyle = grad;
+  ctx.globalAlpha = alpha * 0.6;
+  ctx.shadowBlur = 50;
+  ctx.shadowColor = config.shadow + alpha + ")";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, aoe.radius * 1.05 * pulse, aoe.radius * 0.28 * pulse, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Inner bright core
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = config.innerCore + alpha + ")";
+  ctx.shadowBlur = 30;
+  ctx.shadowColor = "#ffffff";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, aoe.radius * 0.4 * pulse, aoe.radius * 0.15 * pulse, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Sparkles / particles
+  ctx.globalAlpha = alpha * 0.9;
+  ctx.fillStyle = config.sparkles.color + alpha + ")";
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = config.sparkles.shadow;
+
+  for (let s = 0; s < config.sparkles.count; s++) {
+    const angle = (progress * (aoe.type === 'wind' ? 15 : 8) + s * 1.1) % (Math.PI * 2);
+    const dist = aoe.radius * 0.7;
+    const x = Math.cos(angle) * dist;
+    const y = Math.sin(angle) * dist * 0.5;
+
+    ctx.beginPath();
+    if (config.sparkles.lines) {
+      ctx.moveTo(0, 0);
+      ctx.lineTo(x, y);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = config.sparkles.color + alpha + ")";
+      ctx.stroke();
+    } else if (config.sparkles.square) {
+      ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+    } else {
+      ctx.arc(x, y, 1.5 + Math.sin(aoe.frame * 0.25 + s) * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  ctx.restore();
+};
 
     // ---- canvas resize (run once) ----
     // Gets the canvas DOM element from the ref.
@@ -257,72 +349,24 @@ groundTiles.forEach(({ screen, x, y }) => {
 // ——— ISOMETRIC AOE RING (PLAYER) ———
 // ——— EPIC ISOMETRIC AOE RING (PLAYER) ———
 // ——— FLATTER ISOMETRIC AOE RING (PLAYER) ——— v2: Laying Down Edition
-if (aoeRef.current.active) {
-  const aoe = aoeRef.current;
-  const screen = worldToScreen(aoe.x, aoe.y);
+// —————— ELEMENTAL AOE EFFECTS (ALL TYPES) ——————
+aoesRef.current = aoesRef.current.filter(aoe => {
+  if (!aoe.active) return false;
 
-  aoe.radius += 11;  // ← Slightly slower for tighter fit
+  aoe.radius += aoe.speed;
   aoe.frame++;
 
-  if (aoe.frame < 42) {  // ← +2 frames for smoother fade
+  if (aoe.frame < 42) {
     const progress = aoe.frame / 42;
     const alpha = 1 - progress;
-    const pulse = 1 + Math.sin(progress * Math.PI * 3.5) * 0.15;  // Subtle pulse
+    const pulse = 1 + Math.sin(progress * Math.PI * aoe.pulseFreq) * aoe.pulseIntensity;
 
-    ctx.save();
-    
-    // 🔥 KEY FIX #1: Match EXACT tile Y-offset for "ground level"
-    ctx.translate(screen.x, screen.y + tileSize * 0.85);  // ← 0.85 = lays flatter (tune 0.8-1.0)
-    
-    // 🔥 KEY FIX #2: Gentler isometric shear (less diagonal raise)
-ctx.transform(1, 0.1, -0.5, 2.0, 0, 0);  // ← positive X-skew = correct orientation  // ← Reduced skewY/skewX for flatter angle
-
-    // 🌟 GLOW LAYERS: 3 rings (thinner for flat look)
-    for (let i = 0; i < 3; i++) {
-      const glowAlpha = alpha * (0.25 + i * 0.18);
-      const glowOffset = i * 2.5;
-      const glowWidth = 16 - i * 3.5;
-
-      ctx.strokeStyle = `rgba(255, 120, 20, ${glowAlpha})`;  // Warmer orange
-      ctx.lineWidth = glowWidth;
-      ctx.shadowBlur = 35 + i * 18;  // Softer glow
-      ctx.shadowColor = `rgba(255, 100, 0, ${glowAlpha * 0.7})`;
-
-      ctx.beginPath();
-      // 🔥 KEY FIX #3: Much flatter ellipse (0.28 height = hugs ground)
-      ctx.ellipse(0, 0, (aoe.radius + glowOffset) * 1.05 * pulse, (aoe.radius + glowOffset) * 0.28 * pulse, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    // 💫 FLAT INNER GLOW (no raise)
-    ctx.globalAlpha = alpha * 0.35;
-    ctx.fillStyle = `rgba(255, 160, 40, 0.5)`;
-    ctx.shadowBlur = 25;
-    ctx.shadowColor = '#ff8800';
-    ctx.beginPath();
-    ctx.ellipse(0, 0, aoe.radius * 0.55 * pulse, aoe.radius * 0.22 * pulse, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // ✨ MICRO-SPARKLES (flat orbit)
-    ctx.fillStyle = `rgba(255, 255, 150, ${alpha * 0.9})`;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = '#ffff77';
-    for (let s = 0; s < 6; s++) {
-      const sparkleAngle = (progress * 8 + s * 1.1) % (Math.PI * 2);
-      const sparkleDist = aoe.radius * 0.65;
-      const sx = Math.cos(sparkleAngle) * sparkleDist;
-      const sy = Math.sin(sparkleAngle) * sparkleDist * 0.5;  // ← Flatter orbit
-      ctx.beginPath();
-      ctx.arc(sx, sy, 1.5 + Math.sin(aoe.frame * 0.25 + s) * 0.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.restore();
+    drawElementalAOE(ctx, aoe, progress, alpha, pulse);
+    return true;
   } else {
-    aoeRef.current.active = false;
+    return false; // auto-remove when done
   }
-}
+});
 
     ctx.restore();
     raf = requestAnimationFrame(render);

@@ -128,16 +128,39 @@ export const ITEMS = {
 fireball: {
   emoji: '🔥',
   name: 'Fireball',
-  description: '8 AOE dmg (2+ enemies ≤10 tiles)',
+  description: '8 AOE fire damage',
   rarity: 'rare',
   stats: {
-    damage: { min: 8, max: 8 },  // Fixed 8 dmg per enemy in AOE
-    range: 10,                   // Max flight distance
-    aoeRadius: 2.5,              // Explosion radius
-    isAOE: true,                 // ← Special flag for crowd logic
+    damage: { min: 8, max: 8 },
+    range: 10,
+    aoeRadius: 2.5,
+    isAOE: true,
+    element: 'fire'  // ← THIS IS THE KEY
   },
-  cost: { gold: 50 },  // Or whatever
-  sell: { gold: 20 }
+},
+iceball: {
+  emoji: '🧊',
+  name: 'Ice Nova',
+    description: '8 AOE ice damage',
+  stats: {
+    damage: { min: 8, max: 8 },
+    range: 10,
+    aoeRadius: 2.5,
+    isAOE: true,
+    element: 'ice'
+  },
+},
+windball: {
+  emoji: '🌪️',
+  name: 'Windblast',
+    description: '8 AOE wind damage',
+  stats: {
+    damage: { min: 8, max: 8 },
+    range: 10,
+    aoeRadius: 2.5,
+    isAOE: true,
+    element: 'wind'
+  },
 },
   // ──────────────────────────────────────────────────────────────
   // NON-EQUIPMENT

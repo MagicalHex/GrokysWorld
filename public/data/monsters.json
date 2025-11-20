@@ -43,6 +43,8 @@
     "range": 1,
     "loot": [
       { "id": "fireball", "chance": 1.0 },
+            { "id": "iceball", "chance": 1.0 },
+                  { "id": "windball", "chance": 1.0 },
       { "id": "knights-armor", "chance": 0.2 },
       { "id": "short-sword", "chance": 0.1 }
     ]

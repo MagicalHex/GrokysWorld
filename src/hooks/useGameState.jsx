@@ -208,7 +208,7 @@ const onInventoryChange = useCallback((updater) => {
   // ---- 3. PICK-UP -------------------------------------------------
   const PICKUP = new Set([
     'spiderweb','timber','coin','gold','potion','woodobject',
-    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow', 'fireball'
+    'rockobject', 'dark-armor', 'knights-armor', 'short-sword', 'bow', 'crossbow', 'fireball', 'iceball', 'windball'
   ]);
   let pickupItem = null;
 

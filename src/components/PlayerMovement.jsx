@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject', 'woodobject', 'rockobject', 'gold', 'angel', 'dove',
   'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top', 'knights-armor',
-   'dark-armor', 'short-sword', 'bow', 'crossbow', 'fireball'
+   'dark-armor', 'short-sword', 'bow', 'crossbow', 'fireball', 'windball', 'iceball'
 ]);
 
 const PlayerMovement = ({
