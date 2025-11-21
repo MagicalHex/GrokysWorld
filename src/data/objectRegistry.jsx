@@ -7,13 +7,6 @@ export const OBJECT_DATA = {
     height: 0,
     // image: '/assets/objects/tree.png',   // optional PNG
   },
-    boulder: {
-    emoji: 'tree',
-    size: 'medium',
-    scale: 1.2,
-    height: 0,
-    image: '/ownemojis/boulder.webp',   // optional PNG
-  },
   evergreenobject: {
     emoji: 'evergreen',
     size: 'medium',
@@ -24,7 +17,34 @@ export const OBJECT_DATA = {
     size: 'small',
     scale: 1,
   },
-  // add every static type you use
+    boulder: {
+    emoji: 'tree',
+    size: 'medium',
+    scale: 0.9,
+    height: 0,
+    image: '/ownemojis/boulder.webp',   // optional PNG
+  },
+      deadtree: {
+    emoji: 'tree',
+    size: 'medium',
+    scale: 1.5,
+    height: 0,
+    image: '/ownemojis/deadtree.webp',   // optional PNG
+  },
+      deadtree1: {
+    emoji: 'tree',
+    size: 'medium',
+    scale: 1.5,
+    height: 0,
+    image: '/ownemojis/deadtree1.webp',   // optional PNG
+  },
+  wallruin: {
+    emoji: 'tree',
+    size: 'medium',
+    scale: 1.2,
+    height: 0,
+    image: '/ownemojis/wall-ruin.webp',   // optional PNG
+  },
 };
 
 export const EMOJI_MAP = {

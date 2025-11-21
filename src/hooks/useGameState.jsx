@@ -939,17 +939,32 @@ const generateTownLevel = () => {
 const generateSurvivalLevel = () => {
   const grid = Array(ROWS).fill().map(() => Array(COLS).fill('stonefloor'));
 
-  const staticObjects = {
-    '8,8': 'boulder',
-    '3,12': 'boulder',
-    '12,3': 'boulder',
-    '10,10': 'boulder',
-  };
+const staticObjects = {
+  '5,14': 'boulder',
+  '12,3': 'boulder',
+  '9,7': 'boulder',
+  '2,11': 'boulder',
+  '14,9': 'boulder',
+
+  '3,4': 'deadtree1',
+  '11,13': 'deadtree1',
+  '7,2': 'deadtree1',
+
+  '1,8': 'deadtree',
+  '15,5': 'deadtree',
+  '6,15': 'deadtree',
+  '10,1': 'deadtree',
+
+  '4,8': 'wallruin'
+};
 
   const survivalWaves = {
     wave1: { '3,3': 'skeleton1', '4,4': 'skeleton1', '5,15': 'skeleton1' },
     wave2: { '2,1': 'skeleton1', '3,1': 'skeleton1', '4,1': 'skeleton1', '5,1': 'skeleton1' },
     wave3: { '1,1': 'skeleton1', '3,15': 'skeleton1', '10,3': 'skeleton1', '12,12': 'skeleton1', '14,5': 'skeleton1' },
+    wave4: { '20,1': 'swamptroll', '20,15': 'swamptroll', '20,3': 'swamptroll', '20,12': 'swamptroll', '20,5': 'swamptroll' },
+    wave5: { '1,3': 'skeleton1', '3,10': 'skeleton1', '10,10': 'swamptroll', '12,12': 'skeleton1', '14,10': 'swamptroll' },
+    wave6: { '1,5': 'skeleton1', '3,14': 'swamptroll', '10,2': 'skeleton1', '12,1': 'skeleton1', '8,8': 'swamptroll' },
   };
 
   const initialWave = survivalWaves.wave1;
