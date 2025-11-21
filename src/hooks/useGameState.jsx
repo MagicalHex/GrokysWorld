@@ -305,201 +305,342 @@ const getRespawnDelay = (type) => {
 // ──────────────────────────────────────────────────────────────
 // 2. Unified scheduleRespawn – handles BOTH monsters and static objects
 // ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────
+// 1. Helper: Is this a survival wave monster? → NO individual respawn
+// ──────────────────────────────────────────────────────────────
+const isSurvivalWaveMonster = (monsterId) => {
+  return typeof monsterId === 'string' && monsterId.includes('_wave');
+};
+
+// ──────────────────────────────────────────────────────────────
+// 2. Helper: Extract coordinates from ANY monsterId (old or new format)
+// ──────────────────────────────────────────────────────────────
+const extractCoordsFromId = (monsterId) => {
+  if (!monsterId) return null;
+  const parts = monsterId.split('_');
+  // Last two parts are always x,y (even with wave: skeleton1_Survival_wave3_10_15)
+  if (parts.length < 3) return null;
+  const y = parts.pop();
+  const x = parts.pop();
+  return `${x},${y}`;
+};
+
+// ──────────────────────────────────────────────────────────────
+// 3. Helper: Generate fresh monsterId (universal format)
+// ──────────────────────────────────────────────────────────────
+const generateMonsterId = (type, levelId, key, waveNumber = null) => {
+  const [x, y] = key.split(',');
+  const wavePart = waveNumber !== null ? `_wave${waveNumber}` : '';
+  return `${type}_${levelId}${wavePart}_${x}_${y}`;
+};
+
+// ──────────────────────────────────────────────────────────────
+// 4. FINAL UNIVERSAL scheduleRespawn (replace your giant one)
+// ──────────────────────────────────────────────────────────────
 const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
-  console.log('[scheduleRespawn] CALLED WITH:', { arg1, arg2, arg3, arg4 });
-  console.log('typeof arg1:', typeof arg1);
-
-  let levelId, key, type, delay = 3000;
+  let levelId, key, type, delay;
   let isMonster = false;
-  let monsterId = null;
 
-  // ─── Overload 1: monsterId (string)
+  // ─── Overload 1: monsterId string → respawn that monster
   if (typeof arg1 === 'string') {
-    monsterId = arg1;
-    console.log('→ [MONSTER PATH] monsterId =', monsterId);
+    const monsterId = arg1;
 
-    const parts = monsterId.split('_');
-    console.log('→ parts =', parts);
-
-    if (parts.length < 4) {
-      console.warn('→ Invalid monsterId format:', monsterId);
+    // SURVIVAL WAVE MONSTERS: never respawn individually
+    if (isSurvivalWaveMonster(monsterId)) {
+      console.log('[scheduleRespawn] Ignoring wave monster respawn:', monsterId);
       return;
     }
 
+    const parts = monsterId.split('_');
     type = parts[0];
-    // levelId = Number(parts[1]);
-    if (parts[1] === 'survival') {
-  levelId = 'survival';
-} else if (parts[1] === 'story') {
-  levelId = 'story';
-} else {
-  levelId = Number(parts[1]);
-}
+
+    // Extract levelId
+    const levelPart = parts[1];
+    levelId = levelPart === 'survival' || levelPart === 'story' ? levelPart : 'story';
 
     delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
-    const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false;
 
-    console.log('→ type:', type, 'levelId:', levelId, 'delay:', delay, 'forceSpawn:', forceSpawn);
-
-    let origKey;
-    if (forceSpawn) {
-      const x = parts[2], y = parts[3];
-      origKey = `${x},${y}`;
-      console.log('→ forceSpawn: using x,y from ID →', origKey);
-    } else {
-      console.log('→ Calling getOriginalKey for:', monsterId);
-      origKey = getOriginalKey(monsterId, levels);
-      console.log('→ getOriginalKey returned:', origKey);
-      if (!origKey) {
-        console.warn('→ [FATAL] No original key for:', monsterId);
-        return;
-      }
+    // Extract key safely
+    key = extractCoordsFromId(monsterId);
+    if (!key) {
+      console.warn('[scheduleRespawn] Could not extract coords from:', monsterId);
+      return;
     }
 
-    key = origKey;
     isMonster = true;
 
-  // ─── Overload 2: levelId, key, type, delay
+  // ─── Overload 2: levelId, key, type, delay → static object
   } else {
     levelId = arg1;
     key = arg2;
     type = arg3;
-    delay = arg4 ?? 3000;
+    delay = arg4 ?? getRespawnDelay(arg3);
     isMonster = false;
-    console.log('→ [STATIC PATH] levelId:', levelId, 'key:', key, 'type:', type, 'delay:', delay);
   }
 
-  console.log('→ FINAL: levelId=', levelId, 'key=', key, 'type=', type, 'isMonster=', isMonster);
-
-  const timestamp = Date.now() + delay;
-  console.log('→ timestamp =', new Date(timestamp).toLocaleTimeString());
-
-  // ─── Prevent duplicate
-  const queue = levels[levelId]?.respawnQueue || [];
-  const alreadyQueued = queue.some(i => i.key === key && i.type === type);
-  if (alreadyQueued) {
-    console.log('→ [DUPLICATE] Already queued:', { levelId, key, type });
+  // ─── Final validation
+  if (!levelId || !key || !type) {
+    console.warn('[scheduleRespawn] Invalid args:', { levelId, key, type });
     return;
   }
 
-  // ─── Add to queue
-  console.log('→ Adding to queue:', { levelId, key, type, timestamp });
+  const timestamp = Date.now() + delay;
+
+  // ─── Add to respawnQueue (prevents duplicates)
   updateLevel(levelId, prev => ({
     ...prev,
-    respawnQueue: [...(prev.respawnQueue || []), { key, type, timestamp }]
+    respawnQueue: [...(prev.respawnQueue || []).filter(i => !(i.key === key && i.type === type)),
+             { key, type, timestamp, isMonster }]
   }));
 
-  // ─── Set timeout
-  console.log('→ setTimeout in', delay, 'ms');
-  const timerId = setTimeout(() => {
-    console.log('[TIMER FIRED] for:', { levelId, key, type, monsterId });
-
+  // ─── The actual timer
+  const timer = setTimeout(() => {
     setLevels(prevLevels => {
       const level = prevLevels[levelId];
-if (!level) {
-    console.error('→ CRITICAL: Level missing!', levelId, Object.keys(prevLevels));
-    return prevLevels;
-  }
+      if (!level) return prevLevels;
 
-      const now = Date.now();
-      console.log('→ now:', now, 'timestamp:', timestamp, 'too early?', now < timestamp);
+      // Remove from queue
+      const newQueue = level.respawnQueue?.filter(i => !(i.key === key && i.type === type)) || [];
 
-      if (now < timestamp) {
-        console.log('→ Too early → rescheduling in', timestamp - now, 'ms');
-        if (isMonster) {
-          console.log('→ RECALL: scheduleRespawn(monsterId, delay)');
-          scheduleRespawn(monsterId, timestamp - now);
-        } else {
-          console.log('→ RECALL: scheduleRespawn(levelId, key, type, delay)');
-          scheduleRespawn(levelId, key, type, timestamp - now);
+      // Try to place (prefer original tile)
+      const tryPlace = (targetKey) => {
+        const occupant = level.objects[targetKey];
+        const walkable = !occupant || ['gold', 'spiderweb', 'coin'].includes(occupant);
+        if (walkable) {
+          if (isMonster) {
+            const newMonsterId = generateMonsterId(type, levelId, targetKey);
+            setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
+            setGlobalMonsterHealths(p => ({ ...p, [newMonsterId]: MONSTER_DATA[type]?.hp ?? 100 }));
+            return { ...level.objects, [targetKey]: newMonsterId };
+          } else {
+            return { ...level.objects, [targetKey]: type };
+          }
         }
-        return prevLevels;
+        return null;
+      };
+
+      // 1. Try original spot
+      let newObjects = tryPlace(key);
+      if (newObjects) {
+        return { ...prevLevels, [levelId]: { ...level, objects: newObjects, respawnQueue: newQueue }};
       }
 
-      const occupied = level.objects[key];
-      console.log('→ Tile occupied by:', occupied);
-
-// === FIND NEARBY AVAILABLE TILE ===
-const [origX, origY] = key.split(',').map(Number);
-const lootTiles = ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'];
-
-let placed = false;
-let newKey = key;
-
-for (let radius = 1; radius <= 5 && !placed; radius++) {
-  const candidates = [];
-
-  for (let dx = -radius; dx <= radius; dx++) {
-    for (let dy = -radius; dy <= radius; dy++) {
-      if (Math.abs(dx) + Math.abs(dy) > radius) continue; // Manhattan
-
-      const nx = origX + dx;
-      const ny = origY + dy;
-      const nKey = `${nx},${ny}`;
-
-      if (nKey === key) continue; // skip original (we already know it's blocked)
-
-      const occupant = level.objects[nKey];
-      if (!occupant || lootTiles.includes(occupant)) {
-        candidates.push({ key: nKey, dist: Math.abs(dx) + Math.abs(dy) });
-      }
-    }
-  }
-
-  if (candidates.length > 0) {
-    // Sort by distance, pick closest
-    candidates.sort((a, b) => a.dist - b.dist);
-    newKey = candidates[0].key;
-    placed = true;
-    console.log(`→ SPAWNING NEARBY at ${newKey} (dist: ${candidates[0].dist})`);
-  }
-}
-
-if (!placed) {
-  console.log('→ No nearby tile → retry in 1s');
-  if (isMonster) {
-    scheduleRespawn(monsterId, 1000);
-  } else {
-    scheduleRespawn(levelId, key, type, 1000);
-  }
-  return prevLevels;
-}
-
-      console.log('→ PLACING:', isMonster ? 'MONSTER' : 'STATIC');
-
-      if (isMonster) {
-        const [x, y] = key.split(',').map(Number);
-        const newMonsterId = `${type}_${levelId}_${x}_${y}`;
-        console.log('→ Spawning new monster:', newMonsterId, 'at', key);
-       // ── use base health from monsterData  ──
-        setGlobalMonsterHealths(p => ({
-          ...p,
-          [newMonsterId]: MONSTER_DATA[type]?.hp ?? 100
-        }));
-        setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
-
-        return {
-          ...prevLevels,
-          [levelId]: {
-            ...level,
-            objects: { ...level.objects, [key]: newMonsterId },
-            respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
+      // 2. Try nearby (simple 3x3)
+      const [x, y] = key.split(',').map(Number);
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          if (dx === 0 && dy === 0) continue;
+          const nx = x + dx, ny = y + dy;
+          const nKey = `${nx},${ny}`;
+          newObjects = tryPlace(nKey);
+          if (newObjects) {
+            return { ...prevLevels, [levelId]: { ...level, objects: newObjects, respawnQueue: newQueue }};
           }
-        };
-      } else {
-        return {
-          ...prevLevels,
-          [levelId]: {
-            ...level,
-            objects: { ...level.objects, [key]: type },
-            respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
-          }
-        };
+        }
       }
+
+      // 3. Still blocked? Retry in 2s
+      scheduleRespawn(levelId, key, type, 2000);
+      return prevLevels;
     });
   }, delay);
 
-}, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes, getOriginalKey]);
+}, [updateLevel, setLevels, setMonsterTypes, setGlobalMonsterHealths]);
+// const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
+//   console.log('[scheduleRespawn] CALLED WITH:', { arg1, arg2, arg3, arg4 });
+//   console.log('typeof arg1:', typeof arg1);
+
+//   let levelId, key, type, delay = 3000;
+//   let isMonster = false;
+//   let monsterId = null;
+
+//   // ─── Overload 1: monsterId (string)
+//   if (typeof arg1 === 'string') {
+//     monsterId = arg1;
+//     console.log('→ [MONSTER PATH] monsterId =', monsterId);
+
+//     const parts = monsterId.split('_');
+//     console.log('→ parts =', parts);
+
+//     if (parts.length < 4) {
+//       console.warn('→ Invalid monsterId format:', monsterId);
+//       return;
+//     }
+
+//     type = parts[0];
+//     // levelId = Number(parts[1]);
+//     if (parts[1] === 'survival') {
+//   levelId = 'survival';
+// } else if (parts[1] === 'story') {
+//   levelId = 'story';
+// } else {
+//   levelId = Number(parts[1]);
+// }
+
+//     delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
+//     const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false;
+
+//     console.log('→ type:', type, 'levelId:', levelId, 'delay:', delay, 'forceSpawn:', forceSpawn);
+
+//     let origKey;
+//     if (forceSpawn) {
+//       const x = parts[2], y = parts[3];
+//       origKey = `${x},${y}`;
+//       console.log('→ forceSpawn: using x,y from ID →', origKey);
+//     } else {
+//       console.log('→ Calling getOriginalKey for:', monsterId);
+//       origKey = getOriginalKey(monsterId, levels);
+//       console.log('→ getOriginalKey returned:', origKey);
+//       if (!origKey) {
+//         console.warn('→ [FATAL] No original key for:', monsterId);
+//         return;
+//       }
+//     }
+
+//     key = origKey;
+//     isMonster = true;
+
+//   // ─── Overload 2: levelId, key, type, delay
+//   } else {
+//     levelId = arg1;
+//     key = arg2;
+//     type = arg3;
+//     delay = arg4 ?? 3000;
+//     isMonster = false;
+//     console.log('→ [STATIC PATH] levelId:', levelId, 'key:', key, 'type:', type, 'delay:', delay);
+//   }
+
+//   console.log('→ FINAL: levelId=', levelId, 'key=', key, 'type=', type, 'isMonster=', isMonster);
+
+//   const timestamp = Date.now() + delay;
+//   console.log('→ timestamp =', new Date(timestamp).toLocaleTimeString());
+
+//   // ─── Prevent duplicate
+//   const queue = levels[levelId]?.respawnQueue || [];
+//   const alreadyQueued = queue.some(i => i.key === key && i.type === type);
+//   if (alreadyQueued) {
+//     console.log('→ [DUPLICATE] Already queued:', { levelId, key, type });
+//     return;
+//   }
+
+//   // ─── Add to queue
+//   console.log('→ Adding to queue:', { levelId, key, type, timestamp });
+//   updateLevel(levelId, prev => ({
+//     ...prev,
+//     respawnQueue: [...(prev.respawnQueue || []), { key, type, timestamp }]
+//   }));
+
+//   // ─── Set timeout
+//   console.log('→ setTimeout in', delay, 'ms');
+//   const timerId = setTimeout(() => {
+//     console.log('[TIMER FIRED] for:', { levelId, key, type, monsterId });
+
+//     setLevels(prevLevels => {
+//       const level = prevLevels[levelId];
+// if (!level) {
+//     console.error('→ CRITICAL: Level missing!', levelId, Object.keys(prevLevels));
+//     return prevLevels;
+//   }
+
+//       const now = Date.now();
+//       console.log('→ now:', now, 'timestamp:', timestamp, 'too early?', now < timestamp);
+
+//       if (now < timestamp) {
+//         console.log('→ Too early → rescheduling in', timestamp - now, 'ms');
+//         if (isMonster) {
+//           console.log('→ RECALL: scheduleRespawn(monsterId, delay)');
+//           scheduleRespawn(monsterId, timestamp - now);
+//         } else {
+//           console.log('→ RECALL: scheduleRespawn(levelId, key, type, delay)');
+//           scheduleRespawn(levelId, key, type, timestamp - now);
+//         }
+//         return prevLevels;
+//       }
+
+//       const occupied = level.objects[key];
+//       console.log('→ Tile occupied by:', occupied);
+
+// // === FIND NEARBY AVAILABLE TILE ===
+// const [origX, origY] = key.split(',').map(Number);
+// const lootTiles = ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'];
+
+// let placed = false;
+// let newKey = key;
+
+// for (let radius = 1; radius <= 5 && !placed; radius++) {
+//   const candidates = [];
+
+//   for (let dx = -radius; dx <= radius; dx++) {
+//     for (let dy = -radius; dy <= radius; dy++) {
+//       if (Math.abs(dx) + Math.abs(dy) > radius) continue; // Manhattan
+
+//       const nx = origX + dx;
+//       const ny = origY + dy;
+//       const nKey = `${nx},${ny}`;
+
+//       if (nKey === key) continue; // skip original (we already know it's blocked)
+
+//       const occupant = level.objects[nKey];
+//       if (!occupant || lootTiles.includes(occupant)) {
+//         candidates.push({ key: nKey, dist: Math.abs(dx) + Math.abs(dy) });
+//       }
+//     }
+//   }
+
+//   if (candidates.length > 0) {
+//     // Sort by distance, pick closest
+//     candidates.sort((a, b) => a.dist - b.dist);
+//     newKey = candidates[0].key;
+//     placed = true;
+//     console.log(`→ SPAWNING NEARBY at ${newKey} (dist: ${candidates[0].dist})`);
+//   }
+// }
+
+// if (!placed) {
+//   console.log('→ No nearby tile → retry in 1s');
+//   if (isMonster) {
+//     scheduleRespawn(monsterId, 1000);
+//   } else {
+//     scheduleRespawn(levelId, key, type, 1000);
+//   }
+//   return prevLevels;
+// }
+
+//       console.log('→ PLACING:', isMonster ? 'MONSTER' : 'STATIC');
+
+//       if (isMonster) {
+//         const [x, y] = key.split(',').map(Number);
+//         const newMonsterId = `${type}_${levelId}_${x}_${y}`;
+//         console.log('→ Spawning new monster:', newMonsterId, 'at', key);
+//        // ── use base health from monsterData  ──
+//         setGlobalMonsterHealths(p => ({
+//           ...p,
+//           [newMonsterId]: MONSTER_DATA[type]?.hp ?? 100
+//         }));
+//         setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
+
+//         return {
+//           ...prevLevels,
+//           [levelId]: {
+//             ...level,
+//             objects: { ...level.objects, [key]: newMonsterId },
+//             respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
+//           }
+//         };
+//       } else {
+//         return {
+//           ...prevLevels,
+//           [levelId]: {
+//             ...level,
+//             objects: { ...level.objects, [key]: type },
+//             respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
+//           }
+//         };
+//       }
+//     });
+//   }, delay);
+
+// }, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes, getOriginalKey]);
 
 // ──────────────────────────────────────────────────────────────
 //  RESPAWN, PART OF ABOVE
@@ -525,6 +666,23 @@ const spawnMonster = useCallback(
   },
   [currentLevel, scheduleRespawn]
 );
+// NEW
+const spawnMonsterAt = useCallback((levelId, key, type, waveNumber = null) => {
+  const [x, y] = key.split(',');
+  const wavePart = waveNumber ? `_wave${waveNumber}` : '';
+  const monsterId = `${type}_${levelId}${wavePart}_${x}_${y}`;
+
+  setLevels(prev => ({
+    ...prev,
+    [levelId]: {
+      ...prev[levelId],
+      objects: { ...prev[levelId].objects, [key]: monsterId }
+    }
+  }));
+
+  setMonsterTypes(p => ({ ...p, [monsterId]: type }));
+  setGlobalMonsterHealths(p => ({ ...p, [monsterId]: MONSTER_DATA[type]?.hp ?? 100 }));
+}, []);
 // ──────────────────────────────────────────────────────────────
 //  A HELP-SWEEPER TO SPAWN EVERY 30 SECONDS. HELPS TO AVOID STALE MONSTERS
 // ──────────────────────────────────────────────────────────────
@@ -571,78 +729,77 @@ useEffect(() => {
 // Check wave complete for Survival Mode
 // -------------------------------------------------
 const checkWaveComplete = useCallback(() => {
-  let spawnTimeout = null;  // ← Track our timeout
+  setLevels(prevLevels => {
+    const level = prevLevels.survival;
+    if (!level?.survivalWaves || level.currentWave == null) return prevLevels;
 
-  setLevels(currentLevels => {
-    const level = currentLevels.survival;
-    if (!level?.survivalWaves || level.currentWave == null) return currentLevels;
-
-    const waveKey = `wave${level.currentWave}`;
+    const currentWaveNum = level.currentWave;
+    const waveKey = `wave${currentWaveNum}`;
     const waveSpawns = level.survivalWaves[waveKey];
-    if (!waveSpawns) return currentLevels;
+    if (!waveSpawns) return prevLevels;
 
-    console.log(`\n🔍 Checking Wave ${level.currentWave} completion...`);
-    console.log(`   Expected spawns:`, waveSpawns);
-
-    const aliveMonsters = Object.entries(waveSpawns).filter(([key, expectedType]) => {
+    // Count how many of THIS wave's monsters are still alive
+    const aliveInThisWave = Object.entries(waveSpawns).filter(([key, expectedType]) => {
       const occupant = level.objects[key];
-      const isAlive = occupant && typeof occupant === 'string' && occupant.startsWith(expectedType);
-      if (isAlive) console.log(`   ⚔️ Alive → ${key}: ${occupant}`);
-      return isAlive;
+      return occupant && 
+             typeof occupant === 'string' && 
+             occupant.startsWith(expectedType + '_') &&
+             occupant.includes(`_wave${currentWaveNum}_`);
     });
 
-    console.log(`   → ${aliveMonsters.length}/${Object.keys(waveSpawns).length} alive`);
-
-    if (aliveMonsters.length > 0) {
-      console.log(`   ❌ Wave ${level.currentWave} NOT cleared.\n`);
-      return currentLevels;  // ← NO SPAWN SCHEDULED!
+    if (aliveInThisWave.length > 0) {
+      return prevLevels; // still fighting
     }
 
-    // ✅ WAVE CLEARED!
-    console.log(`✅ WAVE ${level.currentWave} CLEARED!\n`);
-
-    const nextWaveNum = level.currentWave + 1;
+    // WAVE CLEARED!
+    const nextWaveNum = currentWaveNum + 1;
     const nextWaveKey = `wave${nextWaveNum}`;
     const nextWaveSpawns = level.survivalWaves[nextWaveKey];
 
     if (!nextWaveSpawns) {
-      console.log('🏆 ALL WAVES COMPLETE!');
       return {
-        ...currentLevels,
+        ...prevLevels,
         survival: { ...level, name: 'Survival Mode - Victory!' }
       };
     }
 
-    console.log(`⏭️ Advancing to Wave ${nextWaveNum} (+5s spawn)`);
+    // SCHEDULE NEXT WAVE USING FRESH STATE
+    setTimeout(() => {
+      setLevels(current => {
+        const freshLevel = current.survival;
+        if (!freshLevel) return current;
 
-    // ✅ SCHEDULE SPAWN ONLY HERE (wave cleared)
-    spawnTimeout = setTimeout(() => {
-      const currentLevel = levels.survival;
-      if (!currentLevel) return;
+        const spawns = freshLevel.survivalWaves?.[`wave${nextWaveNum}`];
+        if (!spawns) return current;
 
-      const spawns = currentLevel.survivalWaves?.[nextWaveKey];
-      if (!spawns) return;
+        console.log(`\nSPAWNING WAVE ${nextWaveNum}`);
+        Object.entries(spawns).forEach(([key, type]) => {
+          // Use your clean spawnMonsterAt (or forceSpawnMonster)
+          spawnMonsterAt('survival', key, type, nextWaveNum);
+        });
 
-      console.log(`\n🚨 [5s DELAY OVER] Spawning ${nextWaveKey}:`);
-      Object.entries(spawns).forEach(([key, type]) => {
-        console.log(`   → ${key}: ${type}`);
-        spawnMonster(key, type, 0);
+        return {
+          ...current,
+          survival: {
+            ...freshLevel,
+            currentWave: nextWaveNum,
+            name: `Survival Mode - Wave ${nextWaveNum}`
+          }
+        };
       });
     }, 5000);
 
+    // Return updated level (wave number + name) immediately
     return {
-      ...currentLevels,
+      ...prevLevels,
       survival: {
         ...level,
         currentWave: nextWaveNum,
-        name: `Survival Mode - Wave ${nextWaveNum}`
+        name: `Survival Mode - Wave ${nextWaveNum} (spawning...)`
       }
     };
   });
-
-  // Cleanup old timeout if called again before 5s
-  return () => spawnTimeout && clearTimeout(spawnTimeout);
-}, [levels, spawnMonster]);
+}, [spawnMonsterAt]); // ← only depend on the clean spawner
   // Monster health update
 const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
   console.log('[useGameState] onMonsterHealthChange:', { monsterId, newHealth });
@@ -725,104 +882,164 @@ const onMonsterHealthChange = useCallback((monsterId, newHealth) => {
      8. Load maps + initialise monster health
      -------------------------------------------------------------- */
      
-useEffect(() => {
-  const generateTown = () => {
-    const grid = Array(ROWS).fill().map(() => Array(COLS).fill('grass'));
-    
-    // === STORY MODE SPAWNS ===
-    const storySpawns = {
-      '7,7': 'treeobject',
-      '6,7': 'treeobject', 
-      '5,7': 'treeobject',
-      '5,5': 'treeobject',
-      '5,6': 'treeobject',
-      '10,7': 'skeleton1',
-      '10,10': 'cavespider'
-    };
+// ──────────────────────────────────────────────────────────────
+// 1. Level ID Constants (one source of truth)
+// ──────────────────────────────────────────────────────────────
+const LEVEL_IDS = {
+  STORY: 'story',
+  SURVIVAL: 'survival',
+  TOWN: 'town',        // if you ever have separate town level
+  DUNGEON: 'dungeon',
+  BOSS: 'boss'
+};
 
-    const objects = { ...storySpawns };
-    
-    // Spawn monsters with IDs
-    Object.entries(storySpawns).forEach(([key, type]) => {
-      if (isMonster(type)) {
-        const [x, y] = key.split(',').map(Number);
-        const monsterId = `${type}_story_1_${x}_${y}`;
-        objects[key] = monsterId;
-        setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
-        setGlobalMonsterHealths(prev => ({
-          ...prev,
-          [monsterId]: MONSTER_DATA[type]?.hp ?? 100
-        }));
-      }
-    });
+// ──────────────────────────────────────────────────────────────
+// 2. Universal Monster ID Generator (fixed & predictable)
+// ──────────────────────────────────────────────────────────────
+const createMonsterId = (type, levelId, waveNumber, x, y) => {
+  const wavePart = waveNumber ? `_wave${waveNumber}` : '';
+  return `${type}_${levelId}${wavePart}_${x}_${y}`;
+};
 
-    return {
-      name: 'Town',
-      grid,
-      objects,
-      originalSpawns: storySpawns,
-      respawnQueue: [],
-      playerPos: PORTAL_ENTRY_POINTS[1],
-      objectTypes: OBJECT_DATA,
-      background: 'townbgreduced.webp'  // ← NEW: background identifier
-    };
+// ──────────────────────────────────────────────────────────────
+// 3. Town Level Generator (clean component)
+// ──────────────────────────────────────────────────────────────
+const generateTownLevel = () => {
+  const grid = Array(ROWS).fill().map(() => Array(COLS).fill('grass'));
+
+  const staticObjects = {
+    '7,7': 'treeobject',
+    '6,7': 'treeobject',
+    '5,7': 'treeobject',
+    '5,5': 'treeobject',
+    '5,6': 'treeobject',
+    '8,8': 'boulder',
+    '5,8': 'boulder',
   };
 
-const generateDungeon = () => {
+  const monsterSpawns = {
+    '10,7': 'skeleton1',
+    '10,10': 'cavespider'
+  };
+
+  return buildLevel({
+    levelId: LEVEL_IDS.STORY,
+    name: 'Town',
+    gridType: 'grass',
+    staticObjects,
+    monsterSpawns,
+    playerPos: PORTAL_ENTRY_POINTS[1],
+    background: 'townbgreduced.webp'
+  });
+};
+
+// ──────────────────────────────────────────────────────────────
+// 4. Survival Level Generator (clean component)
+// ──────────────────────────────────────────────────────────────
+const generateSurvivalLevel = () => {
   const grid = Array(ROWS).fill().map(() => Array(COLS).fill('stonefloor'));
-  
-  // === SURVIVAL WAVES ===
-  const waves = {
-    wave1: { '3,3': 'skeleton1', '4,4': 'skeleton1', '5,15': 'skeleton1' },           // 3 skeletons
-    wave2: { '2,1': 'skeleton1', '3,1': 'skeleton1', '4,1': 'skeleton1', '5,1': 'skeleton1' },  // 4
-    wave3: { '1,1': 'skeleton1', '3,15': 'skeleton1', '10,3': 'skeleton1', '12,12': 'skeleton1', '14,5': 'skeleton1' }, // 5
-    // Add wave4, wave5... later
+
+  const staticObjects = {
+    '8,8': 'boulder',
+    '3,12': 'boulder',
+    '12,3': 'boulder',
+    '10,10': 'boulder',
   };
 
-  // Start with wave 1
-  const objects = { ...waves.wave1 };
-  
-  // Spawn wave 1 monsters
-  Object.entries(waves.wave1).forEach(([key, type]) => {
-    if (isMonster(type)) {
-      const [x, y] = key.split(',').map(Number);
-      const monsterId = `${type}_survival_1_${x}_${y}`;
-      objects[key] = monsterId;
-      setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
-      setGlobalMonsterHealths(prev => ({
-        ...prev,
-        [monsterId]: MONSTER_DATA[type]?.hp ?? 100
-      }));
+  const survivalWaves = {
+    wave1: { '3,3': 'skeleton1', '4,4': 'skeleton1', '5,15': 'skeleton1' },
+    wave2: { '2,1': 'skeleton1', '3,1': 'skeleton1', '4,1': 'skeleton1', '5,1': 'skeleton1' },
+    wave3: { '1,1': 'skeleton1', '3,15': 'skeleton1', '10,3': 'skeleton1', '12,12': 'skeleton1', '14,5': 'skeleton1' },
+  };
+
+  const initialWave = survivalWaves.wave1;
+
+  const level = buildLevel({
+    levelId: LEVEL_IDS.SURVIVAL,
+    name: 'Survival Mode - Wave 1',
+    gridType: 'stonefloor',
+    staticObjects,
+    monsterSpawns: initialWave,
+    playerPos: { x: 11, y: 8 },
+    background: 'survivalmap.webp',
+    extraData: {
+      survivalWaves,
+      currentWave: 1
     }
   });
 
+  // Attach wave data
+  level.survivalWaves = survivalWaves;
+  level.currentWave = 1;
+
+  return level;
+};
+
+// ──────────────────────────────────────────────────────────────
+// 5. Universal Level Builder (now PERFECT monsterIds)
+// ──────────────────────────────────────────────────────────────
+const buildLevel = ({
+  levelId,
+  name,
+  gridType,
+  staticObjects = {},
+  monsterSpawns = {},
+  playerPos,
+  background,
+  extraData = {}
+}) => {
+  const grid = Array(ROWS).fill().map(() => Array(COLS).fill(gridType));
+  const objects = { ...staticObjects };
+
+  Object.entries(monsterSpawns).forEach(([coord, type]) => {
+    if (!isMonster(type)) return;
+
+    const [x, y] = coord.split(',').map(Number);
+    const waveNumber = extraData.currentWave || null;
+
+    const monsterId = createMonsterId(type, levelId, waveNumber, x, y);
+    
+    objects[coord] = monsterId;
+
+    setMonsterTypes(prev => ({ ...prev, [monsterId]: type }));
+    setGlobalMonsterHealths(prev => ({
+      ...prev,
+      [monsterId]: MONSTER_DATA[type]?.hp ?? 100
+    }));
+  });
+
   return {
-    name: 'Survival Mode - Wave 1',
+    name,
     grid,
     objects,
-    originalSpawns: waves.wave1,
-    respawnQueue: [],
-    playerPos: { x: 11, y: 8 },
+    staticObjects,
+    monsterSpawns,
+    playerPos,
     objectTypes: OBJECT_DATA,
-    background: 'survivalmap.webp',
-    survivalWaves: waves,        // ← NEW: All waves data
-    currentWave: 1               // ← NEW: Track progress
+    background,
+    respawnQueue: [],           // ← Important! Always initialize
+    ...extraData
   };
 };
 
-  // Store both levels
-  const storyLevel = generateTown();
-  const survivalLevel = generateDungeon();
-  
-  setLevels({ 
-    story: storyLevel, 
-    survival: survivalLevel 
+// ──────────────────────────────────────────────────────────────
+// 6. Main useEffect – super clean now
+// ──────────────────────────────────────────────────────────────
+useEffect(() => {
+  const storyLevel = generateTownLevel();
+  const survivalLevel = generateSurvivalLevel();
+
+  setLevels({
+    [LEVEL_IDS.STORY]: storyLevel,
+    [LEVEL_IDS.SURVIVAL]: survivalLevel
   });
-  setRestrictedTilesByLevel({ 
-    story: new Set(), 
-    survival: new Set() 
+
+  setRestrictedTilesByLevel({
+    [LEVEL_IDS.STORY]: new Set(),
+    [LEVEL_IDS.SURVIVAL]: new Set()
   });
-  setCurrentLevel('story');  // default
+
+  setCurrentLevel(LEVEL_IDS.STORY);
   setIsLoading(false);
 }, []);
 

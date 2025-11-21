@@ -3,6 +3,11 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { subscribe } from '../utils/gameLoop';
 import MONSTER_DATA from '../../public/data/monsters.json';
 
+/**
+ * MonsterMovement Component
+ * Handles all monster AI pathfinding & movement every 500ms
+ * Uses BFS to chase player while respecting walls, objects, and other monsters
+ */
 const MonsterMovement = ({
   objects,
   playerPos,
@@ -12,12 +17,15 @@ const MonsterMovement = ({
   columns,
   globalMonsterHealths,
   monsterTypes,
-  // ADD THESE PROPS
-  monsterMoveDirectionRef,     // { current: { [monsterId]: 'up'|'down'|... } }
-  monsterMoveTriggerRef,       // { current: number } — global trigger count
-  forceMonsterUpdate           // () => void — force re-render in MonsterLayer
+
+  // === NEW: Animation sync props ===
+  monsterMoveDirectionRef,   // { current: { [monsterId]: 'up'|'down'|'left'|'right' } }
+  monsterMoveTriggerRef,     // { current: number } – bumps to trigger sprite animation
+  forceMonsterUpdate         // () => void – forces MonsterLayer to re-render
 }) => {
-  // === REFS TO HOLD LATEST VALUES ===
+  // =================================================================
+  // Keep latest props in refs (so the game loop can access fresh data)
+  // =================================================================
   const refs = useRef({
     objects,
     playerPos,
@@ -27,13 +35,11 @@ const MonsterMovement = ({
     globalMonsterHealths,
     monsterTypes,
     onObjectsChange,
-    // ADD THESE
     monsterMoveDirectionRef,
     monsterMoveTriggerRef,
     forceMonsterUpdate,
   });
 
-  // Update refs on every render
   useEffect(() => {
     refs.current = {
       objects,
@@ -62,115 +68,130 @@ const MonsterMovement = ({
     forceMonsterUpdate,
   ]);
 
+  // =================================================================
+  // Helper: Manhattan distance
+  // =================================================================
   const distance = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 
+  // List of valid monster type strings (from MONSTER_DATA)
   const MONSTER_TYPES = Object.keys(MONSTER_DATA);
   const isMonster = (type) => MONSTER_TYPES.includes(type);
 
+  // =================================================================
+  // Core AI: Find the best next tile toward the player using BFS
+  // Returns { x, y, direction } or null if no valid move
+  // =================================================================
   const getBestMove = useCallback((mx, my, monsterType) => {
-    const { playerPos, objects, restrictedTiles, rows: gridRows, columns: gridCols, monsterTypes } = refs.current;
+    const {
+      playerPos,
+      objects,
+      restrictedTiles,
+      rows: gridRows,
+      columns: gridCols,
+      monsterTypes
+    } = refs.current;
 
-    const startPos = { x: mx, y: my };
+    const start = { x: mx, y: my };
     const startKey = `${mx},${my}`;
     const playerKey = `${playerPos.x},${playerPos.y}`;
 
-    const manhattanDist = distance(startPos, playerPos);
+    // Too far → idle
     const maxChaseDistance = monsterType === 'spider' ? 12 : 7;
-    if (manhattanDist > maxChaseDistance) return null;
+    if (distance(start, playerPos) > maxChaseDistance) return null;
 
-    const dx = Math.abs(playerPos.x - mx);
-    const dy = Math.abs(playerPos.y - my);
-    if (dx + dy <= 1 && dx + dy > 0) {
-      return null;
-    }
+    // Already adjacent or on player → don't move (attack handled elsewhere)
+    if (distance(start, playerPos) <= 1) return null;
 
-    // === BFS (unchanged) ===
+    // =================================================================
+    // BFS to find shortest path
+    // =================================================================
     const cameFrom = new Map();
-    const queue = [{ x: mx, y: my }];
+    const queue = [start];
     const visited = new Set([startKey]);
     cameFrom.set(startKey, null);
 
-    const dirs = [
+    const directions = [
       [0, -1, 'up'],
       [0, 1, 'down'],
       [-1, 0, 'left'],
       [1, 0, 'right']
     ];
 
-    let reachedPlayer = false;
-    while (queue.length > 0 && !reachedPlayer) {
+    while (queue.length > 0) {
       const curr = queue.shift();
       const currKey = `${curr.x},${curr.y}`;
 
       if (currKey === playerKey) {
-        reachedPlayer = true;
-        break;
+        // Path found!
+        const path = [];
+        let step = playerKey;
+        while (step !== startKey) {
+          path.push(step);
+          step = cameFrom.get(step);
+        }
+        path.push(startKey);
+        path.reverse();
+
+        const nextKey = path[1]; // first move
+        const [nx, ny] = nextKey.split(',').map(Number);
+
+        const dirX = nx - mx;
+        const dirY = ny - my;
+        let direction = 'down';
+        if (dirY === -1) direction = 'up';
+        else if (dirY === 1) direction = 'down';
+        else if (dirX === -1) direction = 'left';
+        else if (dirX === 1) direction = 'right';
+
+        return { x: nx, y: ny, direction };
       }
 
-      for (const [dx, dy, dir] of dirs) {
+      for (const [dx, dy] of directions) {
         const nx = curr.x + dx;
         const ny = curr.y + dy;
         const nKey = `${nx},${ny}`;
 
+        // Bounds check
         if (nx < 0 || nx >= gridCols || ny < 0 || ny >= gridRows) continue;
         if (visited.has(nKey)) continue;
+
+        // Restricted tiles (walls, trees, etc.)
         if (restrictedTiles.has(nKey)) continue;
 
-        const obj = objects[nKey];
-        let walkable = false;
-        if (!obj) {
-          walkable = true;
-        } else if (obj === 'spiderweb' || obj === 'gold' || obj.startsWith('portal-to-')) {
-          walkable = true;
-        } else {
-          const objType = monsterTypes[obj];
-          if (objType && isMonster(objType)) {
-            walkable = true;
-          }
+        const occupant = objects[nKey];
+
+        // === BLOCKED IF: another monster is standing there ===
+        const occupantType = occupant && monsterTypes[occupant];
+        if (occupantType && isMonster(occupantType)) {
+          continue; // monsters block each other → no swapping!
         }
 
-        if (nKey === playerKey) walkable = true;
-        if (!walkable) continue;
+        // Walkable static objects
+        const walkableStatic = !occupant ||
+          occupant === 'spiderweb' ||
+          occupant === 'gold' ||
+          occupant.startsWith('portal-to-');
 
-        visited.add(nKey);
-        queue.push({ x: nx, y: ny });
-        cameFrom.set(nKey, currKey);
+        // Player tile is always "walkable" for pathfinding (we stop before stepping on player)
+        const isPlayerTile = nKey === playerKey;
+
+        if (walkableStatic || isPlayerTile) {
+          visited.add(nKey);
+          queue.push({ x: nx, y: ny });
+          cameFrom.set(nKey, currKey);
+        }
       }
     }
 
-    if (!cameFrom.has(playerKey)) return null;
-
-    const path = [];
-    let current = playerKey;
-    while (current !== startKey) {
-      path.push(current);
-      current = cameFrom.get(current);
-      if (!current) return null;
-    }
-    path.push(startKey);
-    path.reverse();
-
-    const pathDist = path.length - 1;
-    if (pathDist > maxChaseDistance || pathDist <= 1) return null;
-
-    const nextKey = path[1];
-    const [nextX, nextY] = nextKey.split(',').map(Number);
-
-    // Determine direction from current -> next
-    const dirX = nextX - mx;
-    const dirY = nextY - my;
-    let direction = null;
-    if (dirY === -1) direction = 'up';
-    else if (dirY === 1) direction = 'down';
-    else if (dirX === -1) direction = 'left';
-    else if (dirX === 1) direction = 'right';
-
-    return { x: nextX, y: nextY, direction };
+    return null; // no path
   }, []);
 
+  // =================================================================
+  // Main game loop: move monsters every 500ms
+  // =================================================================
   useEffect(() => {
     let lastMoveTime = 0;
-    const MOVE_INTERVAL = 500;
+    const MOVE_INTERVAL = 500; // ms
 
     const unsubscribe = subscribe((delta, time) => {
       if (time - lastMoveTime < MOVE_INTERVAL) return;
@@ -187,60 +208,62 @@ const MonsterMovement = ({
         onObjectsChange,
         monsterMoveDirectionRef,
         monsterMoveTriggerRef,
-        forceMonsterUpdate,
+        forceMonsterUpdate
       } = refs.current;
 
-      const monsters = [];
-      Object.entries(objects).forEach(([key, monsterId]) => {
-        const type = monsterTypes[monsterId];
-        if (isMonster(type)) {
+      // Collect all alive monsters
+      const monsters = Object.entries(objects)
+        .map(([key, id]) => {
+          const type = monsterTypes[id];
+          if (!type || !isMonster(type)) return null;
           const [x, y] = key.split(',').map(Number);
-          const health = globalMonsterHealths[monsterId] ?? 100;
-          if (health > 0) {
-            monsters.push({ key, monsterId, type, x, y });
-          }
-        }
-      });
+          if ((globalMonsterHealths[id] ?? 0) <= 0) return null;
+          return { key, id, type, x, y };
+        })
+        .filter(Boolean);
 
       if (monsters.length === 0) return;
 
       const newObjects = { ...objects };
       let anyMove = false;
 
-      for (const { key, monsterId, type, x, y } of monsters) {
-        const result = getBestMove(x, y, type);
-        if (!result) continue;
+      for (const { key, id, type, x, y } of monsters) {
+        const move = getBestMove(x, y, type);
+        if (!move) continue;
 
-        const { x: toX, y: toY, direction } = result;
+        const { x: toX, y: toY, direction } = move;
         const toKey = `${toX},${toY}`;
 
-        // SET DIRECTION + TRIGGER RENDER
+        // === Update animation direction & trigger flip ===
         if (direction && monsterMoveDirectionRef.current) {
-          monsterMoveDirectionRef.current[monsterId] = direction;
+          monsterMoveDirectionRef.current[id] = direction;
           monsterMoveTriggerRef.current += 1;
-          forceMonsterUpdate();
+          forceMonsterUpdate?.();
         }
 
+        // === FINAL MOVE CHECK (still valid?) ===
         const occupant = newObjects[toKey];
-        if (occupant && isMonster(monsterTypes[occupant])) {
-          newObjects[key] = occupant;
-          newObjects[toKey] = monsterId;
-          anyMove = true;
-        } 
-        else if (
-          toX >= 0 && toX < columns &&
-          toY >= 0 && toY < rows &&
-          !restrictedTiles.has(toKey) &&
-          !(toX === playerPos.x && toY === playerPos.y) &&
-          (!newObjects[toKey] || 
-           newObjects[toKey] === 'spiderweb' || 
-           newObjects[toKey] === 'gold' || 
-           newObjects[toKey].startsWith('portal-to-'))
-        ) {
-          delete newObjects[key];
-          newObjects[toKey] = monsterId;
-          anyMove = true;
-        }
+        const occupantIsMonster = occupant && isMonster(monsterTypes[occupant]);
+
+        // Block move if another monster is there (prevents swapping)
+        if (occupantIsMonster) continue;
+
+        // Player tile → don't step on player (attack handled elsewhere)
+        if (toX === playerPos.x && toY === playerPos.y) continue;
+
+        // Must be empty or walkable static object
+        const targetIsWalkable =
+          !occupant ||
+          occupant === 'spiderweb' ||
+          occupant === 'gold' ||
+          occupant.startsWith('portal-to-');
+
+        if (!targetIsWalkable) continue;
+
+        // === PERFORM MOVE ===
+        delete newObjects[key];
+        newObjects[toKey] = id;
+        anyMove = true;
       }
 
       if (anyMove) {
@@ -251,7 +274,7 @@ const MonsterMovement = ({
     return unsubscribe;
   }, [getBestMove]);
 
-  return null;
+  return null; // renderless component
 };
 
 export default MonsterMovement;

@@ -81,7 +81,6 @@ data-player="true"            // 🔥 Alternative selector
       top: '50.5%',
       width: `${tileSize}px`,
       height: `${tileSize}px`,
-      position: 'absolute',
       pointerEvents: 'none',
       // zIndex: 1000,
     }}

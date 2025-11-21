@@ -7,6 +7,13 @@ export const OBJECT_DATA = {
     height: 0,
     // image: '/assets/objects/tree.png',   // optional PNG
   },
+    boulder: {
+    emoji: 'tree',
+    size: 'medium',
+    scale: 1.2,
+    height: 0,
+    image: '/ownemojis/boulder.webp',   // optional PNG
+  },
   evergreenobject: {
     emoji: 'evergreen',
     size: 'medium',
