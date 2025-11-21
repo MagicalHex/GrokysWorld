@@ -27,8 +27,11 @@ const StaticObjectLayer = memo(({
         const x = Number(xs), y = Number(ys);
         if (x < startX || x > endX || y < startY || y > endY) return null;
 
-        const type = typeof raw === 'string' ? raw : raw.type;
-        const cfg = objectTypes[type];
+const type = typeof raw === 'string' ? raw : raw.type;
+const cfg = { 
+  ...objectTypes[type], 
+  ...(typeof raw === 'object' ? raw : {})   // overrides win
+};
         if (!cfg) return null;
 
         return { id: key, x, y, cfg };
@@ -75,17 +78,34 @@ const StaticObjectLayer = memo(({
             }}
           >
             {hasImg ? (
-              <img
-                src={cfg.image}
-                alt=""
-                style={{
-                  width: `${100 * (cfg.scale ?? 1)}%`,
-                  height: `${100 * (cfg.scale ?? 1)}%`,
-                  imageRendering: 'pixelated',
-                  transform: cfg.size === 'large' ? 'translate(5%, 40%)' : 'translate(0, 0)',
-                  filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-                }}
-              />
+<img
+  src={cfg.image}
+  alt=""
+  draggable={false}
+  style={{
+    width: `${100 * (cfg.scale ?? 1)}%`,
+    height: `${100 * (cfg.scale ?? 1)}%`,
+    imageRendering: 'pixelated',
+
+    // ← DELETE the old transform line completely!
+    // ← Use ONLY this new one:
+
+    transform: `
+      translate(${cfg.offsetX || 0}px, ${cfg.offsetY || 0}px)
+      ${cfg.flipH ? 'scaleX(-1)' : ''}
+      ${cfg.flipV ? 'scaleY(-1)' : ''}
+      rotateX(${cfg.rotateX || 0}deg)
+      rotate(${cfg.rotate || 0}deg)
+      rotateY(${cfg.rotateY || 0}deg)
+      rotateZ(${cfg.rotateZ || 0}deg)
+    `.trim().replace(/\s+/g, ' '),
+
+    transformOrigin: 'center bottom',
+
+    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.7))',
+    opacity: cfg.opacity ?? 1,
+  }}
+/>
             ) : emoji ? (
               <div
                 style={{

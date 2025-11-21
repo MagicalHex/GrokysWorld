@@ -940,32 +940,154 @@ const generateSurvivalLevel = () => {
   const grid = Array(ROWS).fill().map(() => Array(COLS).fill('stonefloor'));
 
 const staticObjects = {
+  // Boulders — natural obstacles & cover
   '5,14': 'boulder',
   '12,3': 'boulder',
   '9,7': 'boulder',
   '2,11': 'boulder',
   '14,9': 'boulder',
+  '18,4': 'boulder',
+  '22,19': 'boulder',
+  '3,21': 'boulder',
+  '17,24': 'boulder',
+  '25,10': 'boulder',
 
+  // Dead trees — twisted forest remnants
   '3,4': 'deadtree1',
   '11,13': 'deadtree1',
   '7,2': 'deadtree1',
+  '19,8': 'deadtree1',
+  '4,17': 'deadtree1',
+  '23,6': 'deadtree1',
 
-  '1,8': 'deadtree',
-  '15,5': 'deadtree',
-  '6,15': 'deadtree',
-  '10,1': 'deadtree',
+  '1,8': 'deadtree2',
+  '15,5': 'deadtree2',
+  '6,15': 'deadtree2',
+  '10,1': 'deadtree2',
+  '21,22': 'deadtree2',
+  '2,24': 'deadtree2',
+  '13,25': 'deadtree2',
+  '20,2': 'deadtree2',
 
-  '4,8': 'wallruin'
+  // Wall ruins — ancient crumbling walls (clusters feel intentional)
+  '15,8': 'wallruin',
+  '16,8': 'wallruin',
+  '19,8': 'wallruin',
+  '15,12': 'wallruin',
+  '16,12': 'wallruin',
+  '20,12': 'wallruin',
+
+  '3,6': 'wallruin',
+  '4,6': 'wallruin',
+  '7,6': 'wallruin',
+  '8,6': 'wallruin',
+
+  // Skull piles & bone decorations
+  '5,5': 'skullobject',
+  '8,18': 'skullobject',
+  '14,20': 'skullobject',
+  '24,14': 'skullobject',
+  '10,22': 'skullobject',
+
+  // Sacrificial altars
+  '5,10': 'deadaltar',
+  '18,15': 'deadaltar',
+  '9,3': 'deadaltar',
+
+  // Ominous obelisks & monoliths
+  '12,12': 'obeliskstone',
+  '3,13': 'obeliskstone',
+  '22,11': 'obeliskstone',
+  '16,23': 'obeliskstone'
 };
 
-  const survivalWaves = {
-    wave1: { '3,3': 'skeleton1', '4,4': 'skeleton1', '5,15': 'skeleton1' },
-    wave2: { '2,1': 'skeleton1', '3,1': 'skeleton1', '4,1': 'skeleton1', '5,1': 'skeleton1' },
-    wave3: { '1,1': 'skeleton1', '3,15': 'skeleton1', '10,3': 'skeleton1', '12,12': 'skeleton1', '14,5': 'skeleton1' },
-    wave4: { '20,1': 'swamptroll', '20,15': 'swamptroll', '20,3': 'swamptroll', '20,12': 'swamptroll', '20,5': 'swamptroll' },
-    wave5: { '1,3': 'skeleton1', '3,10': 'skeleton1', '10,10': 'swamptroll', '12,12': 'skeleton1', '14,10': 'swamptroll' },
-    wave6: { '1,5': 'skeleton1', '3,14': 'swamptroll', '10,2': 'skeleton1', '12,1': 'skeleton1', '8,8': 'swamptroll' },
-  };
+const survivalWaves = {
+  wave1: {
+    '5,6': 'skeleton1',
+    '5,11': 'skeleton1',
+  },
+  wave2: {
+    '10,20': 'skeleton1',
+    '12,15': 'skeleton1',
+    '3,10': 'skeleton1',
+    '1,5': 'skeleton1'
+  },
+  wave3: {
+    '20,20': 'skeleton1',
+    '8,7': 'skeleton1',
+    '15,8': 'skeleton1',
+    '5,9': 'skeleton1',
+    '11,5': 'skeleton1',
+    '17,10': 'skeleton1',
+  },
+  wave4: {
+    '3,4': 'swamptroll',
+    '8,20': 'swamptroll',
+    '19,6': 'swamptroll',
+    '22,12': 'swamptroll',
+    '10,22': 'swamptroll',
+    '9,16': 'skeleton1',
+    '13,15': 'skeleton1',
+    '6,13': 'skeleton1'
+  },
+  wave5: {
+    '2,8': 'skeleton1',
+    '7,3': 'skeleton1',
+    '18,14': 'skeleton1',
+    '24,18': 'swamptroll',
+    '12,24': 'swamptroll',
+    '5,16': 'skeleton1'
+  },
+  wave6: {
+    '1,5': 'swamptroll',
+    '9,2': 'skeleton1',
+    '20,23': 'swamptroll',
+    '15,3': 'skeleton1',
+    '23,8': 'swamptroll',
+    '4,18': 'skeleton1'
+  },
+  wave7: {
+    '25,10': 'swamptroll',
+    '3,22': 'skeleton1',
+    '11,1': 'skeleton1',
+    '19,25': 'swamptroll',
+    '6,4': 'swamptroll',
+    '21,3': 'skeleton1',
+    '14,21': 'skeleton1'
+  },
+  wave8: {
+    '2,14': 'swamptroll',
+    '10,25': 'swamptroll',
+    '24,5': 'swamptroll',
+    '5,2': 'skeleton1',
+    '18,20': 'swamptroll',
+    '22,2': 'skeleton1',
+    '8,23': 'swamptroll'
+  },
+  wave9: {
+    '1,15': 'swamptroll',
+    '13,3': 'swamptroll',
+    '25,20': 'swamptroll',
+    '4,25': 'skeleton1',
+    '20,4': 'swamptroll',
+    '9,19': 'skeleton1',
+    '16,24': 'swamptroll',
+    '7,1': 'skeleton1'
+  },
+  wave10: {
+    '3,13': 'swamptroll',
+    '11,23': 'swamptroll',
+    '23,11': 'swamptroll',
+    '5,7': 'swamptroll',
+    '19,16': 'swamptroll',
+    '14,25': 'swamptroll',
+    '25,6': 'skeleton1',
+    '2,19': 'swamptroll',
+    '17,4': 'skeleton1',
+    '8,17': 'swamptroll',
+    '21,22': 'skeleton1'
+  }
+};
 
   const initialWave = survivalWaves.wave1;
 
