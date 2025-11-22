@@ -48,7 +48,8 @@ const cfg = {
 
       const el = refs.current.get(o.id);
       if (el) {
-        el.style.transform = `translate(${dx}px, ${dy}px)`;  // NO OFFSET!
+el.style.transform = `translate3d(${dx}px, ${dy}px, 0px)`;
+el.style.transform += ' translateZ(0)'; // force GPU layer
       }
     });
   });
@@ -71,7 +72,7 @@ const cfg = {
               position: 'absolute',
               width: tileSize,
               height: tileSize,
-              transition: 'transform 0.08s ease-out',
+              transition: 'transform 0.2s ease-out',
               opacity: 0,
               animation: 'fadeIn 0.3s ease-out forwards',
               pointerEvents: 'none',

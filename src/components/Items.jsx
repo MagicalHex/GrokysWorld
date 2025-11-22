@@ -131,7 +131,7 @@ fireball: {
   description: '8 AOE fire damage',
   rarity: 'rare',
   stats: {
-    damage: { min: 8, max: 8 },
+    damage: { min: 10, max: 50 },
     range: 10,
     aoeRadius: 2.5,
     isAOE: true,
@@ -143,7 +143,7 @@ iceball: {
   name: 'Ice Nova',
     description: '8 AOE ice damage',
   stats: {
-    damage: { min: 8, max: 8 },
+    damage: { min: 10, max: 50 },
     range: 10,
     aoeRadius: 2.5,
     isAOE: true,
@@ -155,7 +155,7 @@ windball: {
   name: 'Windblast',
     description: '8 AOE wind damage',
   stats: {
-    damage: { min: 8, max: 8 },
+    damage: { min: 10, max: 50 },
     range: 10,
     aoeRadius: 2.5,
     isAOE: true,

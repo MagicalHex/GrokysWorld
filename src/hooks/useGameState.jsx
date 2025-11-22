@@ -945,7 +945,7 @@ const staticObjects = {
   '12,3': 'boulder',
   '9,7': 'boulder',
   '2,11': 'boulder',
-  '14,9': 'boulder',
+  // '14,9': 'boulder',
   '18,4': 'boulder',
   '22,19': 'boulder',
   '3,21': 'boulder',
@@ -970,17 +970,11 @@ const staticObjects = {
   '20,2': 'deadtree2',
 
   // Wall ruins — ancient crumbling walls (clusters feel intentional)
-  '15,8': 'wallruin',
-  '16,8': 'wallruin',
-  '19,8': 'wallruin',
-  '15,12': 'wallruin',
-  '16,12': 'wallruin',
-  '20,12': 'wallruin',
-
-  '3,6': 'wallruin',
-  '4,6': 'wallruin',
-  '7,6': 'wallruin',
-  '8,6': 'wallruin',
+  // '10,6': 'wallruin',
+  '14,8': 'wallruin',
+  '18,8': 'wallruin',
+  '14,14': 'wallruin',
+  '18,14': 'wallruin',
 
   // Skull piles & bone decorations
   '5,5': 'skullobject',
@@ -991,11 +985,11 @@ const staticObjects = {
 
   // Sacrificial altars
   '5,10': 'deadaltar',
-  '18,15': 'deadaltar',
+  // '18,15': 'deadaltar',
   '9,3': 'deadaltar',
 
   // Ominous obelisks & monoliths
-  '12,12': 'obeliskstone',
+  // '12,12': 'obeliskstone',
   '3,13': 'obeliskstone',
   '22,11': 'obeliskstone',
   '16,23': 'obeliskstone'
@@ -1086,6 +1080,13 @@ const survivalWaves = {
     '17,4': 'skeleton1',
     '8,17': 'swamptroll',
     '21,22': 'skeleton1'
+  },
+  wave11: {
+    '5,6': 'deadshriek'
+  },
+    wave12: {
+    '1,1': 'deadshriek',
+    '5,20': 'deadshriek'
   }
 };
 

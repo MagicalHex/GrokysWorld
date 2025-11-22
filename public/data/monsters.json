@@ -44,7 +44,8 @@
     "loot": [
       { "id": "fireball", "chance": 0.5 },
             { "id": "iceball", "chance": 1.0 },
-                  { "id": "windball", "chance": 1.0 },
+                              { "id": "bow", "chance": 1.0 },
+                  { "id": "windball", "chance": 0.5 },
       { "id": "knights-armor", "chance": 0.2 },
       { "id": "short-sword", "chance": 0.1 }
     ]
@@ -171,7 +172,17 @@
     "name": "DEAD SHRIEK",
     "xp": [500, 750],
     "damage": { "min": 15, "max": 70 },
-    "range": 4,
+    "image": "/ownemojis/deadshriek.webp",
+        "images": {
+      "up": "/ownemojis/deadshriekup.webp",
+      "down": "/ownemojis/deadshriekfront.webp",
+      "left": "/ownemojis/deadshriekleft.webp",
+      "right": "/ownemojis/deadshriekright.webp"
+    },
+        "range": 3,
+    "scale": 1.5,
+    "nameHeightPosition": "high",
+    "nameWidthPosition": "right",
     "loot": [
       { "id": "gold", "chance": 1.0, "min": 10, "max": 15 },
       { "id": "knights-armor", "chance": 0.8 },

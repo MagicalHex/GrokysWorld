@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const WALKABLE_OBJECTS = new Set(['spiderweb','unlockeddoorobject', 'woodobject', 'rockobject', 'gold', 'angel', 'dove',
-  'campfirebenchobject_right', 'campfirebenchobject_left', 'campfirebenchobject_bottom', 'campfirebenchobject_top', 'knights-armor',
-   'dark-armor', 'short-sword', 'bow', 'crossbow', 'fireball', 'windball', 'iceball'
+const WALKABLE_OBJECTS = new Set([
+  'spiderweb','unlockeddoorobject','woodobject','rockobject','gold','angel','dove',
+  'campfirebenchobject_right','campfirebenchobject_left','campfirebenchobject_bottom','campfirebenchobject_top',
+  'knights-armor','dark-armor','short-sword','bow','crossbow','fireball','windball','iceball'
 ]);
 
 const PlayerMovement = ({
@@ -17,65 +18,69 @@ const PlayerMovement = ({
   onLevelChange,
   onStartInteraction,
   onCancelInteraction,
-  interactionActive,        // <-- lock flag
-  interactionType,   // NEW: 'chop' | 'talk' | null
+  interactionActive,
+  interactionType,
   CHOPPABLE_OBJECTS,
   TALKABLE_OBJECTS,
   OPENABLE_OBJECTS,
   isDead,
-  setMoveDirection
+  setMoveDirection,
+  tileSize = 64
 }) => {
   const [canMove, setCanMove] = useState(true);
-  const moveDelay = 300;
+  const moveDelay = 160;
+
+  // Shared animation state (read this from CanvasGrid via ref)
+  const moveAnim = useRef({ progress: 0, direction: 'down' }).current;
+
+  // Simple 160ms slide animation
+  useEffect(() => {
+    if (moveAnim.progress <= 0) return;
+    const start = Date.now();
+    const duration = 160;
+
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      moveAnim.progress = Math.max(0, 1 - elapsed / duration);
+      if (moveAnim.progress > 0) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [moveAnim.progress]);
 
   useEffect(() => {
     const handleKey = (e) => {
       if (!canMove || !playerPos || isDead) return;
 
-      // LOG LOCK STATE
-      console.log('[PlayerMovement] active:', interactionActive, 'type:', interactionType);
-      if (e.code === 'ControlRight') {
-        // Allow Right Ctrl to pass through to PlayerInventory
+      if (interactionActive && interactionType === 'talk') {
+        if (e.key === ' ') { e.preventDefault(); onExit(); }
         return;
       }
-      // === TALKING: FULL LOCK (except SPACE) ===
-      if (interactionActive && interactionType === 'talk') {
-        if (e.key === ' ') {
-          e.preventDefault();
-          onExit();
-        }
-        return; // ← NO cancel, NO move
-      }
 
-      // ---- TRY TO MOVE → cancel any pending interaction first ----
       if (onCancelInteraction) onCancelInteraction();
 
-let newPos = { ...playerPos };
-let direction = null;  // ← track direction, pass it to PlayMode to render movement smoothly
+      let newPos = { ...playerPos };
+      let dir = null;
 
-if (e.key === 'ArrowUp'    && playerPos.y > 0)          { newPos.y -= 1; direction = 'up'; }
-else if (e.key === 'ArrowDown'  && playerPos.y < rows-1) { newPos.y += 1; direction = 'down'; }
-else if (e.key === 'ArrowLeft'  && playerPos.x > 0)       { newPos.x -= 1; direction = 'left'; }
-else if (e.key === 'ArrowRight' && playerPos.x < columns-1) { newPos.x += 1; direction = 'right'; }
-else if (e.key === ' ') { e.preventDefault(); onExit(); return; }
-else return;
+      if (e.key === 'ArrowUp' && playerPos.y > 0)           { newPos.y -= 1; dir = 'up'; }
+      else if (e.key === 'ArrowDown' && playerPos.y < rows - 1) { newPos.y += 1; dir = 'down'; }
+      else if (e.key === 'ArrowLeft' && playerPos.x > 0)       { newPos.x -= 1; dir = 'left'; }
+      else if (e.key === 'ArrowRight' && playerPos.x < columns - 1) { newPos.x += 1; dir = 'right'; }
+      else if (e.key === ' ') { e.preventDefault(); onExit(); return; }
+      else return;
 
       const targetKey = `${newPos.x},${newPos.y}`;
       const targetObj = objects[targetKey];
 
-      // ---- BLOCKED? ----
       if (restrictedTiles.has(targetKey)) return;
 
-      // ---- INTERACT (chop / talk) ----
       const isChoppable = targetObj && CHOPPABLE_OBJECTS.has(targetObj);
       const isTalkable  = targetObj && TALKABLE_OBJECTS.has(targetObj);
-      const isOpenable = targetObj && OPENABLE_OBJECTS.has(targetObj);
+      const isOpenable  = targetObj && OPENABLE_OBJECTS.has(targetObj);
       if (isChoppable || isTalkable || isOpenable) {
         onStartInteraction(targetKey);
         return;
       }
 
-      // ---- WALKABLE ----
       const isWalkable = !targetObj || WALKABLE_OBJECTS.has(targetObj);
       const teleportMatch = targetObj?.match(/^(portal|rope|hole)-to-(\d+)$/);
       const isLegacyRope = targetObj === 'ropeobject';
@@ -83,15 +88,14 @@ else return;
 
       if (!isWalkable && !teleportMatch && !isLegacyRope && !isLegacyHole) return;
 
+      e.preventDefault();
       setCanMove(false);
+      moveAnim.progress = 1;                    // start slide
+      moveAnim.direction = dir || 'down';
+      setMoveDirection(dir || 'down');
       onPlayerMove(newPos);
 
-if (direction) {
-  console.log('SETTING DIRECTION:', direction);  // ← ADD THIS
-  setMoveDirection(direction);
-}
-
-      // === TELEPORT LOGIC ===
+      // TELEPORT LOGIC — FULLY BACK
       if (teleportMatch || isLegacyRope || isLegacyHole) {
         let level;
         let customSpawn = null;
@@ -113,14 +117,13 @@ if (direction) {
           const key = `${type}-${level}`;
           customSpawn = CUSTOM_SPAWNS[key] || null;
         } 
-        // FALLBACKS, SHOULD NOT BE USED
         else if (isLegacyRope) {
           level = 1;
           customSpawn = { x: 21, y: 14 };
         } 
         else if (isLegacyHole) {
           level = 5;
-          customSpawn = null;  // use default
+          customSpawn = null;
         }
 
         setTimeout(() => onLevelChange(level, customSpawn), 100);
@@ -132,9 +135,10 @@ if (direction) {
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [
-    playerPos, onPlayerMove, onExit, objects, restrictedTiles,
-    rows, columns, level, onLevelChange, onStartInteraction,
-    onCancelInteraction, interactionActive, canMove, CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS, setMoveDirection
+    playerPos, canMove, isDead, interactionActive, interactionType,
+    objects, restrictedTiles, rows, columns,
+    onPlayerMove, onExit, onStartInteraction, onCancelInteraction, onLevelChange, setMoveDirection,
+    CHOPPABLE_OBJECTS, TALKABLE_OBJECTS, OPENABLE_OBJECTS
   ]);
 
   return null;

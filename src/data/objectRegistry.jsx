@@ -53,8 +53,8 @@ boulder: {
     size: 'medium',
     scale: 0.8,
     image: '/ownemojis/skullobject.webp',
-    offsetX: 0,
-    offsetY: 0,
+    offsetX: 0, // negative = left
+    offsetY: 20, // negative = up
   },
   obeliskstone: {
     size: 'medium',
@@ -72,9 +72,9 @@ boulder: {
   },
 wallruin: {
   image: '/ownemojis/wall-ruin.webp',
-  scale: 1.3,
-  offsetY: -10,      // crucial! lift it way up so base touches ground
-  offsetX: -10,
+  scale: 1.7,
+    offsetX: -10,
+    offsetY: -40,
   rotateX: 0,       // ← this makes it stand upright!
   rotate: 0,         // or 90, 180, 270 for other directions
   lean: 12,          // optional ruin tilt

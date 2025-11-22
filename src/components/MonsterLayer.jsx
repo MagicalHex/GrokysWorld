@@ -213,7 +213,7 @@ const MonsterLayer = memo(
               width: tileSize,
               height: tileSize,
               // Smooth movement between world positions
-              transition: 'transform 0.1s ease-out',
+              transition: 'transform 0.2s ease-out',
               // Fade-in animation (no pop-in)
               opacity: 0,
               animation: 'fadeIn 0.3s ease-out forwards',

@@ -187,21 +187,27 @@ const drawElementalAOE = (ctx, aoe, progress, alpha, pulse) => {
     // Gets ctx from ref.
     useEffect(() => {
       let lastLog = 0; // For log
-      let raf;
-      const ctx = ctxRef.current;
-      if (!ctx || !grid) return;
+let raf;
+  let lastTime = 0;  // ← NEW: Track time for dt
+  const ctx = ctxRef.current;
+  if (!ctx || !grid) return;
 
       // SMOOTH CAMERA STATE
-  let smoothCam = { x: cameraRef.current.x, y: cameraRef.current.y };
-  const lerpFactor = 0.1; // 0.1 = smooth, 1.0 = instant
+let smoothCam = { x: cameraRef.current.x, y: cameraRef.current.y };
+  const lerpSpeed = 8; // 0.1 = smooth, 1.0 = instant
 
       // Defines a render function for the animation loop.
       // Clears the entire canvas before each frame to erase previous drawings.
-      const render = () => {
-        // Update smooth camera
+const render = (currentTime = 0) => {
+// Calc dt (frame time in seconds)
+    const dt = lastTime ? (currentTime - lastTime) / 1000 : 0.016;  // Fallback to 60fps
+    lastTime = currentTime;
+
+    // Time-based lerp: alpha = 1 - e^(-speed * dt) → consistent chase speed
     const target = cameraRef.current;
-    smoothCam.x += (target.x - smoothCam.x) * lerpFactor;
-    smoothCam.y += (target.y - smoothCam.y) * lerpFactor;
+    const alpha = 1 - Math.exp(-lerpSpeed * dt);  // Exponential smoothing magic
+    smoothCam.x += (target.x - smoothCam.x) * alpha;
+    smoothCam.y += (target.y - smoothCam.y) * alpha;
 
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 

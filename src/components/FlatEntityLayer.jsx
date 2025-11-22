@@ -43,8 +43,8 @@ const FlatEntityLayer = ({
         worldToScreen={worldToScreen} // Pass if needed for positioning
         // For monster image switching when moving
         monsterMoveDirectionRef={monsterMoveDirectionRef}
-  monsterMoveTrigger={monsterMoveTriggerRef.current}
-  forceMonsterUpdate={forceMonsterUpdate}
+        monsterMoveTrigger={monsterMoveTriggerRef.current}
+        forceMonsterUpdate={forceMonsterUpdate}
       />
       {/* 🔥 OBJECTS — Direct siblings of Player */}
       <StaticObjectLayer
