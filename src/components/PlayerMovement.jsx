@@ -25,7 +25,7 @@ const PlayerMovement = ({
   OPENABLE_OBJECTS,
   isDead,
   setMoveDirection,
-  tileSize = 64
+  // tileSize = 64
 }) => {
   const [canMove, setCanMove] = useState(true);
   const moveDelay = 160;

@@ -51,7 +51,7 @@ opacity: 0;
   opacity: 0;
   font-size: 35px;
   /* animation: npc-bob 2.5s ease-in-out infinite; */
-  background: url('/ownemojis/player-image.webp') center/contain no-repeat;
+  /* background: url('/ownemojis/player-image.webp') center/contain no-repeat; */
   filter: drop-shadow(0px 0px 4px rgb(255, 223, 43));
   text-shadow: 1px 1px 6px black;
 }
@@ -61,24 +61,6 @@ opacity: 0;
   opacity: 1;
   /* animation: npc-bob 2.5s ease-in-out infinite; */
 }
-
-/* Directional entry animations */
-.player-container.enter-from-left {
-  /* animation: enterFromLeft 0.28s ease-out forwards; */
-}
-
-.player-container.enter-from-right {
-  /* animation: enterFromRight 0.28s ease-out forwards; */
-}
-
-.player-container.enter-from-down {
-  /* animation: enterFromTop 0.28s ease-out forwards; */
-}
-
-.player-container.enter-from-up {
-  /* animation: enterFromBottom 0.28s ease-out forwards; */
-}
-
 /* Keyframes */
 @keyframes enterFromLeft {
   from {
@@ -124,7 +106,15 @@ opacity: 0;
   }
 }
 
+
 @keyframes npc-bob {
   0%, 100% { transform: translate(-50%, -50%) translateY(0); }
   50% { transform: translate(-50%, -50%) translateY(-6px); }
+}
+
+.player-sprite-mirror {
+  position: absolute;
+  inset: 0;
+  background: center/contain no-repeat;
+  pointer-events: none;
 }
