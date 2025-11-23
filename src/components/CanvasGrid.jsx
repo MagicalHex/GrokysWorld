@@ -239,13 +239,19 @@ const tilesAcross = Math.ceil(canvasRef.current.width / tileSize) + 2;
 const playerX = smoothCam.x;
     const playerY = smoothCam.y;
 
+        // ─────── SURVIVAL 30×30 HARD BOUNDARY (BEST HACK EVER) ───────
+        const isSurvival = grid[0]?.[0] === 'survivalfloor';  // magic detection
+        const maxX = isSurvival ? 29 : columns - 1;
+        const maxY = isSurvival ? 29 : rows - 1;
+
         // Computes the visible grid bounds centered on the player.
         // Clamps to grid edges (0 to columns-1, etc.) to avoid out-of-bounds.
         // Uses Math.floor for integer coords.
         const startX = Math.max(0, Math.floor(playerX - tilesAcross / 2));
-        const endX = Math.min(columns - 1, Math.floor(playerX + tilesAcross / 2));
         const startY = Math.max(0, Math.floor(playerY - tilesDown / 2));
-        const endY = Math.min(rows - 1, Math.floor(playerY + tilesDown / 2));
+        const endX   = Math.min(maxX, Math.floor(playerX + tilesAcross / 2));
+        const endY   = Math.min(maxY, Math.floor(playerY + tilesDown / 2));
+        // ─────────────────────────────────────────────────────────────
 
 // THROTTLED LOGS
     // const now = performance.now();
@@ -323,7 +329,7 @@ groundTiles.forEach(({ screen, x, y }) => {
     ctx.fill();
   }
   // ────── SIMPLIFIED STONE (2 layers → PERFECT!) ──────
-  else if (terrain === 'stonefloor') {
+else if (terrain === 'stonefloor' || terrain === 'survivalfloor') {
     // Base layer (dark gray)
     ctx.fillStyle = `rgba(64, 64, 68, ${fade * 0.9})`;
     ctx.beginPath();

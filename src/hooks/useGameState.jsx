@@ -10,10 +10,13 @@ import { ITEMS } from '../components/Items.jsx';
 // const ROWS = 16;
 // const COLS = 24;
 
-// NEW 
+// STORY AND DEFAULT
 const COLS = 50;
 const ROWS = 50;
 const TILE_SIZE = 48;
+// SURVIVAL
+const SURVIVAL_ROWS = 30;
+const SURVIVAL_COLS = 30;
 
 const PORTAL_ENTRY_POINTS = { 
   1: { x: 1, y: 1 }, // Town
@@ -937,7 +940,7 @@ const generateTownLevel = () => {
 // 4. Survival Level Generator (clean component)
 // ──────────────────────────────────────────────────────────────
 const generateSurvivalLevel = () => {
-  const grid = Array(ROWS).fill().map(() => Array(COLS).fill('stonefloor'));
+  const grid = Array(SURVIVAL_ROWS).fill().map(() => Array(SURVIVAL_COLS).fill('survivalfloor'));
 
 const staticObjects = {
   // Boulders — natural obstacles & cover
@@ -1095,20 +1098,27 @@ const survivalWaves = {
   const level = buildLevel({
     levelId: LEVEL_IDS.SURVIVAL,
     name: 'Survival Mode - Wave 1',
-    gridType: 'stonefloor',
+    gridType: 'survivalfloor',
     staticObjects,
     monsterSpawns: initialWave,
-    playerPos: { x: 11, y: 8 },
+    playerPos: { x: 16, y: 16 },
     background: 'survivalmap.webp',
-    extraData: {
+extraData: {
       survivalWaves,
-      currentWave: 1
+      currentWave: 1,
+      rows: SURVIVAL_ROWS,     // pass the real size
+      cols: SURVIVAL_COLS
     }
   });
 
-  // Attach wave data
+// Attach wave data
   level.survivalWaves = survivalWaves;
   level.currentWave = 1;
+
+  // Override the grid size that buildLevel created (it used ROWS/COLS)
+  level.grid = grid;                     // ← 30×30 grid
+  level.rows = SURVIVAL_ROWS;
+  level.cols = SURVIVAL_COLS;
 
   return level;
 };
@@ -1124,9 +1134,11 @@ const buildLevel = ({
   monsterSpawns = {},
   playerPos,
   background,
-  extraData = {}
+  extraData = {},
+  rows = ROWS,       // ← new optional params
+  cols = COLS
 }) => {
-  const grid = Array(ROWS).fill().map(() => Array(COLS).fill(gridType));
+const grid = Array(rows).fill().map(() => Array(cols).fill(gridType));
   const objects = { ...staticObjects };
 
   Object.entries(monsterSpawns).forEach(([coord, type]) => {
@@ -1147,7 +1159,7 @@ const buildLevel = ({
   });
 
   return {
-    name,
+name,
     grid,
     objects,
     staticObjects,
@@ -1155,7 +1167,9 @@ const buildLevel = ({
     playerPos,
     objectTypes: OBJECT_DATA,
     background,
-    respawnQueue: [],           // ← Important! Always initialize
+    rows,     // expose real dimensions
+    cols,
+    respawnQueue: [],
     ...extraData
   };
 };
