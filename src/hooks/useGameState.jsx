@@ -1222,6 +1222,7 @@ useEffect(() => {
     currentLevel,
     currentLevelData,
     restrictedTiles,
+    // We use 'currentLevelData.rows/cols' to let level decide amount of rows/cols (50x50 or 30x30)
 rows: currentLevelData?.rows ?? ROWS,
   columns: currentLevelData?.cols ?? COLS,
     TILE_SIZE: TILE_SIZE,

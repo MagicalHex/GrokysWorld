@@ -454,7 +454,8 @@ useEffect(() => {
           <div className="death-message">
             <h1>You Died</h1>
             <p>Your adventure ends here...</p>
-            <button onClick={respawnPlayer}>Respawn</button>
+            {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
+            <button onClick={() => window.location.reload()}>Restart</button>
           </div>
         </div>
       )}
