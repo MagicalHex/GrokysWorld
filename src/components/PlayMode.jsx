@@ -79,7 +79,12 @@ const PlayMode = ({
   onHealPopupFinish,
   lastDamageTime,
   setLastDamageTime,
-  camera
+  camera,
+  // for survival
+currentSurvivalWave,
+  survivalFinalScore,
+  survivalHighScore,
+  getSurvivalTimeFormatted,
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -449,16 +454,49 @@ useEffect(() => {
       />
 
       {/* ---------- DEATH SCREEN ---------- */}
-      {isDead && (
-        <div className="death-screen">
-          <div className="death-message">
-            <h1>You Died</h1>
-            <p>Your adventure ends here...</p>
-            {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
-            <button onClick={() => window.location.reload()}>Restart</button>
+
+
+{/* UPGRADED DEATH SCREEN */}
+{isDead && (
+  <div className="death-screen">
+    <div className="death-message">
+      <h1>You Died</h1>
+
+      {currentLevel === 'survival' ? (
+        <div className="survival-death-stats">
+          <div className="stat">
+            <span className="label">Final Wave </span>
+            <span className="value">{currentSurvivalWave}</span>
+          </div>
+          <div className="stat">
+            <span className="label">Time Survived: </span>
+            <span className="value">{getSurvivalTimeFormatted()}</span>
+          </div>
+          <div className="stat score">
+            <span className="label">Final Score: </span>
+            <span className="value">{survivalFinalScore?.toLocaleString() || '0'}</span>
+          </div>
+
+          {survivalFinalScore > survivalHighScore && (
+            <div className="new-record">NEW PERSONAL BEST!</div>
+          )}
+
+          <div className="highscore-note">
+            Best: {survivalHighScore.toLocaleString()}
           </div>
         </div>
+      ) : (
+        <p>Your adventure ends here...</p>
       )}
+
+      <div className="death-buttons">
+        <button onClick={() => window.location.reload()}>Play Again</button>
+        <button onClick={() => onExit()}>Main Menu</button>
+                    {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ---------- GRID ---------- */}
 <CanvasGrid
@@ -558,6 +596,21 @@ fireballCastTrigger={fireballCastTrigger}
   activeQuests={activeQuests}
   setActiveQuests={setActiveQuests}
       />
+      {/* SURVIVAL HUD — STICKY BOTTOM CENTER, ON TOP OF EVERYTHING */}
+      {currentLevel === 'survival' && !isDead && (
+        <div className="survival-hud-overlay">
+          <div className="hud-content">
+            <div className="hud-item wave">
+              <span className="label">WAVE</span>
+              <span className="value">{currentSurvivalWave}</span>
+            </div>
+            <div className="hud-item timer">
+              <span className="label">TIME</span>
+              <span className="value">{getSurvivalTimeFormatted()}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
     {/* COOLDOWN / CHARGE BAR */}
 <CooldownBar 

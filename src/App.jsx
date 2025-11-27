@@ -93,7 +93,13 @@ function App() {
     lastDamageTime,
     setLastDamageTime,
     PORTAL_ENTRY_POINTS,
-    camera
+    camera,
+    // for survival scores
+currentSurvivalWave,
+  survivalFinalScore,
+  survivalHighScore,
+  getSurvivalTimeFormatted,  // ← renamed for clarity
+  survivalElapsedTime,
   } = game;
 
 // ------------------------------------------------------------------ //
@@ -185,6 +191,12 @@ useEffect(() => {
         lastDamageTime={lastDamageTime}
         setLastDamageTime={setLastDamageTime}
         camera={camera}
+// for survival
+currentSurvivalWave={currentSurvivalWave}
+  survivalFinalScore={survivalFinalScore}
+  survivalHighScore={survivalHighScore}
+  getSurvivalTimeFormatted={getSurvivalTimeFormatted}  // ← correct name
+  survivalElapsedTime={survivalElapsedTime}
       />
     );
   }

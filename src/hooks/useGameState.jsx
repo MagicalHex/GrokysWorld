@@ -113,6 +113,26 @@ export const useGameState = () => {
   setCurrentLevel(Number(id));
 }, [levels, setLevels]);
 
+// ──────────────────────────────────────────────────────────────
+//  TRACK SURVIVAL MODE STATS
+// ──────────────────────────────────────────────────────────────
+const [startTime, setStartTime] = useState(null);
+const [elapsedTime, setElapsedTime] = useState(0);
+const [isTimerRunning, setIsTimerRunning] = useState(false);
+const [finalScore, setFinalScore] = useState(null);
+useEffect(() => {
+  if (!isTimerRunning || isDead) return;
+
+  const interval = setInterval(() => {
+    setElapsedTime(Date.now() - startTime);
+  }, 100); // smooth enough, low overhead
+
+  return () => clearInterval(interval);
+}, [isTimerRunning, isDead, startTime]);
+const getCurrentSurvivalWave = () => {
+  return levels.survival?.currentWave ?? 1;
+};
+
   /* --------------------------------------------------------------
      4. Respawn (uses onLevelChange → safe now)
      -------------------------------------------------------------- */
@@ -133,22 +153,82 @@ const onHealPopup = useCallback((x, y, amount) => {
 }, []);
 
 // Level and player pos
+// useEffect(() => {
+//   const levelData = levels[currentLevel];
+//   if (levelData?.playerPos) {
+//     playerPosRef.current = levelData.playerPos;
+//   }
+// }, [currentLevel, levels]);
+// AUTO-START SURVIVAL TIMER — ONLY WHEN NEEDED
+// Level and player pos
 useEffect(() => {
   const levelData = levels[currentLevel];
+
   if (levelData?.playerPos) {
     playerPosRef.current = levelData.playerPos;
+
+    // SURVIVAL MODE: START TIMER (once per run)
+    if (
+      currentLevel === 'survival' &&
+      !isDead &&
+      !isTimerRunning &&
+      levelData.playerPos // ensures player actually spawned
+    ) {
+      console.log('SURVIVAL MODE DETECTED → TIMER STARTED');
+      setStartTime(Date.now() - elapsedTime); // resumes if somehow paused (defensive)
+      setIsTimerRunning(true);
+      setFinalScore(null); // fresh run
+    }
   }
-}, [currentLevel, levels]);
+}, [currentLevel, levels, isDead, isTimerRunning, elapsedTime]);
 
 const playerPosRef = useRef({ x: 0, y: 0 });
 
+// const onPlayerHealthChange = useCallback((setter) => {
+//   setGlobalPlayerHealth(prev => {
+//     const newHealth = typeof setter === 'function' ? setter(prev) : setter;
+//     if (newHealth <= 0 && !isDead) setIsDead(true);
+//     return newHealth;
+//   });
+// }, [isDead]);
 const onPlayerHealthChange = useCallback((setter) => {
   setGlobalPlayerHealth(prev => {
     const newHealth = typeof setter === 'function' ? setter(prev) : setter;
-    if (newHealth <= 0 && !isDead) setIsDead(true);
-    return newHealth;
+    const clampedHealth = Math.max(0, newHealth);
+
+    // ONLY HANDLE DEATH IN SURVIVAL MODE
+    if (clampedHealth <= 0 && !isDead && currentLevel === 'survival') {
+      setIsDead(true);
+      setIsTimerRunning(false);
+
+      const finalWave = levels.survival?.currentWave ?? 1;
+      const timeSeconds = elapsedTime / 1000;
+
+      const score = Math.floor(
+        (finalWave * 12000) +
+        Math.max(180000 - timeSeconds * 90, 0) +
+        (finalWave >= 8 ? (finalWave - 7) * 30000 : 0)
+      );
+
+      setFinalScore(score);
+
+      // Highscore — survival only
+      const key = 'grokySurvivalHighscore';
+      const best = Number(localStorage.getItem(key) || 0);
+      if (score > best) {
+        localStorage.setItem(key, score.toString());
+        console.log('NEW SURVIVAL HIGH SCORE:', score);
+      }
+    }
+
+    // Regular levels? Just die normally, no score
+    else if (clampedHealth <= 0 && !isDead) {
+      setIsDead(true);
+    }
+
+    return clampedHealth;
   });
-}, [isDead]);
+}, [isDead, currentLevel, elapsedTime, levels.survival?.currentWave]);
 
 // Reset popup after animation
 const onHealPopupFinish = useCallback(() => {
@@ -449,201 +529,6 @@ const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
   }, delay);
 
 }, [updateLevel, setLevels, setMonsterTypes, setGlobalMonsterHealths]);
-// const scheduleRespawn = useCallback((arg1, arg2, arg3, arg4) => {
-//   console.log('[scheduleRespawn] CALLED WITH:', { arg1, arg2, arg3, arg4 });
-//   console.log('typeof arg1:', typeof arg1);
-
-//   let levelId, key, type, delay = 3000;
-//   let isMonster = false;
-//   let monsterId = null;
-
-//   // ─── Overload 1: monsterId (string)
-//   if (typeof arg1 === 'string') {
-//     monsterId = arg1;
-//     console.log('→ [MONSTER PATH] monsterId =', monsterId);
-
-//     const parts = monsterId.split('_');
-//     console.log('→ parts =', parts);
-
-//     if (parts.length < 4) {
-//       console.warn('→ Invalid monsterId format:', monsterId);
-//       return;
-//     }
-
-//     type = parts[0];
-//     // levelId = Number(parts[1]);
-//     if (parts[1] === 'survival') {
-//   levelId = 'survival';
-// } else if (parts[1] === 'story') {
-//   levelId = 'story';
-// } else {
-//   levelId = Number(parts[1]);
-// }
-
-//     delay = typeof arg2 === 'number' ? arg2 : getRespawnDelay(type);
-//     const forceSpawn = typeof arg3 === 'boolean' ? arg3 : false;
-
-//     console.log('→ type:', type, 'levelId:', levelId, 'delay:', delay, 'forceSpawn:', forceSpawn);
-
-//     let origKey;
-//     if (forceSpawn) {
-//       const x = parts[2], y = parts[3];
-//       origKey = `${x},${y}`;
-//       console.log('→ forceSpawn: using x,y from ID →', origKey);
-//     } else {
-//       console.log('→ Calling getOriginalKey for:', monsterId);
-//       origKey = getOriginalKey(monsterId, levels);
-//       console.log('→ getOriginalKey returned:', origKey);
-//       if (!origKey) {
-//         console.warn('→ [FATAL] No original key for:', monsterId);
-//         return;
-//       }
-//     }
-
-//     key = origKey;
-//     isMonster = true;
-
-//   // ─── Overload 2: levelId, key, type, delay
-//   } else {
-//     levelId = arg1;
-//     key = arg2;
-//     type = arg3;
-//     delay = arg4 ?? 3000;
-//     isMonster = false;
-//     console.log('→ [STATIC PATH] levelId:', levelId, 'key:', key, 'type:', type, 'delay:', delay);
-//   }
-
-//   console.log('→ FINAL: levelId=', levelId, 'key=', key, 'type=', type, 'isMonster=', isMonster);
-
-//   const timestamp = Date.now() + delay;
-//   console.log('→ timestamp =', new Date(timestamp).toLocaleTimeString());
-
-//   // ─── Prevent duplicate
-//   const queue = levels[levelId]?.respawnQueue || [];
-//   const alreadyQueued = queue.some(i => i.key === key && i.type === type);
-//   if (alreadyQueued) {
-//     console.log('→ [DUPLICATE] Already queued:', { levelId, key, type });
-//     return;
-//   }
-
-//   // ─── Add to queue
-//   console.log('→ Adding to queue:', { levelId, key, type, timestamp });
-//   updateLevel(levelId, prev => ({
-//     ...prev,
-//     respawnQueue: [...(prev.respawnQueue || []), { key, type, timestamp }]
-//   }));
-
-//   // ─── Set timeout
-//   console.log('→ setTimeout in', delay, 'ms');
-//   const timerId = setTimeout(() => {
-//     console.log('[TIMER FIRED] for:', { levelId, key, type, monsterId });
-
-//     setLevels(prevLevels => {
-//       const level = prevLevels[levelId];
-// if (!level) {
-//     console.error('→ CRITICAL: Level missing!', levelId, Object.keys(prevLevels));
-//     return prevLevels;
-//   }
-
-//       const now = Date.now();
-//       console.log('→ now:', now, 'timestamp:', timestamp, 'too early?', now < timestamp);
-
-//       if (now < timestamp) {
-//         console.log('→ Too early → rescheduling in', timestamp - now, 'ms');
-//         if (isMonster) {
-//           console.log('→ RECALL: scheduleRespawn(monsterId, delay)');
-//           scheduleRespawn(monsterId, timestamp - now);
-//         } else {
-//           console.log('→ RECALL: scheduleRespawn(levelId, key, type, delay)');
-//           scheduleRespawn(levelId, key, type, timestamp - now);
-//         }
-//         return prevLevels;
-//       }
-
-//       const occupied = level.objects[key];
-//       console.log('→ Tile occupied by:', occupied);
-
-// // === FIND NEARBY AVAILABLE TILE ===
-// const [origX, origY] = key.split(',').map(Number);
-// const lootTiles = ['gold', 'coin', 'timberwoodchoppedobject', 'lightstonechoppedobject', 'spiderweb'];
-
-// let placed = false;
-// let newKey = key;
-
-// for (let radius = 1; radius <= 5 && !placed; radius++) {
-//   const candidates = [];
-
-//   for (let dx = -radius; dx <= radius; dx++) {
-//     for (let dy = -radius; dy <= radius; dy++) {
-//       if (Math.abs(dx) + Math.abs(dy) > radius) continue; // Manhattan
-
-//       const nx = origX + dx;
-//       const ny = origY + dy;
-//       const nKey = `${nx},${ny}`;
-
-//       if (nKey === key) continue; // skip original (we already know it's blocked)
-
-//       const occupant = level.objects[nKey];
-//       if (!occupant || lootTiles.includes(occupant)) {
-//         candidates.push({ key: nKey, dist: Math.abs(dx) + Math.abs(dy) });
-//       }
-//     }
-//   }
-
-//   if (candidates.length > 0) {
-//     // Sort by distance, pick closest
-//     candidates.sort((a, b) => a.dist - b.dist);
-//     newKey = candidates[0].key;
-//     placed = true;
-//     console.log(`→ SPAWNING NEARBY at ${newKey} (dist: ${candidates[0].dist})`);
-//   }
-// }
-
-// if (!placed) {
-//   console.log('→ No nearby tile → retry in 1s');
-//   if (isMonster) {
-//     scheduleRespawn(monsterId, 1000);
-//   } else {
-//     scheduleRespawn(levelId, key, type, 1000);
-//   }
-//   return prevLevels;
-// }
-
-//       console.log('→ PLACING:', isMonster ? 'MONSTER' : 'STATIC');
-
-//       if (isMonster) {
-//         const [x, y] = key.split(',').map(Number);
-//         const newMonsterId = `${type}_${levelId}_${x}_${y}`;
-//         console.log('→ Spawning new monster:', newMonsterId, 'at', key);
-//        // ── use base health from monsterData  ──
-//         setGlobalMonsterHealths(p => ({
-//           ...p,
-//           [newMonsterId]: MONSTER_DATA[type]?.hp ?? 100
-//         }));
-//         setMonsterTypes(p => ({ ...p, [newMonsterId]: type }));
-
-//         return {
-//           ...prevLevels,
-//           [levelId]: {
-//             ...level,
-//             objects: { ...level.objects, [key]: newMonsterId },
-//             respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
-//           }
-//         };
-//       } else {
-//         return {
-//           ...prevLevels,
-//           [levelId]: {
-//             ...level,
-//             objects: { ...level.objects, [key]: type },
-//             respawnQueue: level.respawnQueue.filter(i => !(i.key === key && i.type === type))
-//           }
-//         };
-//       }
-//     });
-//   }, delay);
-
-// }, [levels, updateLevel, setLevels, setGlobalMonsterHealths, setMonsterTypes, getOriginalKey]);
 
 // ──────────────────────────────────────────────────────────────
 //  RESPAWN, PART OF ABOVE
@@ -1214,6 +1099,17 @@ useEffect(() => {
   }
 }, [currentLevelData?.playerPos?.x, currentLevelData?.playerPos?.y]); // Re-run when player moves
 
+// Add this as a proper function inside useGameState
+const getSurvivalTimeFormatted = useCallback(() => {
+  if (currentLevel !== 'survival') return '00:00.00';
+
+  const totalSeconds = Math.floor(elapsedTime / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  const centi = String(Math.floor((elapsedTime % 1000) / 10)).padStart(2, '0');
+  return `${minutes}:${seconds}.${centi}`;
+}, [currentLevel, elapsedTime]);
+
   /* --------------------------------------------------------------
      10. Return everything (including the NEW callback)
      -------------------------------------------------------------- */
@@ -1268,6 +1164,17 @@ rows: currentLevelData?.rows ?? ROWS,
           <option key={id} value={id}>{data.name || `Level ${id}`}</option>
         ))}
       </select>
-    )
+    ),
+    // Timer & Score for survival
+// SURVIVAL-ONLY EXPORTS (safe to use anywhere — just render conditionally)
+currentSurvivalWave: currentLevel === 'survival' ? (levels.survival?.currentWave ?? 1) : 1,
+  survivalFinalScore: currentLevel === 'survival' ? finalScore : null,
+  survivalHighScore: Number(localStorage.getItem('grokySurvivalHighscore') || 0),
+
+  // THIS IS THE ONE THAT WORKS — no conditional functions!
+  getSurvivalTimeFormatted,  // ← this is the real hero
+
+  // Optional: raw elapsed time if you ever need it
+  survivalElapsedTime: currentLevel === 'survival' ? elapsedTime : 0,
   };
 };
