@@ -124,6 +124,7 @@ export const ITEMS = {
   },
   // ──────────────────────────────────────────────────────────────
   // SPELLS
+  // THE RANGE OF SPELLS NEEDS TO MATCH THE GRAPHICS OF THEM (in CanvasGrid)
   // ──────────────────────────────────────────────────────────────
 fireball: {
   emoji: '🔥',
@@ -132,7 +133,7 @@ fireball: {
   rarity: 'rare',
   stats: {
     damage: { min: 10, max: 50 },
-    range: 10,
+    range: 6,
     aoeRadius: 2.5,
     isAOE: true,
     element: 'fire'  // ← THIS IS THE KEY
@@ -144,7 +145,7 @@ iceball: {
     description: '8 AOE ice damage',
   stats: {
     damage: { min: 10, max: 50 },
-    range: 10,
+    range: 6,
     aoeRadius: 2.5,
     isAOE: true,
     element: 'ice'
@@ -156,7 +157,7 @@ windball: {
     description: '8 AOE wind damage',
   stats: {
     damage: { min: 10, max: 50 },
-    range: 10,
+    range: 6,
     aoeRadius: 2.5,
     isAOE: true,
     element: 'wind'

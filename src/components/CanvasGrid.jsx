@@ -368,8 +368,8 @@ aoesRef.current = aoesRef.current.filter(aoe => {
   aoe.radius += aoe.speed;
   aoe.frame++;
 
-  if (aoe.frame < 42) {
-    const progress = aoe.frame / 42;
+  if (aoe.frame < 30) {
+    const progress = aoe.frame / 30;
     const alpha = 1 - progress;
     const pulse = 1 + Math.sin(progress * Math.PI * aoe.pulseFreq) * aoe.pulseIntensity;
 

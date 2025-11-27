@@ -237,7 +237,7 @@ useEffect(() => {
       if ((globalMonsterHealths[objId] ?? 100) <= 0) continue;
 
       const d = distance(mPos, playerPos);
-      if (d <= 10) {
+      if (d <= 6) {
         hasMonsterInSpellRange++;
         monstersInRangeData.push({ objId, mPos, key, type, distance: d });
       }

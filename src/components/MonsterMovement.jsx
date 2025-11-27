@@ -96,7 +96,7 @@ const MonsterMovement = ({
     const playerKey = `${playerPos.x},${playerPos.y}`;
 
     // Too far → idle
-    const maxChaseDistance = monsterType === 'spider' ? 12 : 7;
+    const maxChaseDistance = monsterType === 'spider' ? 12 : 10;
     if (distance(start, playerPos) > maxChaseDistance) return null;
 
     // Already adjacent or on player → don't move (attack handled elsewhere)
