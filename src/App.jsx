@@ -100,6 +100,7 @@ currentSurvivalWave,
   survivalHighScore,
   getSurvivalTimeFormatted,  // ← renamed for clarity
   survivalElapsedTime,
+  restartCurrentMode
   } = game;
 
 // ------------------------------------------------------------------ //
@@ -197,6 +198,7 @@ currentSurvivalWave={currentSurvivalWave}
   survivalHighScore={survivalHighScore}
   getSurvivalTimeFormatted={getSurvivalTimeFormatted}  // ← correct name
   survivalElapsedTime={survivalElapsedTime}
+onRestart={restartCurrentMode}
       />
     );
   }

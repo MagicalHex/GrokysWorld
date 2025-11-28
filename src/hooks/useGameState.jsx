@@ -1099,7 +1099,7 @@ useEffect(() => {
   }
 }, [currentLevelData?.playerPos?.x, currentLevelData?.playerPos?.y]); // Re-run when player moves
 
-// Add this as a proper function inside useGameState
+// For survival mode timer
 const getSurvivalTimeFormatted = useCallback(() => {
   if (currentLevel !== 'survival') return '00:00.00';
 
@@ -1109,6 +1109,38 @@ const getSurvivalTimeFormatted = useCallback(() => {
   const centi = String(Math.floor((elapsedTime % 1000) / 10)).padStart(2, '0');
   return `${minutes}:${seconds}.${centi}`;
 }, [currentLevel, elapsedTime]);
+
+// Add this function
+const restartCurrentMode = useCallback(() => {
+  if (!currentLevel) return;
+
+  // === 1. Reset all gameplay state ===
+  setIsDead(false);
+  setGlobalPlayerHealth(100); // or 100
+  setGlobalInventory([]);                  // or your starting items
+  setGlobalMonsterHealths({});
+  setMonsterTypes({});
+  setHealPopup(null);
+  setLastDamageTime(0);
+  setSurvivalFinalScore(0);
+  setSurvivalElapsedTime(0);
+  // add any other resets you need (camera, effects, etc.)
+
+  // === 2. If Survival → generate fresh level (this IS wave 1) ===
+  if (currentLevel === 'survival') {
+    const freshSurvivalLevel = generateSurvivalLevel();
+    setCurrentLevel(freshSurvivalLevel);
+    // No need to touch currentWave — it's already 1 inside the level
+  } 
+  // === 3. For normal levels → just respawn player (keep progress) ===
+  else {
+    respawnPlayer(); // your existing checkpoint respawn logic
+  }
+}, [
+  currentLevel,
+  respawnPlayer,
+  // include any dependencies like STARTING_HEALTH if not constant
+]);
 
   /* --------------------------------------------------------------
      10. Return everything (including the NEW callback)
@@ -1176,5 +1208,6 @@ currentSurvivalWave: currentLevel === 'survival' ? (levels.survival?.currentWave
 
   // Optional: raw elapsed time if you ever need it
   survivalElapsedTime: currentLevel === 'survival' ? elapsedTime : 0,
+  restartCurrentMode
   };
 };

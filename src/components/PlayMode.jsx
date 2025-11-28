@@ -85,6 +85,7 @@ currentSurvivalWave,
   survivalFinalScore,
   survivalHighScore,
   getSurvivalTimeFormatted,
+  onRestart
 }) => {
   /* --------------------------------------------------------------
      DEBUG AREA
@@ -490,7 +491,7 @@ useEffect(() => {
       )}
 
       <div className="death-buttons">
-        <button onClick={() => window.location.reload()}>Play Again</button>
+<button onClick={onRestart}>Play Again</button>
         <button onClick={() => onExit()}>Main Menu</button>
                     {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
       </div>
