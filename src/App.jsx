@@ -58,7 +58,8 @@ function App() {
   // ------------------------------------------------------------------ //
   // Game state hook
   // ------------------------------------------------------------------ //
-  const game = useGameState();
+
+const game = useGameState();
   const {
     isLoading,
     currentLevelData,
@@ -99,9 +100,19 @@ currentSurvivalWave,
   survivalFinalScore,
   survivalHighScore,
   getSurvivalTimeFormatted,  // ← renamed for clarity
-  survivalElapsedTime,
-  restartCurrentMode
+  survivalElapsedTime
   } = game;
+
+useEffect(() => {
+    if (isLoading) return; // still loading → do nothing
+
+    if (localStorage.getItem('autoStartSurvival') === 'true') {
+      localStorage.removeItem('autoStartSurvival');
+      setCurrentLevel('survival');
+      setPlayMode(true);
+      setHasSeenIntro(true);
+    }
+  }, [isLoading]); // ← this runs once when isLoading becomes false
 
 // ------------------------------------------------------------------ //
 // AUTO-SET PLAYER SPAWN POSITION after load
@@ -148,7 +159,6 @@ useEffect(() => {
       </div>
     );
   }
-
   // ------------------------------------------------------------------ //
   // PlayMode (unchanged props)
   // ------------------------------------------------------------------ //
@@ -198,7 +208,6 @@ currentSurvivalWave={currentSurvivalWave}
   survivalHighScore={survivalHighScore}
   getSurvivalTimeFormatted={getSurvivalTimeFormatted}  // ← correct name
   survivalElapsedTime={survivalElapsedTime}
-onRestart={restartCurrentMode}
       />
     );
   }

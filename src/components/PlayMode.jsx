@@ -491,8 +491,20 @@ useEffect(() => {
       )}
 
       <div className="death-buttons">
-<button onClick={onRestart}>Play Again</button>
-        <button onClick={() => onExit()}>Main Menu</button>
+<button 
+  className="big-btn" 
+  onClick={() => {
+    localStorage.setItem('autoStartSurvival', 'true');
+    window.location.reload();
+  }}
+>
+  Play Again
+</button>
+        <button onClick={() => {
+    // Force full reload to guarantee 100% clean state
+    window.location.href = '/'; 
+  }}
+>Main Menu</button>
                     {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
       </div>
     </div>
