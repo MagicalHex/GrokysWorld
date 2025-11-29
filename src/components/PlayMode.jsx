@@ -93,7 +93,7 @@ currentSurvivalWave,
      // TEMP - Add to PlayMode
 const renderCount = useRef(0);
 renderCount.current++;
-console.log(`[RENDERS] ${renderCount.current}`); // Put at top of component
+// console.log(`[RENDERS] ${renderCount.current}`); // Put at top of component
 
 // useEffect(() => {
 //   console.log('[PlayMode] current level updated:', currentLevel);
@@ -340,16 +340,16 @@ const memoizedTiles = useMemo(() => {
 // }, [grid, objects, activeQuests, globalInventory]);  // Only re-compute when THESE change
 
      // TOP OF PlayMode
-useEffect(() => {
-  console.log('[RENDER TRIGGERS]', {
-    playerPos: playerPos?.x + ',' + playerPos?.y,
-    moveDirection: moveDirectionRef.current,
-    objectsChanged: !!objects,
-    gridChanged: !!grid,
-    popups: popups.length,
-    pickupPopups: pickupPopups.length,
-  });
-}, [playerPos, objects, grid, popups, pickupPopups]);
+// useEffect(() => {
+//   console.log('[RENDER TRIGGERS]', {
+//     playerPos: playerPos?.x + ',' + playerPos?.y,
+//     moveDirection: moveDirectionRef.current,
+//     objectsChanged: !!objects,
+//     gridChanged: !!grid,
+//     popups: popups.length,
+//     pickupPopups: pickupPopups.length,
+//   });
+// }, [playerPos, objects, grid, popups, pickupPopups]);
   /* --------------------------------------------------------------
      3. Render
      -------------------------------------------------------------- */

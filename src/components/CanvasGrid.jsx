@@ -38,15 +38,15 @@ useEffect(() => {
   cameraRef.current = camera;
 }, [camera]);
 
-useEffect(() => {
-  if (!camera) return;
+// useEffect(() => {
+//   if (!camera) return;
 
-  console.log('CAMERA CHANGED:', {
-    x: camera.x,
-    y: camera.y,
-    source: 'useEffect'
-  });
-}, [camera]);
+//   console.log('CAMERA CHANGED:', {
+//     x: camera.x,
+//     y: camera.y,
+//     source: 'useEffect'
+//   });
+// }, [camera]);
 
 // 1. AT THE TOP — Replace your old aoeRef with this (supports multiple + type)
 const aoesRef = useRef([]);  // ← NOW AN ARRAY! Supports multiple AOEs

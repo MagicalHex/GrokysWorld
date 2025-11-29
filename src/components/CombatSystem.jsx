@@ -164,24 +164,24 @@ useEffect(() => {
   // === MAIN COMBAT LOOP (via gameLoop) ===
   // Throttled logger (once every 3 sec)
 // Put this once at the top of your file
-const logCombat = (() => {
-  let lastBatch = 0;
-  const queue = [];
+// const logCombat = (() => {
+//   let lastBatch = 0;
+//   const queue = [];
 
-  const flush = () => {
-    if (queue.length > 0 && Date.now() - lastBatch > 3000) {
-      console.log('%c[COMBAT BATCH]', 'color: #ffaa00; font-weight: bold;');
-      queue.forEach(msg => console.log(`   ${msg}`));
-      queue.length = 0;
-      lastBatch = Date.now();
-    }
-  };
+//   const flush = () => {
+//     if (queue.length > 0 && Date.now() - lastBatch > 3000) {
+//       console.log('%c[COMBAT BATCH]', 'color: #ffaa00; font-weight: bold;');
+//       queue.forEach(msg => console.log(`   ${msg}`));
+//       queue.length = 0;
+//       lastBatch = Date.now();
+//     }
+//   };
 
-  return (msg) => {
-    queue.push(msg);
-    flush();
-  };
-})();
+//   return (msg) => {
+//     queue.push(msg);
+//     flush();
+//   };
+// })();
 useEffect(() => {
   // === Used for both attacks (here) and CooldownBar (PlayMode) to reset. ===
   // const PLAYER_COOLDOWN = 1500;
@@ -243,7 +243,7 @@ useEffect(() => {
       }
     }
 
-    logCombat(`LOOP 1: Found ${hasMonsterInSpellRange} monsters in spell range (10 tiles)`);
+    // logCombat(`LOOP 1: Found ${hasMonsterInSpellRange} monsters in spell range (10 tiles)`);
 
     // ========================================
     // LOOP 2: EQUIP WEAPON & DECIDE ATTACK
@@ -257,7 +257,7 @@ useEffect(() => {
       const hasAdjacent = monstersInRangeData.some(m => m.distance <= 1);
       const hasMultipleNonAdjacent = !hasAdjacent && hasMonsterInSpellRange >= 2;
 
-      logCombat(`LOOP 2: Adjacent: ${hasAdjacent} | Multiple non-adj: ${hasMultipleNonAdjacent}`);
+      // logCombat(`LOOP 2: Adjacent: ${hasAdjacent} | Multiple non-adj: ${hasMultipleNonAdjacent}`);
 
       if (hasAdjacent) {
         // Always melee if adjacent
@@ -274,7 +274,7 @@ useEffect(() => {
       weaponRange = weaponStats.range || 1;
       isSpell = weaponStats.isAOE ?? false;
 
-      logCombat(`LOOP 2: Selected ${nearestRangeType} | Range: ${weaponRange} | AOE: ${isSpell}`);
+      // logCombat(`LOOP 2: Selected ${nearestRangeType} | Range: ${weaponRange} | AOE: ${isSpell}`);
     }
 
     // ========================================
@@ -285,12 +285,12 @@ useEffect(() => {
       const cooldownKey = isMeleeAttack ? cooldowns.MELEE : cooldowns.RANGED;
 
       if (now - lastPlayerAttack >= cooldownKey) {
-        logCombat(`✅ PLAYER ATTACK FIRED! Type: ${nearestRangeType} | Cooldown ready`);
+        // logCombat(`✅ PLAYER ATTACK FIRED! Type: ${nearestRangeType} | Cooldown ready`);
 
         // Filter targets to actual weapon range
         const validTargets = monstersInRangeData.filter(m => m.distance <= weaponRange);
 
-        logCombat(`Found ${validTargets.length} valid targets in weapon range (${weaponRange})`);
+        // logCombat(`Found ${validTargets.length} valid targets in weapon range (${weaponRange})`);
 
         // AOE vs SINGLE TARGET
         const hitAll = isSpell;
@@ -300,7 +300,7 @@ useEffect(() => {
 
         if (finalTargets.length === 0) return; // ← this single line kills the crash forever
 
-        logCombat(`Final targets: ${finalTargets.length} (AOE: ${hitAll})`);
+        // logCombat(`Final targets: ${finalTargets.length} (AOE: ${hitAll})`);
 
         // for spell effect
 if (isSpell && refs.current.onFireballCast) {
@@ -311,7 +311,7 @@ if (isSpell && refs.current.onFireballCast) {
 
         // === ATTACK ALL FINAL TARGETS ===
         finalTargets.forEach(({ objId, mPos, key, type }) => {
-          logCombat(`→ Hitting ${objId}`);
+          // logCombat(`→ Hitting ${objId}`);
 
           // 1 in 8 chance to crit (12.5%)
           const isCrit = Math.random() < 1/8;
@@ -423,7 +423,7 @@ if (isSpell && refs.current.onFireballCast) {
         });
 
         lastMonsterAttack[objId] = now;
-        logCombat(`Monster ${type} (${objId}) hits player for ${finalDmg}`);
+        // logCombat(`Monster ${type} (${objId}) hits player for ${finalDmg}`);
       }
     }
 

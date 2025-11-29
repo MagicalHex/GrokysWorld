@@ -21,9 +21,9 @@ const PlayerLayer = memo(({
   const direction = moveDirectionRef.current;
 
   // === PROPER DEBUG LOGGING: Only when popups change ===
-  useEffect(() => {
-    console.log('PlayerLayer - popups updated:', popups);
-  }, [popups]);
+  // useEffect(() => {
+  //   console.log('PlayerLayer - popups updated:', popups);
+  // }, [popups]);
 
   // State
   const [displayImage, setDisplayImage] = useState('/ownemojis/player-image.webp'); // standing by default
