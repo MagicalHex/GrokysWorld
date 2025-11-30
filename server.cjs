@@ -20,6 +20,7 @@ const connectLimiter = rateLimit({
 app.use('/api/connect', connectLimiter);
 
 let db = null;
+let scoresCol = null;
 const BUILD_PATH = path.resolve(__dirname, 'build');
 
 // === LOG STARTUP ===
@@ -36,21 +37,30 @@ if (process.env.MONGODB_URI) {
     .then(() => {
       db = client.db('grokysworld');
 
+      // Set up collections ONLY after successful connection
       const liveCol = db.collection('connections_live');
       const logCol  = db.collection('connections_log');
+      scoresCol = db.collection('survival_scores');  // ← THIS IS CRUCIAL
 
-      // TTL: Delete live entries after 15 minutes
+      // TTL index for live connections
       liveCol.createIndex(
         { timestamp: 1 },
         { expireAfterSeconds: 900 }
       ).then(() => console.log('TTL index created on connections_live'))
        .catch(err => console.error('TTL index failed:', err));
 
-      console.log('MongoDB connected');
+      // Leaderboard index
+      scoresCol.createIndex({ score: -1, timestamp: -1 });
+      // Optional: prevent same session spamming (uncomment if needed)
+      // scoresCol.createIndex({ sessionId: 1 }, { unique: true });
+
+      console.log('MongoDB connected + collections ready');
+      console.log('Leaderboard collection (survival_scores) is READY');
     })
     .catch(err => {
       console.error('MongoDB connect failed:', err.message);
       db = null;
+      scoresCol = null;
     });
 } else {
   console.warn('MONGODB_URI not set — running without DB');
@@ -131,7 +141,7 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // === SURVIVAL LEADERBOARD COLLECTION ===
-let scoresCol = null;
+
 if (db) {
   scoresCol = db.collection('survival_scores');
 
@@ -144,7 +154,8 @@ if (db) {
 // === API: SUBMIT SURVIVAL SCORE ===
 // === API: SUBMIT SURVIVAL SCORE (NO LOGIN, FULLY ANONYMOUS) ===
 app.post('/api/submit-score', async (req, res) => {
-  if (!db || !scoresCol) {
+if (!db || !scoresCol) {
+    console.log('Leaderboard not ready yet (db or scoresCol missing)');
     return res.status(503).json({ ok: false, error: 'Leaderboard not ready' });
   }
 
