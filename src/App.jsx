@@ -223,8 +223,9 @@ if (!isDev && !playMode && !hasSeenIntro) {
         <p>
           <kbd>↑↓←→</kbd> to move around. You will only use the key arrows for everything.<br/><br/>
           <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them<br/><br/>
-          Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/><br/>
-          Talk to the <strong>mushroom in town</strong> for quests
+          Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/>
+          Skeletons drops <strong>fire balls</strong>, <strong>wind balls</strong> and <strong>ice balls</strong> to attack multiple from range<br/><br/>
+          Only Survival Mode currently supported
         </p>
         <div className="mode-buttons">
           <button 
