@@ -273,9 +273,6 @@ useEffect(() => {
   forceTileUpdate(); // Rebuild memoizedTiles when these change
 }, [grid, objects, activeQuests, globalInventory]);
 
-  /* --------------------------------------------------------------
-   MOBILE JOYSTICK — CLEAN, SAFE, NO FREEZE
-   -------------------------------------------------------------- */
 /* --------------------------------------------------------------
    MOBILE JOYSTICK — SIMPLE & WORKING (No restrictions!)
    -------------------------------------------------------------- */
@@ -461,51 +458,93 @@ const memoizedTiles = useMemo(() => {
 {isDead && (
   <div className="death-screen">
     <div className="death-message">
-      <h1>You Died</h1>
+      <h1 className="glitch" data-text="YOU DIED">YOU DIED</h1>
 
       {currentLevel === 'survival' ? (
         <div className="survival-death-stats">
-          <div className="stat">
-            <span className="label">Final Wave </span>
-            <span className="value">{currentSurvivalWave}</span>
-          </div>
-          <div className="stat">
-            <span className="label">Time Survived: </span>
-            <span className="value">{getSurvivalTimeFormatted()}</span>
-          </div>
-          <div className="stat score">
-            <span className="label">Final Score: </span>
-            <span className="value">{survivalFinalScore?.toLocaleString() || '0'}</span>
-          </div>
+
+          <div className="stat"><span className="label">Final Wave </span><span className="value">{currentSurvivalWave}</span></div>
+          <div className="stat"><span className="label">Time Survived: </span><span className="value">{getSurvivalTimeFormatted()}</span></div>
+          <div className="stat score"><span className="label">Final Score: </span><span className="value">{survivalFinalScore?.toLocaleString() || '0'}</span></div>
 
           {survivalFinalScore > survivalHighScore && (
-            <div className="new-record">NEW PERSONAL BEST!</div>
+            <div className="new-record animate-pulse">NEW PERSONAL BEST!</div>
           )}
 
-          <div className="highscore-note">
-            Best: {survivalHighScore.toLocaleString()}
-          </div>
+          <div className="highscore-note">Personal Best: {survivalHighScore.toLocaleString()}</div>
+
+          {/* === HALL OF FAME CLAIM — ONLY ONCE PER RUN === */}
+          {!localStorage.getItem('lastSubmittedScore') || 
+           Number(localStorage.getItem('lastSubmittedScore')) !== survivalFinalScore ? (
+            <div className="claim-fame mt-8 p-6 bg-gradient-to-br from-purple-900 to-black border-4 border-yellow-500 rounded-xl">
+              <h2 className="text-3xl font-bold text-yellow-400 mb-4">CLAIM YOUR PLACE</h2>
+
+              <input
+                type="text"
+                id="player-name-input"
+                maxLength={18}
+                placeholder="Name for the leaderboard"
+                defaultValue={[
+                  'Groky Slayer', 'Wave God', 'Unkillable', '420 Survivor',
+                  'Pixel Chad', 'Doom Groky', 'The Final Boss', 'No Scope Legend'
+                ][Math.floor(Math.random() * 8)]}
+                className="w-full px-4 py-3 text-center text-2xl bg-black/80 border-2 border-yellow-600 rounded-lg text-white mb-4"
+              />
+
+              <button
+                onClick={async () => {
+                  let name = document.getElementById('player-name-input').value.trim();
+                  if (!name) name = 'Mystery Legend #' + Math.floor(Math.random() * 9999);
+
+                  try {
+                    await fetch('/api/submit-score', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        sessionId,
+                        score: survivalFinalScore,
+                        name: name.slice(0, 25)
+                      })
+                    });
+
+                    localStorage.setItem('lastSubmittedScore', survivalFinalScore);
+                    alert(`Score submitted! ${name} is now in the Hall of Fame!`);
+                  } catch (err) {
+                    alert('No connection? Your score is safe — try again later.');
+                  }
+                }}
+                className="big-btn bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 transform hover:scale-105 transition"
+              >
+                SUBMIT TO LEADERBOARD
+              </button>
+
+              <p className="text-sm text-gray-400 mt-4">You can submit later if you close now</p>
+            </div>
+          ) : (
+            <div className="text-green-400 text-2xl font-bold mt-6">
+              SCORE ALREADY SUBMITTED
+            </div>
+          )}
+
         </div>
       ) : (
         <p>Your adventure ends here...</p>
       )}
 
       <div className="death-buttons">
-<button 
-  className="big-btn" 
-  onClick={() => {
-    localStorage.setItem('autoStartSurvival', 'true');
-    window.location.reload();
-  }}
->
-  Play Again
-</button>
-        <button onClick={() => {
-    // Force full reload to guarantee 100% clean state
-    window.location.href = '/'; 
-  }}
->Main Menu</button>
-                    {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
+        <button
+          className="big-btn"
+          onClick={() => {
+            localStorage.setItem('autoStartSurvival', 'true');
+            window.location.reload();
+          }}
+        >
+          Play Again
+        </button>
+        <button onClick={() => { window.location.href = '/'; }}>
+          Main Menu
+        </button>
+                            {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
       </div>
     </div>
   </div>

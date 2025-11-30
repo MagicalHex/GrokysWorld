@@ -130,6 +130,113 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// === SURVIVAL LEADERBOARD COLLECTION ===
+let scoresCol = null;
+if (db) {
+  scoresCol = db.collection('survival_scores');
+
+  // Index for fast leaderboard + deduplication
+  scoresCol.createIndex({ score: -1, timestamp: -1 });
+  scoresCol.createIndex({ sessionId: 1, score: 1 }, { unique: true, sparse: true }); // prevent spam from same session
+  console.log('Survival leaderboard collection ready');
+}
+
+// === API: SUBMIT SURVIVAL SCORE ===
+app.post('/api/submit-score', async (req, res) => {
+  if (!db || !scoresCol) {
+    return res.status(503).json({ ok: false, error: 'Leaderboard not ready' });
+  }
+
+  const { sessionId, score, name } = req.body;
+
+  // Basic validation
+  if (!sessionId || !score || typeof score !== 'number' || score < 5000) {
+    return res.status(400).json({ ok: false, error: 'Invalid score data' });
+  }
+
+  const cleanName = String(name || 'Anonymous Groky')
+    .trim()
+    .slice(0, 25)
+    .replace(/[^\w\s#-]/gi, '') || 'Groky Fan';
+
+  try {
+    const result = await scoresCol.insertOne({
+      sessionId,
+      score: Math.floor(score),
+      name: cleanName,
+      userAgent: req.headers['user-agent'] || 'unknown',
+      timestamp: new Date(),
+      ip: req.ip || req.connection.remoteAddress
+    }, { 
+      // This makes insert fail silently if same session+score already exists
+      // Prevents refresh-spam
+    });
+
+    console.log(`LEADERBOARD → ${cleanName}: ${score.toLocaleString()}`);
+    res.json({ ok: true, submitted: true });
+  } catch (err) {
+    // Duplicate key error = already submitted this exact score → still success
+    if (err.code === 11000) {
+      console.log(`Duplicate score blocked: ${cleanName} - ${score}`);
+      return res.json({ ok: true, submitted: false, reason: 'already_submitted' });
+    }
+
+    console.error('Score submit error:', err);
+    res.status(500).json({ ok: false, error: 'Server error' });
+  }
+});
+
+// === API: GET LEADERBOARD ===
+app.get('/api/leaderboard', async (req, res) => {
+  if (!db || !scoresCol) {
+    return res.json({ allTime: [], today: [] });
+  }
+
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const [allTime, today] = await Promise.all([
+      scoresCol
+        .find({})
+        .sort({ score: -1, timestamp: 1 })
+        .limit(50)
+        .project({ name: 1, score: 1, timestamp: 1, _id: 0 })
+        .toArray(),
+
+      scoresCol
+        .find({ timestamp: { $gte: startOfDay } })
+        .sort({ score: -1, timestamp: 1 })
+        .limit(20)
+        .project({ name: 1, score: 1, timestamp: 1, _id: 0 })
+        .toArray()
+    ]);
+
+    const format = (arr) => arr.map(entry => ({
+      name: entry.name,
+      score: entry.score,
+      timeAgo: timeAgo(entry.timestamp)
+    }));
+
+    res.json({
+      allTime: format(allTime),
+      today: format(today)
+    });
+  } catch (err) {
+    console.error('Leaderboard fetch error:', err);
+    res.json({ allTime: [], today: [] });
+  }
+});
+
+// Helper for "3 minutes ago" style
+function timeAgo(date) {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
 // === HEALTH CHECK ===
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });

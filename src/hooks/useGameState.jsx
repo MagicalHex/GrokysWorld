@@ -923,12 +923,10 @@ const staticObjects = {
 const survivalWaves = {
   wave1: {
     '5,6': 'skeleton1',
-    '5,11': 'skeleton1',
   },
   wave2: {
     '10,20': 'skeleton1',
     '12,15': 'skeleton1',
-    '3,10': 'skeleton1',
     '1,5': 'skeleton1'
   },
   wave3: {
@@ -936,18 +934,15 @@ const survivalWaves = {
     '8,7': 'skeleton1',
     '15,8': 'skeleton1',
     '5,9': 'skeleton1',
-    '11,5': 'skeleton1',
-    '17,10': 'skeleton1',
+    '3,10': 'skeleton1'
   },
   wave4: {
-    '3,4': 'swamptroll',
-    '8,20': 'swamptroll',
-    '19,6': 'swamptroll',
-    '22,12': 'swamptroll',
-    '10,22': 'swamptroll',
     '9,16': 'skeleton1',
     '13,15': 'skeleton1',
-    '6,13': 'skeleton1'
+    '6,13': 'skeleton1',
+    '11,5': 'skeleton1',
+    '17,10': 'skeleton1',
+    '25,1': 'skeleton1'
   },
   wave5: {
     '2,8': 'skeleton1',
@@ -963,7 +958,9 @@ const survivalWaves = {
     '20,23': 'swamptroll',
     '15,3': 'skeleton1',
     '23,8': 'swamptroll',
-    '4,18': 'skeleton1'
+    '4,18': 'skeleton1',
+    '3,4': 'swamptroll',
+    '8,20': 'swamptroll'
   },
   wave7: {
     '25,10': 'swamptroll',
@@ -972,7 +969,10 @@ const survivalWaves = {
     '19,25': 'swamptroll',
     '6,4': 'swamptroll',
     '21,3': 'skeleton1',
-    '14,21': 'skeleton1'
+    '14,21': 'skeleton1',
+        '19,6': 'swamptroll',
+    '22,12': 'swamptroll',
+    '10,22': 'swamptroll'
   },
   wave8: {
     '2,14': 'swamptroll',
@@ -1204,14 +1204,11 @@ rows: currentLevelData?.rows ?? ROWS,
         ))}
       </select>
     ),
-    // Timer & Score for survival
-// SURVIVAL-ONLY EXPORTS (safe to use anywhere — just render conditionally)
-currentSurvivalWave: currentLevel === 'survival' ? (levels.survival?.currentWave ?? 1) : 1,
+  // Timer & Score for survival
+  currentSurvivalWave: currentLevel === 'survival' ? (levels.survival?.currentWave ?? 1) : 1,
   survivalFinalScore: currentLevel === 'survival' ? finalScore : null,
   survivalHighScore: Number(localStorage.getItem('grokySurvivalHighscore') || 0),
-
-  // THIS IS THE ONE THAT WORKS — no conditional functions!
-  getSurvivalTimeFormatted,  // ← this is the real hero
+  getSurvivalTimeFormatted, 
 
   // Optional: raw elapsed time if you ever need it
   survivalElapsedTime: currentLevel === 'survival' ? elapsedTime : 0,
