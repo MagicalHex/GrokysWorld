@@ -225,20 +225,20 @@ if (!isDev && !playMode && !hasSeenIntro) {
           </p>
           
           <ul>
-            <li>
+            <p>
               <strong>Interact</strong> with NPCs (talk), trees (chop), or stones (mine) by{' '}
               <strong>walking right into them</strong> <em>(Survival Mode excluded)</em>
-            </li>
-            <li>
+            </p>
+            <p>
               <kbd>Right Ctrl</kbd> to open your <strong>inventory</strong>
-            </li>
-            <li>
+            </p>
+            <p>
               Grab a <strong>crossbow</strong> or <strong>bow</strong> for ranged attacks
-            </li>
-            <li>
+            </p>
+            <p>
               Skeletons drop <strong>fire balls</strong>, <strong>wind balls</strong>, or{' '}
               <strong>ice balls</strong> — perfect for crowd control!
-            </li>
+            </p>
           </ul>
           
           <p className="mode-note">
