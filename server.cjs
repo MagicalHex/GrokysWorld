@@ -137,52 +137,45 @@ if (db) {
 
   // Index for fast leaderboard + deduplication
   scoresCol.createIndex({ score: -1, timestamp: -1 });
-  scoresCol.createIndex({ sessionId: 1, score: 1 }, { unique: true, sparse: true }); // prevent spam from same session
+  // scoresCol.createIndex({ sessionId: 1, score: 1 }, { unique: true, sparse: true }); // prevent spam from same session
   console.log('Survival leaderboard collection ready');
 }
 
 // === API: SUBMIT SURVIVAL SCORE ===
+// === API: SUBMIT SURVIVAL SCORE (NO LOGIN, FULLY ANONYMOUS) ===
 app.post('/api/submit-score', async (req, res) => {
   if (!db || !scoresCol) {
     return res.status(503).json({ ok: false, error: 'Leaderboard not ready' });
   }
 
-  const { sessionId, score, name } = req.body;
+  const { score, name } = req.body;
 
-  // Basic validation
-  if (!sessionId || !score || typeof score !== 'number' || score < 5000) {
-    return res.status(400).json({ ok: false, error: 'Invalid score data' });
+  if (!score || typeof score !== 'number' || score < 5000) {
+    return res.status(400).json({ ok: false, error: 'Invalid score' });
   }
 
-  const cleanName = String(name || 'Anonymous Groky')
+  const cleanName = String(name || 'Anonymous Legend')
     .trim()
     .slice(0, 25)
     .replace(/[^\w\s#-]/gi, '') || 'Groky Fan';
 
   try {
-    const result = await scoresCol.insertOne({
-      sessionId,
+    await scoresCol.insertOne({
       score: Math.floor(score),
       name: cleanName,
-      userAgent: req.headers['user-agent'] || 'unknown',
+      userAgent: req.headers['user-agent']?.slice(0, 100) || 'unknown',
       timestamp: new Date(),
       ip: req.ip || req.connection.remoteAddress
-    }, { 
-      // This makes insert fail silently if same session+score already exists
-      // Prevents refresh-spam
     });
 
     console.log(`LEADERBOARD → ${cleanName}: ${score.toLocaleString()}`);
-    res.json({ ok: true, submitted: true });
+    res.json({ ok: true });
   } catch (err) {
-    // Duplicate key error = already submitted this exact score → still success
     if (err.code === 11000) {
-      console.log(`Duplicate score blocked: ${cleanName} - ${score}`);
-      return res.json({ ok: true, submitted: false, reason: 'already_submitted' });
+      return res.json({ ok: true, alreadySubmitted: true });
     }
-
-    console.error('Score submit error:', err);
-    res.status(500).json({ ok: false, error: 'Server error' });
+    console.error('Submit error:', err);
+    res.status(500).json({ ok: false });
   }
 });
 

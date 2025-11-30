@@ -109,6 +109,8 @@ renderCount.current++;
   // Switch been health and progressbar depending on what Player is doing
   const [currentAction, setCurrentAction] = useState('health');
   const [choppingProgress, setChoppingProgress] = useState(0);
+
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   
   // ── Combat Popups ─────────────────────────────────────────────────────
   // Set popup to display e.g. damagePopup (holds healing popup as well)
@@ -473,58 +475,59 @@ const memoizedTiles = useMemo(() => {
 
           <div className="highscore-note">Personal Best: {survivalHighScore.toLocaleString()}</div>
 
-          {/* === HALL OF FAME CLAIM — ONLY ONCE PER RUN === */}
+          {/* Submit Score — NO SESSIONID */}
           {!localStorage.getItem('lastSubmittedScore') || 
            Number(localStorage.getItem('lastSubmittedScore')) !== survivalFinalScore ? (
-            <div className="claim-fame mt-8 p-6 bg-gradient-to-br from-purple-900 to-black border-4 border-yellow-500 rounded-xl">
-              <h2 className="text-3xl font-bold text-yellow-400 mb-4">CLAIM YOUR PLACE</h2>
-
-              <input
-                type="text"
-                id="player-name-input"
-                maxLength={18}
-                placeholder="Name for the leaderboard"
-                defaultValue={[
-                  'Groky Slayer', 'Wave God', 'Unkillable', '420 Survivor',
-                  'Pixel Chad', 'Doom Groky', 'The Final Boss', 'No Scope Legend'
-                ][Math.floor(Math.random() * 8)]}
-                className="w-full px-4 py-3 text-center text-2xl bg-black/80 border-2 border-yellow-600 rounded-lg text-white mb-4"
+            <div className="claim-fame">
+              <h2>CLAIM YOUR PLACE</h2>
+              <input 
+                id="player-name-input" 
+                maxLength={18} 
+                placeholder="Enter your name..." 
+                defaultValue={['Groky Slayer','Wave God','Unkillable','420 Survivor','Pixel Chad','Doom Groky'][Math.floor(Math.random()*6)]}
               />
-
-              <button
+              <button 
+                className="big-btn"
                 onClick={async () => {
                   let name = document.getElementById('player-name-input').value.trim();
-                  if (!name) name = 'Mystery Legend #' + Math.floor(Math.random() * 9999);
+                  if (!name) name = 'Mystery Legend #' + Math.floor(Math.random()*9999);
 
                   try {
                     await fetch('/api/submit-score', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        sessionId,
                         score: survivalFinalScore,
-                        name: name.slice(0, 25)
+                        name: name
                       })
                     });
-
-                    localStorage.setItem('lastSubmittedScore', survivalFinalScore);
-                    alert(`Score submitted! ${name} is now in the Hall of Fame!`);
-                  } catch (err) {
-                    alert('No connection? Your score is safe — try again later.');
+                    localStorage.setItem('lastSubmittedScore', String(survivalFinalScore));
+                    alert(`Submitted! ${name} is now immortalized!`);
+                  } catch (e) {
+                    alert('No internet? Your score is safe — submit when back online.');
                   }
                 }}
-                className="big-btn bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 transform hover:scale-105 transition"
               >
                 SUBMIT TO LEADERBOARD
               </button>
-
-              <p className="text-sm text-gray-400 mt-4">You can submit later if you close now</p>
+              <p className="text-sm text-gray-400 mt-4">You can submit later</p>
             </div>
           ) : (
-            <div className="text-green-400 text-2xl font-bold mt-6">
-              SCORE ALREADY SUBMITTED
+            <div className="text-green-400 text-2xl font-bold my-8">
+              SCORE SUBMITTED TO LEADERBOARD
             </div>
           )}
+
+          {/* Leaderboard Toggle Button */}
+          <button 
+            className="big-btn btn-leaderboard mt-6"
+            onClick={() => setShowLeaderboard(prev => !prev)}
+          >
+            {showLeaderboard ? 'HIDE' : 'SHOW'} LEADERBOARD
+          </button>
+
+          {/* Leaderboard Display */}
+          {showLeaderboard && <LeaderboardDisplay />}
 
         </div>
       ) : (
@@ -532,19 +535,12 @@ const memoizedTiles = useMemo(() => {
       )}
 
       <div className="death-buttons">
-        <button
-          className="big-btn"
-          onClick={() => {
-            localStorage.setItem('autoStartSurvival', 'true');
-            window.location.reload();
-          }}
-        >
+        <button className="big-btn btn-play-again" onClick={() => { localStorage.setItem('autoStartSurvival','true'); window.location.reload(); }}>
           Play Again
         </button>
-        <button onClick={() => { window.location.href = '/'; }}>
+        <button className="big-btn btn-menu" onClick={() => window.location.href = '/'}>
           Main Menu
         </button>
-                            {/* <button onClick={respawnPlayer}>Respawn</button> Existing code in useGameState*/}
       </div>
     </div>
   </div>
@@ -686,3 +682,32 @@ cooldowns={COOLDOWNS}
 };
 
 export default PlayMode;
+const LeaderboardDisplay = () => {
+  const [data, setData] = useState({ allTime: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/leaderboard')
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="leaderboard-display"><p>Loading legends...</p></div>;
+
+  return (
+    <div className="leaderboard-display">
+      <h3 className="leaderboard-title">ALL-TIME LEGENDS</h3>
+      {data.allTime.length === 0 ? (
+        <p>No scores yet. Be the first!</p>
+      ) : (
+        data.allTime.map((e, i) => (
+          <div key={i} className={`leaderboard-entry ${i < 3 ? `rank-${i+1}` : ''}`}>
+            <span>#{i+1} {e.name}</span>
+            <span>{e.score.toLocaleString()} pts • {e.timeAgo}</span>
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
