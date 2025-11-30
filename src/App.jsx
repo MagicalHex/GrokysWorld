@@ -221,13 +221,29 @@ if (!isDev && !playMode && !hasSeenIntro) {
       <div className="welcome-modal">
         <h1>Welcome to Groky's World!</h1>
         <p>
-          <kbd>↑ ↓ ← →</kbd>Only key arrows to move aroun, you will only use the key arrows for everything.<br/><br/>
-          <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them (not in Survival Mode)<br/><br/>
-          Press right-ctrl to see your <strong>inventory</strong><br/>
-          Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/>
-          Skeletons drops <strong>fire balls</strong>, <strong>wind balls</strong> and <strong>ice balls</strong> to attack multiple from range<br/><br/>
-          Only Survival Mode currently supported
-        </p>
+            <kbd>↑ ↓ ← →</kbd> Arrow keys only — that's all you need to move, interact, and conquer!
+          </p>
+          
+          <ul>
+            <li>
+              <strong>Interact</strong> with NPCs (talk), trees (chop), or stones (mine) by{' '}
+              <strong>walking right into them</strong> <em>(Survival Mode excluded)</em>
+            </li>
+            <li>
+              <kbd>Right Ctrl</kbd> to open your <strong>inventory</strong>
+            </li>
+            <li>
+              Grab a <strong>crossbow</strong> or <strong>bow</strong> for ranged attacks
+            </li>
+            <li>
+              Skeletons drop <strong>fire balls</strong>, <strong>wind balls</strong>, or{' '}
+              <strong>ice balls</strong> — perfect for crowd control!
+            </li>
+          </ul>
+          
+          <p className="mode-note">
+            <strong>💀 Survival Mode only for now</strong> — good luck!
+          </p>
         <div className="mode-buttons">
           <button 
             className="mode-button story" 
