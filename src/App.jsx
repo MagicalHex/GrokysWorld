@@ -221,8 +221,9 @@ if (!isDev && !playMode && !hasSeenIntro) {
       <div className="welcome-modal">
         <h1>Welcome to Groky's World!</h1>
         <p>
-          <kbd>↑↓←→</kbd> to move around. You will only use the key arrows for everything.<br/><br/>
+          <kbd>↑ ↓ ← →</kbd>Only key arrows to move aroun, you will only use the key arrows for everything.<br/><br/>
           <strong>Interact</strong> with NPCs (talk), trees (chop), stones (mine) by walking into them (not in Survival Mode)<br/><br/>
+          Press right-ctrl to see your <strong>inventory</strong><br/>
           Find a <strong>crossbow</strong> or <strong>bow</strong> to attack from range<br/>
           Skeletons drops <strong>fire balls</strong>, <strong>wind balls</strong> and <strong>ice balls</strong> to attack multiple from range<br/><br/>
           Only Survival Mode currently supported
