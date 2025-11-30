@@ -110,7 +110,10 @@ renderCount.current++;
   const [currentAction, setCurrentAction] = useState('health');
   const [choppingProgress, setChoppingProgress] = useState(0);
 
+    // ── For high score and leaderboard ─────────────────────────────────────────────────────
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+const [isSubmitting, setIsSubmitting] = useState(false);
   
   // ── Combat Popups ─────────────────────────────────────────────────────
   // Set popup to display e.g. damagePopup (holds healing popup as well)
@@ -476,47 +479,60 @@ const memoizedTiles = useMemo(() => {
           <div className="highscore-note">Personal Best: {survivalHighScore.toLocaleString()}</div>
 
           {/* Submit Score — NO SESSIONID */}
-          {!localStorage.getItem('lastSubmittedScore') || 
-           Number(localStorage.getItem('lastSubmittedScore')) !== survivalFinalScore ? (
-            <div className="claim-fame">
-              <h2>CLAIM YOUR PLACE</h2>
-              <input 
-                id="player-name-input" 
-                maxLength={18} 
-                placeholder="Enter your name..." 
-                defaultValue={['Groky Slayer','Wave God','Unkillable','420 Survivor','Pixel Chad','Doom Groky'][Math.floor(Math.random()*6)]}
-              />
-              <button 
-                className="big-btn"
-                onClick={async () => {
-                  let name = document.getElementById('player-name-input').value.trim();
-                  if (!name) name = 'Mystery Legend #' + Math.floor(Math.random()*9999);
+// Inside your death screen, replace the whole submit block with this:
+{(!localStorage.getItem('lastSubmittedScore') || 
+  Number(localStorage.getItem('lastSubmittedScore')) !== survivalFinalScore) && !hasSubmitted ? (
+  <div className="claim-fame">
+    <h2>CLAIM YOUR PLACE</h2>
+    <input
+      id="player-name-input"
+      maxLength={18}
+      placeholder="Enter your name..."
+      defaultValue={['Groky Slayer','Wave God','Unkillable','420 Survivor','Pixel Chad','Doom Groky'][Math.floor(Math.random()*6)]}
+    />
+    <button
+      className={`big-btn ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+      disabled={isSubmitting}
+      onClick={async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
-                  try {
-                    await fetch('/api/submit-score', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        score: survivalFinalScore,
-                        name: name
-                      })
-                    });
-                    localStorage.setItem('lastSubmittedScore', String(survivalFinalScore));
-                    alert(`Submitted! ${name} is now immortalized!`);
-                  } catch (e) {
-                    alert('No internet? Your score is safe — submit when back online.');
-                  }
-                }}
-              >
-                SUBMIT TO LEADERBOARD
-              </button>
-              <p className="text-sm text-gray-400 mt-4">You can submit later</p>
-            </div>
-          ) : (
-            <div className="text-green-400 text-2xl font-bold my-8">
-              SCORE SUBMITTED TO LEADERBOARD
-            </div>
-          )}
+        let name = document.getElementById('player-name-input').value.trim() || 
+                   'Mystery Legend #' + Math.floor(Math.random()*9999);
+
+        try {
+          const res = await fetch('/api/submit-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ score: survivalFinalScore, name })
+          });
+
+          if (res.ok) {
+            localStorage.setItem('lastSubmittedScore', String(survivalFinalScore));
+            setHasSubmitted(true);
+            alert(`Score submitted! ${name} is now eternal!`);
+          } else {
+            throw new Error('Server error');
+          }
+        } catch (e) {
+          alert('Offline? No problem — your score is saved locally. Submit when you’re back online!');
+          // Still mark as "submitted locally" so button disappears
+          localStorage.setItem('lastSubmittedScore', String(survivalFinalScore));
+          setHasSubmitted(true);
+        } finally {
+          setIsSubmitting(false);
+        }
+      }}
+    >
+      {isSubmitting ? 'Submitting...' : 'SUBMIT TO LEADERBOARD'}
+    </button>
+    <p className="text-sm text-gray-400 mt-4">One-time glory. Choose wisely.</p>
+  </div>
+) : (
+  <div className="text-green-400 text-2xl font-bold my-8 animate-pulse">
+    SCORE IMMORTALIZED
+  </div>
+)}
 
           {/* Leaderboard Toggle Button */}
           <button 
