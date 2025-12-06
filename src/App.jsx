@@ -247,6 +247,7 @@ if (!isDev && !playMode && !hasSeenIntro) {
         <div className="mode-buttons">
           <button 
             className="mode-button story" 
+            disabled
             onClick={() => {
               setCurrentLevel('story');
               setPlayMode(true);
