@@ -479,7 +479,6 @@ const memoizedTiles = useMemo(() => {
           <div className="highscore-note">Personal Best: {survivalHighScore.toLocaleString()}</div>
 
           {/* Submit Score — NO SESSIONID */}
-// Inside your death screen, replace the whole submit block with this:
 {(!localStorage.getItem('lastSubmittedScore') || 
   Number(localStorage.getItem('lastSubmittedScore')) !== survivalFinalScore) && !hasSubmitted ? (
   <div className="claim-fame">
