@@ -656,31 +656,60 @@ const checkWaveComplete = useCallback(() => {
       };
     }
 
-    // Clear old set, prepare for new wave
-    setTimeout(() => {
+    const spawnDelay = 5000; // Existing delay for wave pause
+    const checkDelay = spawnDelay + 2000; // Check 2 seconds after spawn should have happened
+
+    // Function to handle spawning (extracted for reuse in check)
+    const performSpawn = (waveNum) => {
       setLevels(current => {
         const freshLevel = current.survival;
         if (!freshLevel) return current;
 
-        const spawns = freshLevel.survivalWaves[`wave${nextWaveNum}`];
+        const spawns = freshLevel.survivalWaves[`wave${waveNum}`];
         if (!spawns) return current;
 
-        console.log(`SPAWNING WAVE ${nextWaveNum}`);
+        console.log(`SPAWNING WAVE ${waveNum}`);
         Object.entries(spawns).forEach(([key, type]) => {
-          spawnMonsterAt('survival', key, type, nextWaveNum);
+          spawnMonsterAt('survival', key, type, waveNum);
         });
 
         return {
           ...current,
           survival: {
             ...freshLevel,
-            currentWave: nextWaveNum,
-            name: `Survival Mode - Wave ${nextWaveNum}`,
+            currentWave: waveNum,
+            name: `Survival Mode - Wave ${waveNum}`,
             activeMonstersThisWave: new Set() // will be populated by spawnMonsterAt
           }
         };
       });
-    }, 5000);
+    };
+
+    // Initial spawn after delay
+    setTimeout(() => {
+      performSpawn(nextWaveNum);
+    }, spawnDelay);
+
+    // Safety check after spawn delay + 2 seconds
+    setTimeout(() => {
+      setLevels(current => {
+        const freshLevel = current.survival;
+        if (!freshLevel || freshLevel.currentWave !== nextWaveNum) return current;
+
+        const expectedSpawnCount = Object.keys(freshLevel.survivalWaves[`wave${nextWaveNum}`] || {}).length;
+        const actualSpawnCount = freshLevel.activeMonstersThisWave?.size || 0;
+
+        if (actualSpawnCount >= expectedSpawnCount) {
+          console.log(`Wave ${nextWaveNum} spawn verified: ${actualSpawnCount}/${expectedSpawnCount} monsters active.`);
+          return current;
+        }
+
+        console.warn(`Wave ${nextWaveNum} spawn failed/missing (${actualSpawnCount}/${expectedSpawnCount}). Retrying...`);
+        performSpawn(nextWaveNum); // Retry spawn
+
+        return current; // No state change needed for the check itself
+      });
+    }, checkDelay);
 
     return {
       ...prevLevels,
